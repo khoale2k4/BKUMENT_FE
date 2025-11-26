@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VBook App
 
-## Getting Started
+This is a modern web application, built with the latest technologies in the React ecosystem.
 
-First, run the development server:
+## 🚀 Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Framework:** [Next.js 16](https://nextjs.org/) (App Router)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
+- **State Management:** [Redux Toolkit](https://redux-toolkit.js.org/)
+- **Icons:** [Lucide React](https://lucide.dev/)
+- **Linting:** ESLint
+
+## 📂 Project Structure
+
+```
+src/
+├── app/                  # App Router
+│   ├── (auth)/           # Authentication routes (login, register)
+│   ├── (user)/           # User protected routes
+│   ├── api/              # API Routes
+│   ├── layout.tsx        # Root layout with StoreProvider
+│   └── globals.css       # Global styles (Tailwind)
+├── components/           # Reusable UI components
+│   ├── ui/               # UI elements (buttons, inputs, notifications)
+│   └── layouts/          # Layout components
+├── lib/                  # Utilities and configuration
+│   ├── redux/            # Redux store configuration
+│   │   ├── features/     # Redux slices (auth, articles, ui, notifications)
+│   │   └── store.ts      # Store setup
+│   └── mockData.ts       # Mock data for development
+├── types/                # TypeScript type definitions
+└── utils/                # Helper functions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js (v18 or higher recommended)
+- npm, yarn, pnpm, or bun
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repository:
+   ```bash
+   git clone toSignUp
+   cd vbook-app
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-## Deploy on Vercel
+4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📜 Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev`: Runs the app in development mode.
+- `npm run build`: Builds the app for production.
+- `npm run start`: Runs the built app in production mode.
+- `npm run lint`: Lints the codebase using ESLint.
+
+## 🎨 Features
+
+- **Route Groups**: Organized routing structure separating Authentication and User logic.
+- **Global State**: Redux Toolkit configured with a `StoreProvider` wrapper.
+- **Notifications**: Integrated **Toast** and **Modal** notification systems managed via Redux.
+- **Responsive Design**: Mobile-first approach using Tailwind CSS.
+- **Type Safety**: Full TypeScript support for better developer experience and code reliability.
+
+## 📝 License
+
+This project is for educational purposes.
