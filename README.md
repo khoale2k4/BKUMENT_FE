@@ -44,7 +44,7 @@ src/
 
 1. Clone the repository:
    ```bash
-   git clone toSignUp
+   git clone https://github.com/khoale2k4/BKUMENT_FE.git
    cd vbook-app
    ```
 
