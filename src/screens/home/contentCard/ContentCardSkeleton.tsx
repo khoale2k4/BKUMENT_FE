@@ -1,6 +1,6 @@
 'use client';
 
-export default function ArticleCardSkeleton() {
+export default function ContentCardSkeleton() {
     return (
         <div className="animate-pulse flex gap-4 py-4">
             <div className="flex-1 space-y-2">

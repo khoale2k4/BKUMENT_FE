@@ -1,32 +1,50 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { fetchArticles } from '@/lib/redux/features/articleSlice';
-import Header from '@/components/layouts/Header';
-import Sidebar from '@/components/layouts/Sidebar';
+import { fetchFeed } from '@/lib/redux/features/articleSlice';
 import clsx from 'clsx';
-import ArticleCardSkeleton from './card/articalecard-skeleton';
-import ArticleCard from './card/articalecard';
-import Footer from '@/components/layouts/Footer';
+import Pagination from '@/components/ui/Pagination';
+import ContentCardSkeleton from './contentCard/ContentCardSkeleton';
+import ContentCard from './contentCard/ContentCard';
+import { useRouter } from 'next/navigation';
+import { Plus } from 'lucide-react';
 
 export default function HomePage() {
     const dispatch = useAppDispatch();
-    const { items, status } = useAppSelector((state) => state.articles);
+    const { items, status, currentPage, totalPages } = useAppSelector((state) => state.articles);
+    const router = useRouter();
 
     const [activeTab, setActiveTab] = useState('Following');
+    const [page, setPage] = useState(1);
 
-    const tabs = ['Following', 'Recommanded'];
-
-    const onTabChange = (tab: string) => {
-        setActiveTab(tab);
-        dispatch(fetchArticles());
-    }
+    const tabs = ['Following', 'Recommended', 'Documents'];
 
     useEffect(() => {
-        if (status === 'idle') {
-            dispatch(fetchArticles());
+        const promise = dispatch(fetchFeed({ category: activeTab, page: page }));
+
+        return () => {
+            promise.abort();
         }
-    }, [dispatch, status, activeTab]);
+    }, [activeTab, page, dispatch]);
+
+    const onTabChange = (tab: string) => {
+        if (tab === activeTab) return;
+        setActiveTab(tab);
+        setPage(1);
+    }
+
+    const onPageChange = (newPage: number) => {
+        setPage(newPage);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const onArticleClick = (id: string) => {
+        router.push(`/articles/${id}`);
+    }
+
+    const onDocumentClick = (id: string) => {
+        router.push(`/documents/${id}`);
+    }
 
     return (
         <>
@@ -48,22 +66,47 @@ export default function HomePage() {
                         </button>
                     ))}
                 </div>
+                {activeTab === 'Documents' && (
+                    <button
+                        onClick={() => router.push('/documents/upload')}
+                        className="flex items-center gap-2 text-sm font-medium text-black bg-gray-100 px-4 py-2 rounded-full hover:bg-gray-200 transition mb-4 sm:mb-0"
+                    >
+                        <Plus size={16} />
+                        <span className="hidden sm:inline">Upload</span>
+                    </button>
+                )}
 
                 <div className="max-w-3xl">
                     {status === 'loading' && (
                         <div className="space-y-4">
                             {[1, 2, 3, 4, 5].map(i => (
-                                <ArticleCardSkeleton key={"skeleton-" + i} />
+                                <ContentCardSkeleton key={"skeleton-" + i} />
                             ))}
                         </div>
                     )}
 
                     {status === 'succeeded' && (
-                        <div className="divide-y divide-gray-100">
-                            {items.map((article: any) => (
-                                <ArticleCard key={article.id} data={article} />
-                            ))}
-                        </div>
+                        <>
+                            <div className="divide-y divide-gray-100">
+                                {items.map((content: any) => (
+                                    <ContentCard
+                                        key={content.id}
+                                        data={{
+                                            ...content,
+                                            onClick: (activeTab === 'Documents' ? () => onDocumentClick(content.id) : null)
+                                        }}
+                                    />
+                                ))}
+                            </div>
+
+                            {items.length > 0 && (
+                                <Pagination
+                                    currentPage={page}
+                                    totalPages={totalPages}
+                                    onPageChange={onPageChange}
+                                />
+                            )}
+                        </>
                     )}
                 </div>
             </main>

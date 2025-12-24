@@ -72,3 +72,41 @@ export const ARTICLES_DATA = [
         tags: ["Productivity", "Lifestyle"],
     },
 ];
+
+export const INITIAL_COMMENTS = [
+    {
+        id: 1,
+        user: "Sarah Nguyen",
+        avatar: "https://placehold.co/100x100/orange/white?text=S",
+        content: "Tài liệu rất chi tiết, cảm ơn bạn đã chia sẻ! Phần test case mẫu rất hữu ích.",
+        time: "2 hours ago",
+        likes: 5
+    },
+    {
+        id: 2,
+        user: "David Tran",
+        avatar: "https://placehold.co/100x100/3b82f6/white?text=D",
+        content: "Bạn có thể chia sẻ thêm về phần Automation Testing không?",
+        time: "5 hours ago",
+        likes: 2
+    }
+];
+
+export const DOCUMENT_DATA = {
+    id: "doc-123",
+    title: "Báo cáo môn Software Testing: Black Box Testing Campaign",
+    description: "Tài liệu chi tiết về chiến dịch kiểm thử hộp đen cho dự án thương mại điện tử. Bao gồm kế hoạch kiểm thử, thiết kế test case, và báo cáo lỗi chi tiết. Phù hợp cho sinh viên và người mới bắt đầu tìm hiểu QA/QC.",
+    author: {
+        name: "Amit Das",
+        role: "Senior QA Engineer",
+        avatar: "https://placehold.co/100x100/3b82f6/white?text=A",
+        followers: "2.5K"
+    },
+    stats: {
+        views: 1240,
+        downloads: 350,
+        pages: 24,
+        date: "Dec 20, 2024"
+    },
+    fileUrl: "https://pdfobject.com/pdf/sample-3pp.pdf" 
+};

@@ -2,7 +2,7 @@
 import { 
     Home, BookOpen, User, BarChart2, X, 
     NotebookText, FileText, Send, UserSearch, Bell, 
-    PenSquare, Users, Book
+    PenSquare, Users, Book, File
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
 import { closeSidebar } from '@/lib/redux/features/layoutSlide'; 
@@ -21,7 +21,7 @@ export default function Sidebar() {
         { icon: User, label: 'Profile', href: '/profile', count: 0 },
         { icon: NotebookText, label: 'My Courses', href: '/courses', count: 0 },
         { icon: FileText, label: 'My Blog', href: '/blog', count: 0 },
-        { icon: BarChart2, label: 'Stats', href: '/stats', count: 0 },
+        { icon: File, label: 'Documents', href: '/documents', count: 0 },
         { icon: Send, label: 'Messages', href: '/messages', count: 2 }, 
         { icon: UserSearch, label: 'Find Tutors', href: '/tutors', count: 0 },
         { icon: Bell, label: 'Notifications', href: '/notifications', count: 2 }, 

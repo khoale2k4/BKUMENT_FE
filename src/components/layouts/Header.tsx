@@ -2,9 +2,11 @@
 import { Menu, Search, Settings, Bell } from 'lucide-react';
 import { useAppDispatch } from '@/lib/redux/hooks';
 import { toggleSidebar } from '@/lib/redux/features/layoutSlide';
+import { useRouter } from 'next/navigation';
 
 export default function Header() {
     const dispatch = useAppDispatch();
+    const router = useRouter();
 
     return (
         <header className="sticky top-0 z-50 bg-white border-b border-gray-200 h-16 px-4 flex items-center justify-between">
@@ -17,9 +19,10 @@ export default function Header() {
                 </button>
 
                 <img
-                    src="/images/icon.png"
+                    src="/images/icon-noen.png"
                     alt="Logo"
-                    className="w-10 h-10 rounded-sm object-contain"
+                    className="w-10 h-10 rounded-sm object-contain cursor-pointer hover:opacity-80 transition"
+                    onClick={() => router.push("/")}
                 />
             </div>
 
