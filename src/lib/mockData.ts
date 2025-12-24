@@ -1,7 +1,7 @@
 export const ARTICLES_DATA = [
     {
         id: 1,
-        author: "Carin Cut",
+        author: "Le võ dang khoa ly thanh nhat quang",
         time: "2025-11-20 09:30:00",
         title: "Your portfolio is stopping you from getting that job",
         content: "An intense way to learn about the process and practice your designs skills — My 1st hackathon Hackathons have been on my mind since I heard it was a good way to gain experience as a junior UX designer. As my portfolio...",

@@ -16,6 +16,7 @@ export default function LoginPage() {
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
         dispatch(login({ name: 'New User', email: 'user@example.com' }));
+        console.log("toggle login");
 
         dispatch(showToast({
             type: 'success',

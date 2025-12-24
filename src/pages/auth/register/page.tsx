@@ -13,6 +13,7 @@ export default function RegisterPage() {
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
         dispatch(login({ name: 'New User', email: 'user@example.com' }));
+        console.log("sussesfully signup");
         router.push('/');
     };
 
