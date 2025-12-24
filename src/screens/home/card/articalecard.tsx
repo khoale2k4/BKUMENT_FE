@@ -1,6 +1,7 @@
 'use client';
 
 import { formatTimeAgo } from "@/utils/format_time_ago";
+import { CardProp } from "./props";
 
 export default function ArticleCard({ data }: { data: CardProp }) {
     const timeRead = Math.ceil(data.content.split(" ").length / 200);
