@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
 interface ArticleState {
@@ -13,7 +14,7 @@ const initialState: ArticleState = {
 };
 
 export const fetchArticles = createAsyncThunk('articles/fetch', async () => {
-    const response = await fetch('/api/articles');
+    const response = await fetch(API_ENDPOINTS.ARTICLES.GET_ALL);
     const data = await response.json();
     return data.map((dta: any) => ({
         id: dta.id || Math.random(),
@@ -37,7 +38,6 @@ const articleSlice = createSlice({
             })
             .addCase(fetchArticles.fulfilled, (state, action: PayloadAction<Article[]>) => {
                 state.status = 'succeeded';
-                // action.payload bây giờ đã được TypeScript hiểu là Article[]
                 state.items = action.payload;
             })
             .addCase(fetchArticles.rejected, (state) => {
