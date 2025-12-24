@@ -1,4 +1,4 @@
-type CardProp = {
+export interface CardProp {
     title: string,
     assets: string[],
     author: string,
