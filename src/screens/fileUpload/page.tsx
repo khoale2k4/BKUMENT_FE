@@ -1,8 +1,10 @@
+'use client'
+
 import React, { useState } from 'react';
 import ActiveStep from './steps/ActiveStep';
-import FileUploader from './steps/step1';
-import FileDescription from './steps/step2';
-import UploadSuccess from './steps/step3';
+import FileUploader from './steps/Step1';
+import FileDescription from './steps/Step2';
+import UploadSuccess from './steps/Step3';
 
 const FileUpload = () => {
     const [activeStep, setActiveStep] = useState(1);

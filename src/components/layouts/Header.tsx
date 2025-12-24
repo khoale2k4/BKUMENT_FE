@@ -13,7 +13,7 @@ export default function Header() {
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => dispatch(toggleSidebar())}
-                    className="p-2 hover:bg-gray-100 rounded-full transition"
+                    className="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition"
                 >
                     <Menu className="w-6 h-6 text-gray-700" />
                 </button>
@@ -45,7 +45,7 @@ export default function Header() {
                     <Bell className="w-6 h-6" strokeWidth={1.5} />
                 </button>
 
-                <button className="hidden sm:block border border-black px-4 py-1.5 rounded-full text-sm font-medium hover:bg-black hover:text-white transition">
+                <button className="hidden sm:block border border-black px-4 py-1.5 rounded-full text-sm font-medium hover:bg-black hover:text-white transition text-black">
                     Upgrade
                 </button>
 

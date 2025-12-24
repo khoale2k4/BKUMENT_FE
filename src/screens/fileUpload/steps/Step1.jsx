@@ -1,6 +1,4 @@
-import React from "react";
-import { BsUpload, BsTrash, BsThreeDotsVertical } from "react-icons/bs";
-import { FaFileWord } from "react-icons/fa";
+import { EllipsisVertical, Trash, Upload } from "lucide-react";
 
 const FileUploader = ({ files = [], onFileChange, onDeleteFile }) => {
     const handleDrop = (e) => {
@@ -20,7 +18,7 @@ const FileUploader = ({ files = [], onFileChange, onDeleteFile }) => {
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
             >
-                <BsUpload className="text-4xl text-blue-600 mb-4" />
+                <Upload className="text-4xl text-blue-600 mb-4" />
                 <p className="text-lg font-semibold text-gray-800">Drag & Drop files</p>
                 <p className="text-sm text-gray-500">Or if you prefer</p>
 
@@ -65,10 +63,10 @@ const FileUploader = ({ files = [], onFileChange, onDeleteFile }) => {
                                     onClick={() => onDeleteFile && onDeleteFile(file.id)}
                                     className="text-gray-500 hover:text-red-600"
                                 >
-                                    <BsTrash className="w-5 h-5" />
+                                    <Trash className="w-5 h-5" />
                                 </button>
                                 <button className="text-gray-500 hover:text-gray-800">
-                                    <BsThreeDotsVertical className="w-5 h-5" />
+                                    <EllipsisVertical className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>

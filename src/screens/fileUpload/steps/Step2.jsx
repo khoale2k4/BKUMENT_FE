@@ -1,4 +1,4 @@
-import { BsTrash, BsThreeDotsVertical } from "react-icons/bs";
+import { Trash, EllipsisVertical } from "lucide-react";
 import { FaFileWord } from "react-icons/fa";
 
 const FileDescription = ({ files = [], onFilesChange }) => {
@@ -37,10 +37,10 @@ const FileDescription = ({ files = [], onFilesChange }) => {
                                     onClick={() => handleDeleteFile(file.id)}
                                     className="text-gray-400 hover:text-red-500 transition-colors"
                                 >
-                                    <BsTrash className="w-5 h-5" />
+                                    <Trash className="w-5 h-5" />
                                 </button>
                                 <button className="text-gray-400 hover:text-gray-600 transition-colors">
-                                    <BsThreeDotsVertical className="w-5 h-5" />
+                                    <EllipsisVertical className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>

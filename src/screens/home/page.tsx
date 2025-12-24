@@ -47,9 +47,8 @@ export default function HomePage() {
     }
 
     return (
-        <>
-            <main className="flex-1 px-4 py-8 md:px-12 transition-all duration-300 min-w-0">
-
+        <div className="flex w-full items-start justify-center gap-8">
+            <main className="w-full max-w-3xl py-8 transition-all duration-300">
                 <div className="flex items-center gap-8 mb-8 border-b border-gray-100 overflow-x-auto no-scrollbar">
                     {tabs.map((tab) => (
                         <button
@@ -66,18 +65,9 @@ export default function HomePage() {
                         </button>
                     ))}
                 </div>
-                {activeTab === 'Documents' && (
-                    <button
-                        onClick={() => router.push('/documents/upload')}
-                        className="flex items-center gap-2 text-sm font-medium text-black bg-gray-100 px-4 py-2 rounded-full hover:bg-gray-200 transition mb-4 sm:mb-0"
-                    >
-                        <Plus size={16} />
-                        <span className="hidden sm:inline">Upload</span>
-                    </button>
-                )}
 
-                <div className="max-w-3xl">
-                    {status === 'loading' && (
+                <div>
+                    {status !== 'succeeded' && (
                         <div className="space-y-4">
                             {[1, 2, 3, 4, 5].map(i => (
                                 <ContentCardSkeleton key={"skeleton-" + i} />
@@ -124,6 +114,6 @@ export default function HomePage() {
                     ))}
                 </div>
             </aside>
-        </>
+        </div>
     );
 }
