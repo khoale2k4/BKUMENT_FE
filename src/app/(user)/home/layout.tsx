@@ -1,5 +1,6 @@
+
 import Sidebar from "@/components/layouts/Sidebar";
-import "../globals.css";
+import "../../../app/globals.css";
 import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
 
@@ -7,11 +8,9 @@ export default function UserLayout({ children }: { children: React.ReactNode }) 
     return (
         <div className="min-h-screen flex flex-col bg-white">
             <Header />
-            <div className="flex flex-1 container max-w-[1600px] md:px-6 w-full my-6">
+            <div className="flex flex-1 container mx-auto max-w-10xl">
                 <Sidebar />
-                <main className="flex-1 min-w-0 transition-all duration-300">
-                    {children}
-                </main>
+                {children}
             </div>
             <Footer />
         </div>

@@ -35,7 +35,7 @@ export default function Footer() {
                     
                     <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-16">
                         <Link href="/" className="text-3xl font-serif font-bold tracking-wider">
-                            VBook
+                            Bkuments
                         </Link>
 
                         <div className="flex flex-col md:flex-row gap-4 md:gap-8 text-sm font-medium text-gray-300">
