@@ -1,4 +1,4 @@
-const ActiveStep = ({isActice, title, description, step}) => {
+const ActiveStep = ({ isActice, title, description, step }: { isActice: boolean, title: string, description: string, step: number }) => {
     return <div className="flex flex-row items-center">
         <div
             className={`w-8 h-8 rounded-full flex items-center justify-center font-bold

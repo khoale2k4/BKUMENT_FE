@@ -14,23 +14,26 @@ export interface DocumentDetail {
     id: string;
     title: string;
     description: string;
-    author: {
-        name: string;
-        avatar: string;
-        role?: string;
-    };
-    stats: {
-        views: number;
-        downloads: number;
-        pages: number;
-        date: string;
-    };
-    fileUrl: string;
+    downloadUrl: string;
+    downloadCount: number;
+    documentType?: string;
+    downloadable: boolean;
+    university?: string;
+    course?: string;
+    createdAt: Date;
+}
+
+export interface UserInfo {
+    user: string;
+    avatar: string;
 }
 
 interface DocumentState {
     currentDocument: DocumentDetail | null;
     detailStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+
+    currentAuthor: UserInfo | null;
+    authorStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
     comments: Comment[];
     commentsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -40,6 +43,9 @@ const initialState: DocumentState = {
     currentDocument: null,
     detailStatus: 'idle',
 
+    currentAuthor: null,
+    authorStatus: 'idle',
+
     comments: [],
     commentsStatus: 'idle'
 };
@@ -48,30 +54,39 @@ export const fetchDocumentById = createAsyncThunk(
     'documents/fetchDetail',
     async (id: string) => {
         const response = await fetch(`${API_ENDPOINTS.DOCUMENTS.GET_DETAIL(id)}`);
-        const data = await response.json();
+        const data = (await response.json()).result;
 
         return {
-            id: data.id,
+            id: id,
             title: data.title || "Untitled Document",
-            description: data.description || data.content || "No description available.",
-            author: {
-                name: data.author?.name || data.author || "Unknown",
-                avatar: data.author?.avatar || "https://placehold.co/100x100/3b82f6/white?text=A",
-                role: data.author?.role || "Author"
-            },
-            stats: {
-                views: data.views || 0,
-                downloads: data.downloads || 0,
-                pages: data.pages || 1,
-                date: data.createdAt || "Recently"
-            },
-            fileUrl: data.fileUrl || data.assets?.[0] || ""
+            description: data.description  || "No description available.",
+            downloadUrl: data.downloadUrl || "",
+            createdAt: data.createdAt,
+            documentType: data.documentType,
+            downloadable: data.downloadable,
+            downloadCount: data.downloadCount,
+            course: data.course,
+            university: data.university,
         } as DocumentDetail;
     }
 );
 
+export const fetchAuthorById = createAsyncThunk(
+    'documents/fetchAuthor',
+    async (id: string) => {
+        const response = await fetch(`${API_ENDPOINTS.ACCOUNT.GET_USER_INFO}`);
+        const data = await response.json();
+
+        return {
+            id: id,
+            user: data.user,
+            avatar: data.avatar
+        } as UserInfo;
+    }
+);
+
 export const fetchCommentsByDocId = createAsyncThunk(
-    'articles/fetchComments',
+    'documents/fetchComments',
     async (documentId: string) => {
         const response = await fetch(`${API_ENDPOINTS.COMMENTS.GET_BY_DOC(documentId)}`);
         const data = await response.json();
@@ -93,8 +108,10 @@ const documentSlice = createSlice({
     reducers: {
         clearCurrentDocument: (state) => {
             state.currentDocument = null;
+            state.currentAuthor = null;
             state.comments = [];
             state.detailStatus = 'idle';
+            state.authorStatus = 'idle';
         }
     },
     extraReducers: (builder) => {
@@ -108,6 +125,18 @@ const documentSlice = createSlice({
             })
             .addCase(fetchDocumentById.rejected, (state) => {
                 state.detailStatus = 'failed';
+            });
+
+        builder
+            .addCase(fetchAuthorById.pending, (state) => {
+                state.authorStatus = 'loading';
+            })
+            .addCase(fetchAuthorById.fulfilled, (state, action: PayloadAction<UserInfo>) => {
+                state.authorStatus = 'succeeded';
+                state.currentAuthor = action.payload;
+            })
+            .addCase(fetchAuthorById.rejected, (state) => {
+                state.authorStatus = 'failed';
             });
 
         builder

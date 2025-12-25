@@ -45,7 +45,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                     "h-10 px-3 flex items-center gap-2 text-base font-medium transition-colors rounded-lg",
                     currentPage === 1
                         ? "text-gray-300 cursor-not-allowed"
-                        : "text-gray-600 hover:bg-gray-100"
+                        : "text-gray-600 hover:bg-gray-100 cursor-pointer"
                 )}
             >
                 <ArrowLeft size={18} />
@@ -67,7 +67,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                             key={index}
                             onClick={() => onPageChange(page as number)}
                             className={clsx(
-                                "w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-sm sm:text-base font-medium transition-all",
+                                "w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-sm sm:text-base font-medium transition-all cursor-pointer",
                                 currentPage === page
                                     ? "bg-[#292929] text-white"
                                     : "text-gray-700 hover:bg-gray-100"
@@ -86,7 +86,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                     "h-10 px-3 flex items-center gap-2 text-base font-medium transition-colors rounded-lg",
                     currentPage === totalPages
                         ? "text-gray-300 cursor-not-allowed"
-                        : "text-gray-600 hover:bg-gray-100"
+                        : "text-gray-600 hover:bg-gray-100 cursor-pointer"
                 )}
             >
                 <span>Next</span>

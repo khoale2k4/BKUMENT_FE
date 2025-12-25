@@ -1,7 +1,7 @@
 
 
 const UploadSuccess = () => {
-    const imgUrl = '/src/assets/upload-success.png';
+    const imgUrl = '/images/upload-success.png';
     return <div className="flex flex-col items-center text-center py-12 px-6">
         <h1 className="text-4xl font-serif text-gray-800 mb-4">
             Thanks! We're reviewing your documents

@@ -8,29 +8,40 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 //local
 const IDENTITY_URL = 'http://localhost:8888/api/v1/identity'
+//local
+const DEBUG_URL = ''
+
 export const API_ENDPOINTS = {
     AUTH: {
-        LOGIN: `${IDENTITY_URL}/auth/login`,
-        SIGNUP: `${IDENTITY_URL}/accounts/users`,
-        PROFILE: `${IDENTITY_URL}/api/auth/me`,
+        LOGIN: `${API_BASE_URL}/identity/auth/login`,
+        SIGNUP: `${IDENTITY_URL}/identity/accounts/users`,
+        PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
+    },
+    ACCOUNT: {
+        PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
+        GET_USER_INFO: `${DEBUG_URL}/api/user/info`,
     },
     ARTICLES: {
-        GET_ALL: `${API_BASE_URL}/api/articles`,
+        GET_ALL: `${DEBUG_URL}/api/articles`,
         
-        GET_DETAIL: (id: string | number) => `${API_BASE_URL}/api/articles/${id}`,
-        CREATE: `${API_BASE_URL}/api/articles`,
-        UPDATE: (id: string | number) => `${API_BASE_URL}/api/articles/${id}`,
-        DELETE: (id: string | number) => `${API_BASE_URL}/api/articles/${id}`,
+        GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
+        CREATE: `${DEBUG_URL}/api/articles`,
+        UPDATE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
+        DELETE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
     },
     DOCUMENTS: {
-        GET_ALL: `${API_BASE_URL}/api/resource`,
-        GET_DETAIL: (id: string | number) => `${API_BASE_URL}/api/documents/${id}`,
+        GET_ALL: `${DEBUG_URL}/api/resource`,
+        GET_DETAIL: (id: string | number) => `${API_BASE_URL}/resource/document/${id}`,
+    },
+    RESOURCE: {
+        GET_PRESIGNED_URL: (fileName: string) => `${API_BASE_URL}/resource/presign?fileName=${fileName}`,
+        UPDATE_METADATA: `${API_BASE_URL}/resource/metadata`,
     },
     COMMENTS: {
-        GET_BY_DOC: (id: string | number) => `${API_BASE_URL}/api/documents/${id}/comments`,
+        GET_BY_DOC: (id: string | number) => `${DEBUG_URL}/api/documents/${id}/comments`,
     },
     USERS: {
-        LIST: `${API_BASE_URL}/api/users`,
+        LIST: `${DEBUG_URL}/api/users`,
     }
 };
 

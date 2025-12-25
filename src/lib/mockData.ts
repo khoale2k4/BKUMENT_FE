@@ -1,6 +1,6 @@
 export const ARTICLES_DATA = [
     {
-        id: 1,
+        id: "9f30a3ce-a937-42ca-a3e5-faff19931f09",
         author: "Le võ dang khoa ly thanh nhat quang phuc non",
         time: "2025-11-20 09:30:00",
         title: "Your portfolio is stopping you from getting that job",
@@ -9,7 +9,7 @@ export const ARTICLES_DATA = [
         tags: ["Career", "Design"],
     },
     {
-        id: 2,
+        id: "02ef68d6-fa93-4ffa-9ad5-53ef3d11b804",
         author: "Amit Das",
         time: "2025-11-19 14:20:15",
         title: "Melody mobile app: a UI UX case study",
@@ -18,7 +18,7 @@ export const ARTICLES_DATA = [
         tags: ["UI/UX Design", "Case Study"],
     },
     {
-        id: 3,
+        id: "a6a32582-f025-4091-9675-6ad8f774dbf6",
         author: "Sarah Jenkins",
         time: "2025-11-18 10:15:00",
         title: "Why Redux Toolkit is a game changer for React Developers",
@@ -27,7 +27,7 @@ export const ARTICLES_DATA = [
         tags: ["React", "Development"],
     },
     {
-        id: 4,
+        id: "e58907a3-e4f3-486f-ade8-4901f7d2d3c4",
         author: "David Nguyen",
         time: "2025-11-17 08:45:00",
         title: "The Art of Minimalist Web Design",
@@ -36,7 +36,7 @@ export const ARTICLES_DATA = [
         tags: ["Design", "Web"],
     },
     {
-        id: 5,
+        id: "da895b67-9fb3-4ca3-8235-6396cb775c2a",
         author: "Emily Watson",
         time: "2025-11-16 16:50:00",
         title: "10 Tips to Ace Your Frontend Interview",
@@ -45,7 +45,7 @@ export const ARTICLES_DATA = [
         tags: ["Career", "Tips"],
     },
     {
-        id: 6,
+        id: "a0a36ef5-aac7-4ec9-8ae1-d31bed2e5c81",
         author: "Michael Chen",
         time: "2025-11-15 11:00:00",
         title: "Understanding Next.js 15 Server Actions",
@@ -54,7 +54,7 @@ export const ARTICLES_DATA = [
         tags: ["Technology", "Next.js"],
     },
     {
-        id: 7,
+        id: "09d3734c-5847-451b-8475-1f885a144236",
         author: "Jessica Lee",
         time: "2025-11-14 09:10:00",
         title: "Color Theory for Developers: A Crash Course",
@@ -63,7 +63,7 @@ export const ARTICLES_DATA = [
         tags: ["Design", "Tutorial"],
     },
     {
-        id: 8,
+        id: "094b687d-f40c-40d5-bb88-d569f89d64ae",
         author: "Robert Fox",
         time: "2025-11-13 13:25:00",
         title: "My setup for maximum productivity in 2025",

@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { Loader2 } from 'lucide-react'; // Nếu bạn có lucide-react
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import { PDFLoadingSkeleton } from './skeleton';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -17,7 +19,7 @@ export default function PDFViewer({ fileUrl }: { fileUrl: string }) {
 
     return (
         <div
-            className="flex flex-col items-center bg-gray-100 p-4 gap-4 rounded-xl border border-gray-200"
+            className="flex flex-col items-center bg-gray-100 p-4 gap-4 rounded-xl border border-gray-200 min-h-[600px] justify-center" // Thêm min-h để không bị giật
             ref={(el) => {
                 if (el) {
                     setContainerWidth(el.clientWidth);
@@ -27,26 +29,28 @@ export default function PDFViewer({ fileUrl }: { fileUrl: string }) {
             <Document
                 file={fileUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
-                loading={
-                    <div className="flex items-center gap-2 py-10 text-gray-500">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
-                        <span>Đang tải tài liệu...</span>
-                    </div>
+                loading={<PDFLoadingSkeleton />} 
+                noData={ 
+                    <div className="text-gray-400 text-sm">Chưa có tài liệu nào được chọn</div>
                 }
                 error={
-                    <div className="text-red-500 py-10">
-                        Không thể tải file PDF. Vui lòng kiểm tra lại đường dẫn.
+                    <div className="flex flex-col items-center text-red-500 py-10 gap-2">
+                         <span className="font-semibold">Lỗi tải file</span>
+                         <span className="text-sm">Vui lòng kiểm tra lại đường dẫn.</span>
                     </div>
                 }
             >
                 {Array.from(new Array(numPages), (el, index) => (
-                    <div key={`page_${index + 1}`} className="shadow-lg mb-4 last:mb-0">
+                    <div key={`page_${index + 1}`} className="shadow-lg mb-4 last:mb-0 transition-opacity duration-500">
                         <Page
                             pageNumber={index + 1}
                             width={containerWidth ? containerWidth - 32 : 600}
                             renderTextLayer={true}
                             renderAnnotationLayer={true}
                             className="bg-white"
+                            loading={
+                                <div className="w-full bg-white animate-pulse aspect-[1/1.41]" />
+                            }
                         />
                         <div className="text-center text-xs text-gray-400 py-2 bg-gray-50">
                             Page {index + 1} of {numPages}
