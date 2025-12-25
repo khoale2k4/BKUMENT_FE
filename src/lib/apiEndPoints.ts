@@ -22,6 +22,13 @@ export const API_ENDPOINTS = {
         UPDATE: (id: string | number) => `${API_BASE_URL}/api/articles/${id}`,
         DELETE: (id: string | number) => `${API_BASE_URL}/api/articles/${id}`,
     },
+    DOCUMENTS: {
+        GET_ALL: `${API_BASE_URL}/api/resource`,
+        GET_DETAIL: (id: string | number) => `${API_BASE_URL}/api/documents/${id}`,
+    },
+    COMMENTS: {
+        GET_BY_DOC: (id: string | number) => `${API_BASE_URL}/api/documents/${id}/comments`,
+    },
     USERS: {
         LIST: `${API_BASE_URL}/api/users`,
     }

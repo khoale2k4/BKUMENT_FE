@@ -2,7 +2,7 @@
 import { 
     Home, BookOpen, User, BarChart2, X, 
     NotebookText, FileText, Send, UserSearch, Bell, 
-    PenSquare, Users, Book
+    PenSquare, Users, Book, File, UploadCloud
 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
 import { closeSidebar } from '@/lib/redux/features/layoutSlide'; 
@@ -21,7 +21,7 @@ export default function Sidebar() {
         { icon: User, label: 'Profile', href: '/profile', count: 0 },
         { icon: NotebookText, label: 'My Courses', href: '/courses', count: 0 },
         { icon: FileText, label: 'My Blog', href: '/blog', count: 0 },
-        { icon: BarChart2, label: 'Stats', href: '/stats', count: 0 },
+        { icon: File, label: 'Documents', href: '/documents', count: 0 },
         { icon: Send, label: 'Messages', href: '/messages', count: 2 }, 
         { icon: UserSearch, label: 'Find Tutors', href: '/tutors', count: 0 },
         { icon: Bell, label: 'Notifications', href: '/notifications', count: 2 }, 
@@ -40,11 +40,12 @@ export default function Sidebar() {
                 key={idx}
                 href={item.href}
                 className={clsx(
-                    "relative flex items-center space-x-4 p-1 rounded-lg transition group",
-                    "text-[#757575] hover:text-black hover:bg-gray-50 font-medium"
+                    "relative flex items-center space-x-4 p-2 rounded-lg transition group",
+                    "text-[#757575] hover:text-black hover:bg-gray-50 font-medium",
+                    "whitespace-nowrap" 
                 )}
             >
-                <div className="relative">
+                <div className="relative shrink-0">
                     <item.icon
                         size={22}
                         strokeWidth={isActive ? 2.5 : 2}
@@ -74,15 +75,27 @@ export default function Sidebar() {
 
             <aside
                 className={clsx(
-                    "fixed md:sticky top-16 left-0 z-40 h-[calc(100vh-64px)] shrink-0 w-48 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto custom-scrollbar",
-                    !isSidebarOpen ? "-translate-x-full md:w-0 md:border-none overflow-hidden" : "translate-x-0"
+                    "fixed md:sticky top-16 left-0 z-40 h-[calc(100vh-64px)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out overflow-y-auto custom-scrollbar",
+                    "overflow-hidden", 
+                    isSidebarOpen 
+                        ? "translate-x-0 w-64 mr-6 md:mr-8"
+                        : "-translate-x-full md:translate-x-0 md:w-0 md:border-none md:mr-0"
                 )}
             >
-                <div className="p-4 pb-20 space-y-1"> 
+                <div className="p-4 pb-20 space-y-1 w-64"> 
                     <div className="flex justify-end md:hidden mb-2">
                         <button onClick={() => dispatch(closeSidebar())} className="p-2"><X /></button>
                     </div>
 
+                    <div className="mb-6 px-1">
+                        <Link 
+                            href="/documents/upload" 
+                            className="flex items-center justify-center gap-2 w-full bg-[#292929] text-white py-2.5 rounded-full font-medium text-[15px] hover:bg-black transition shadow-sm hover:shadow-md whitespace-nowrap"
+                        >
+                            <UploadCloud size={18} className="shrink-0" />
+                            <span>Upload Document</span>
+                        </Link>
+                    </div>
                     {mainMenuItems.map(renderMenuItem)}
 
                     <hr className="my-4 border-gray-100" />

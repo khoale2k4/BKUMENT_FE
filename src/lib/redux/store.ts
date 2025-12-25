@@ -3,6 +3,7 @@ import authReducer from './features/authSlice';
 import articleReducer from './features/articleSlice';
 import layoutReducer from './features/layoutSlide';
 import notificationReducer from './features/modalSlice';
+import documentReducer from './features/documentSlice';
 import toastReducer from './features/toastSlice';
 
 export const makeStore = () => {
@@ -10,6 +11,7 @@ export const makeStore = () => {
         reducer: {
             auth: authReducer,
             articles: articleReducer,
+            documents: documentReducer,
             ui: layoutReducer,
             notification: notificationReducer,
             toastNotification: toastReducer,
