@@ -7,14 +7,17 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 // const IDENTITY_URL = 'https://bkment-identity-service-latest.onrender.com/identity';
 
 //local
-const IDENTITY_URL = 'http://localhost:8888/api/v1/identity'
+// const IDENTITY_URL = 'http://localhost:8888/api/v1/identity'
+// local của tui là 8080
+const IDENTITY_URL = 'http://localhost:8080/identity'
 //local
 const DEBUG_URL = ''
 
 export const API_ENDPOINTS = {
     AUTH: {
-        LOGIN: `${API_BASE_URL}/identity/auth/login`,
-        SIGNUP: `${IDENTITY_URL}/identity/accounts/users`,
+        LOGIN: `${IDENTITY_URL}/auth/login`,
+        SIGNUP: `${IDENTITY_URL}/accounts/users`,
+        LOGOUT: `${IDENTITY_URL}/auth/logout`,
         PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
     },
     ACCOUNT: {
