@@ -1,13 +1,17 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 // https://bkment-identity-service-latest.onrender.com/identity/auth/login
-
-const IDENTITY_URL = 'https://bkment-identity-service-latest.onrender.com/identity';
 // const ARTICLE_URL = process.env.NEXT_PUBLIC_ARTICLE_API_URL || '';
 // const USER_URL = process.env.NEXT_PUBLIC_USER_API_URL || '';
+
+// deploy
+//const IDENTITY_URL = 'https://bkment-identity-service-latest.onrender.com/identity';
+
+//local
+const IDENTITY_URL = 'http://localhost:8080/identity'
 export const API_ENDPOINTS = {
     AUTH: {
-        LOGIN: `${IDENTITY_URL}/api/auth/login`,
-        REGISTER: `${IDENTITY_URL}/api/auth/register`,
+        LOGIN: `${IDENTITY_URL}/auth/login`,
+        SIGNUP: `${IDENTITY_URL}/accounts/users`,
         PROFILE: `${IDENTITY_URL}/api/auth/me`,
     },
     ARTICLES: {

@@ -1,5 +1,6 @@
+import HomePage from '@/screens/home/page';
 import { Metadata } from 'next';
-import OnboardingPage from '@/screens/onboarding/page';
+
 
 export const metadata: Metadata = {
   title: "Home | VBook",
@@ -8,6 +9,6 @@ export const metadata: Metadata = {
 
 export default function HomeApp() {
   return (
-    <OnboardingPage/>
+    <HomePage/>
   );
 }

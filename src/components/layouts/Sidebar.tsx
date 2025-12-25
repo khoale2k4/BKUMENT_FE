@@ -74,7 +74,7 @@ export default function Sidebar() {
 
             <aside
                 className={clsx(
-                    "fixed md:sticky top-16 left-0 z-40 h-[calc(100vh-64px)] w-64 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto custom-scrollbar",
+                    "fixed md:sticky top-16 left-0 z-40 h-[calc(100vh-64px)] shrink-0 w-48 bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out overflow-y-auto custom-scrollbar",
                     !isSidebarOpen ? "-translate-x-full md:w-0 md:border-none overflow-hidden" : "translate-x-0"
                 )}
             >
