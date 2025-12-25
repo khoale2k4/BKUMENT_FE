@@ -3,6 +3,7 @@ import { Menu, Search, Settings, Bell } from 'lucide-react';
 import { useAppDispatch } from '@/lib/redux/hooks';
 import { toggleSidebar } from '@/lib/redux/features/layoutSlide';
 import { useRouter } from 'next/navigation';
+import { AppRoute } from '@/lib/appRoutes';
 
 export default function Header() {
     const dispatch = useAppDispatch();
@@ -22,7 +23,7 @@ export default function Header() {
                     src="/images/icon-noen.png"
                     alt="Logo"
                     className="w-10 h-10 rounded-sm object-contain cursor-pointer hover:opacity-80 transition"
-                    onClick={() => router.push("/")}
+                    onClick={() => router.push(AppRoute.home)}
                 />
             </div>
 

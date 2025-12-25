@@ -1,4 +1,5 @@
 import BkumentsLogo from "@/components/logo/Logo";
+import { AppRoute } from "@/lib/appRoutes";
 import Link from "next/link";
 import React from "react";
 
@@ -19,12 +20,12 @@ export default function OnboardingPage() {
             <Link href="#" className="hover:text-black">
               Write
             </Link>
-            <Link href="/login" className="hover:text-black">
+            <Link href={AppRoute.login} className="hover:text-black">
               Sign In
             </Link>
           </nav>
 
-          <Link href="/register">
+          <Link href={AppRoute.register}>
             <button className="bg-black text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
               Sign Up
             </button>
@@ -48,7 +49,7 @@ export default function OnboardingPage() {
             </p>
 
             <div className="pt-4">
-              <Link href="/login">
+              <Link href={AppRoute.login}>
                 <button className="bg-black text-white px-8 py-4 rounded-full text-lg font-serif tracking-wide hover:scale-105 transition-transform duration-200">
                   Start Reading
                 </button>

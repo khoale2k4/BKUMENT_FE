@@ -11,6 +11,7 @@ import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import { showToast } from "@/lib/redux/features/toastSlice";
 import GoogleIcon from "@/components/icons/google";
 import AppleIcon from "@/components/icons/apple";
+import { AppRoute } from "@/lib/appRoutes";
 
 export default function RegisterPage() {
   const dispatch = useAppDispatch();
@@ -296,7 +297,7 @@ export default function RegisterPage() {
 
           <p className="mt-8 text-center text-sm font-semibold text-gray-900">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline">
+            <Link href={AppRoute.login} className="text-blue-600 hover:underline">
               Sign In
             </Link>
           </p>

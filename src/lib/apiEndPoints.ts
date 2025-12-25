@@ -4,10 +4,10 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 // const USER_URL = process.env.NEXT_PUBLIC_USER_API_URL || '';
 
 // deploy
-//const IDENTITY_URL = 'https://bkment-identity-service-latest.onrender.com/identity';
+// const IDENTITY_URL = 'https://bkment-identity-service-latest.onrender.com/identity';
 
 //local
-const IDENTITY_URL = 'http://localhost:8080/identity'
+const IDENTITY_URL = 'http://localhost:8888/api/v1/identity'
 export const API_ENDPOINTS = {
     AUTH: {
         LOGIN: `${IDENTITY_URL}/auth/login`,

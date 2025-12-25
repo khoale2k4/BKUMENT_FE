@@ -10,6 +10,7 @@ import AppleIcon from "@/components/icons/apple";
 import GoogleIcon from "@/components/icons/google";
 import { showToast } from "@/lib/redux/features/toastSlice";
 import { API_ENDPOINTS } from "../../../lib/apiEndPoints";
+import { AppRoute } from "@/lib/appRoutes";
 
 export default function LoginPage() {
   const dispatch = useAppDispatch();
@@ -121,7 +122,7 @@ export default function LoginPage() {
                 </label>
 
                 <Link
-                  href="/forgot-password"
+                  href={AppRoute.forgot_password}
                   className="text-sm text-blue-600 font-medium hover:underline"
                 >
                   Forgot password?
@@ -199,7 +200,7 @@ export default function LoginPage() {
 
           <p className="mt-8 text-center text-sm font-semibold text-gray-900">
             Don't have an account?{" "}
-            <Link href="/register" className="text-blue-600 hover:underline">
+            <Link href={AppRoute.register} className="text-blue-600 hover:underline">
               Sign Up
             </Link>
           </p>
