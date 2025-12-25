@@ -5,7 +5,7 @@ import { login } from "@/lib/redux/features/authSlice";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/components/ui/TextInput";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
 import AppleIcon from "@/components/icons/apple";
 import GoogleIcon from "@/components/icons/google";
 import { showToast } from "@/lib/redux/features/toastSlice";
