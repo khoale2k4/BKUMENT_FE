@@ -3,7 +3,7 @@ export type VisibilityStatus = 'PUBLIC' | 'PRIVATE' | 'OTHER';
 
 export interface FileUploadItem {
     localId: string;
-    file: File;
+    file?: File;
     name: string;
     size: number;
     type: string;

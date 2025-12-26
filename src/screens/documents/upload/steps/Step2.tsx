@@ -1,11 +1,11 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import { Trash, FileText, Image as ImageIcon, Globe, Lock } from "lucide-react";
 import { FaFileWord, FaFilePdf } from "react-icons/fa";
 import { FileUploadItem } from "@/types/FileUpload";
 
 interface FileDescriptionProps {
     files: FileUploadItem[];
-    onFilesChange: Dispatch<SetStateAction<FileUploadItem[]>>;
+    onFilesChange: (files: FileUploadItem[]) => void;
 }
 
 const getFileIcon = (fileType: string) => {
@@ -16,20 +16,21 @@ const getFileIcon = (fileType: string) => {
 };
 
 const FileDescription = ({ files = [], onFilesChange }: FileDescriptionProps) => {
-    // Hàm update tổng quát
     const handleDetailChange = (localId: string, field: keyof FileUploadItem, value: string) => {
         if (!onFilesChange) return;
 
-        onFilesChange((prevFiles) =>
-            prevFiles.map((file) =>
-                file.localId === localId ? { ...file, [field]: value } : file
-            )
+        const updatedFiles = files.map((file) =>
+            file.localId === localId ? { ...file, [field]: value } : file
         );
+
+        onFilesChange(updatedFiles);
     };
 
     const handleDeleteFile = (localId: string) => {
         if (!onFilesChange) return;
-        onFilesChange((prevFiles) => prevFiles.filter((f) => f.localId !== localId));
+
+        const updatedFiles = files.filter((f) => f.localId !== localId);
+        onFilesChange(updatedFiles);
     };
 
     return (
@@ -44,17 +45,15 @@ const FileDescription = ({ files = [], onFilesChange }: FileDescriptionProps) =>
                         key={file.localId}
                         className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden transition-all hover:shadow-md"
                     >
-                        {/* --- HEADER: Thay đổi layout hiển thị --- */}
                         <div className="flex justify-between items-center p-4 bg-gray-50 border-b border-gray-100">
                             <div className="flex items-center space-x-3 overflow-hidden">
                                 <div className="shrink-0">
                                     {getFileIcon(file.type)}
                                 </div>
-                                {/* Hiển thị tên và size trên cùng 1 dòng */}
                                 <div className="flex items-center text-sm text-gray-600">
                                     <span
                                         className="font-semibold text-gray-700 truncate max-w-[150px] sm:max-w-[250px]"
-                                        title={file.name} // Hover vào sẽ thấy tên đầy đủ
+                                        title={file.name}
                                     >
                                         {file.name}
                                     </span>
@@ -65,7 +64,6 @@ const FileDescription = ({ files = [], onFilesChange }: FileDescriptionProps) =>
                                 </div>
                             </div>
 
-                            {/* Chỉ giữ lại nút Delete */}
                             <button
                                 onClick={() => handleDeleteFile(file.localId)}
                                 className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"

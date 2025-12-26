@@ -1,4 +1,5 @@
 import Sidebar from "@/components/layouts/Sidebar";
+import '@mantine/core/styles.css';
 import "../globals.css";
 import Header from "@/components/layouts/Header/Header";
 import Footer from "@/components/layouts/Footer";

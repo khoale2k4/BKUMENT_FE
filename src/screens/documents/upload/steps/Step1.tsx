@@ -5,7 +5,7 @@ import { FaFileWord, FaFilePdf } from "react-icons/fa";
 
 interface FileUploaderProps {
     files: FileUploadItem[];
-    onFileChange: (e: any) => Promise<void>;
+    onFileChange: (e: any) => void;
     onDrop: (e: any) => void;
     onDeleteFile: (stringId: string) => void;
 }

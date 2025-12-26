@@ -1,64 +1,44 @@
 'use client'
 
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import ActiveStep from './steps/ActiveStep';
 import FileUploader from './steps/Step1';
 import FileDescription from './steps/Step2';
 import UploadSuccess from './steps/Step3';
 import { FileUploadItem } from '@/types/FileUpload';
-import { API_ENDPOINTS } from '@/lib/apiEndPoints';
-import axios from 'axios';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+import {
+    setUploadFiles,
+    removeUploadFile,
+    updateFileMetadataInput,
+    setActiveStep,
+    resetUploadState,
+    uploadFile,
+    saveFilesMetadata
+} from '@/lib/redux/features/documentSlice';
 
 const FileUpload = () => {
-    const [activeStep, setActiveStep] = useState(1);
-    const [files, setFiles] = useState<FileUploadItem[]>([]);
+    const dispatch = useAppDispatch();
 
-    const updateFileState = useCallback((localId: string, updates: Partial<FileUploadItem>) => {
-        setFiles((prev) => prev.map(f => f.localId === localId ? { ...f, ...updates } : f));
-    }, []);
+    const { files, activeStep, uploadStatus } = useAppSelector((state) => state.documents.upload);
 
-    const processUploadFile = async (fileItem: FileUploadItem) => {
-        const { localId, file } = fileItem;
-
-        try {
-            updateFileState(localId, { status: 'getting_url' });
-
-            const initRes = await axios.get(API_ENDPOINTS.RESOURCE.GET_PRESIGNED_URL(fileItem.file.name));
-
-            const uploadUrl = initRes.data.result.url;
-            const fileId = initRes.data.result.assetId;
-
-            updateFileState(localId, {
-                status: 'uploading',
-                presignedUrl: uploadUrl,
-                storageId: fileId
-            });
-
-            await axios.put(uploadUrl, file, {
-                headers: { 'Content-Type': file.type },
-                onUploadProgress: (progressEvent) => {
-                    if (progressEvent.total) {
-                        const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                        updateFileState(localId, { progress: percent });
-                    }
-                },
-            });
-
-            updateFileState(localId, { status: 'uploaded', progress: 100 });
-        } catch (err: any) {
-            console.error("Upload error:", err);
-            updateFileState(localId, {
-                status: 'error',
-                errorMessage: err.response?.data?.message || 'Upload failed'
-            });
-        }
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files) return;
+        const selectedFiles = Array.from(e.target.files);
+        processFiles(selectedFiles);
+        e.target.value = '';
     };
 
-    const handleFileChange = async (e: any) => {
-        if (!e.target.files) return;
-        const selectedFiles = Array.from(e.target.files) as File[];
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!e.dataTransfer.files) return;
+        const droppedFiles = Array.from(e.dataTransfer.files);
+        processFiles(droppedFiles);
+    };
 
-        const newFiles: FileUploadItem[] = selectedFiles.map((file) => ({
+    const processFiles = (fileList: File[]) => {
+        const newFilesFull: FileUploadItem[] = fileList.map((file) => ({
             localId: crypto.randomUUID(),
             file: file,
             name: file.name,
@@ -73,88 +53,42 @@ const FileUpload = () => {
             description: ''
         }));
 
-        setFiles((prev) => [...prev, ...newFiles]);
+        const newFilesForRedux = newFilesFull.map(({ file, ...rest }) => rest);
 
-        e.target.value = '';
+        dispatch(setUploadFiles(newFilesForRedux));
 
-        newFiles.forEach(fileItem => processUploadFile(fileItem));
-    };
-
-    const handleDrop = (e: any) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        if (!e.dataTransfer.files) return;
-        const droppedFiles = Array.from(e.dataTransfer.files) as File[];
-
-        const newFiles: FileUploadItem[] = droppedFiles.map((file) => ({
-            localId: crypto.randomUUID(),
-            file: file,
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            visibility: 'PUBLIC',
-            progress: 0,
-            status: 'idle',
-            title: file.name.split('.')[0],
-        }));
-
-        setFiles((prev) => [...prev, ...newFiles]);
-        newFiles.forEach(fileItem => processUploadFile(fileItem));
+        newFilesFull.forEach(fileItem => {
+            dispatch(uploadFile(fileItem));
+        });
     };
 
     const handleDeleteFile = (localId: string) => {
-        setFiles((prev) => prev.filter((f) => f.localId !== localId));
+        dispatch(removeUploadFile(localId));
     };
 
-    const handleUpdateMetadata = async () => {
-        let hasError = false;
-
-        const filesToSave = files.filter(f => f.status === 'uploaded' || f.status === 'success');
-
-        if (filesToSave.length === 0) {
-            setActiveStep(3);
-            return;
+    const handleNextStep = () => {
+        if (activeStep === 2) {
+            dispatch(saveFilesMetadata());
+        } else {
+            dispatch(setActiveStep(Math.min(3, activeStep + 1)));
         }
+    };
 
-        for (let file of filesToSave) {
-            try {
-                updateFileState(file.localId, { status: 'saving' });
-
-                await axios.post(API_ENDPOINTS.RESOURCE.UPDATE_METADATA, {
-                    assetId: file.storageId,
-                    title: file.title,
-                    university: file.university,
-                    course: file.course,
-                    description: file.description,
-                    resourceType: 'DOCUMENT',
-                    visibility: file.visibility,
-                    downloadable: true,
-                    documentType: file.type,
-                });
-
-                updateFileState(file.localId, { status: 'success' });
-            } catch (error) {
-                console.error(error);
-                hasError = true;
-                updateFileState(file.localId, { status: 'error', errorMessage: "Save info failed" });
-            }
-        }
-
-        if (!hasError) {
-            setActiveStep(3);
-        }
-    }
+    const handlePrevStep = () => {
+        dispatch(setActiveStep(Math.max(1, activeStep - 1)));
+    };
 
     const handleRestart = () => {
-        setFiles([]);
-        setActiveStep(1);
-    }
+        dispatch(resetUploadState());
+    };
 
     const isNextDisabled = () => {
         if (activeStep === 1) {
             if (files.length === 0) return true;
             return files.some(f => f.status !== 'uploaded' && f.status !== 'success');
+        }
+        if (activeStep === 2) {
+            return uploadStatus === 'saving';
         }
         return false;
     };
@@ -171,45 +105,39 @@ const FileUpload = () => {
 
             <div className="w-1/2 text-center text-sm font-medium text-gray-500">
 
-                {activeStep == 1 && <FileUploader
+                {activeStep === 1 && <FileUploader
                     files={files}
                     onFileChange={handleFileChange}
                     onDrop={handleDrop}
                     onDeleteFile={handleDeleteFile}
                 />}
 
-                {activeStep == 2 && <FileDescription
+                {activeStep === 2 && <FileDescription
                     files={files}
-                    onFilesChange={setFiles}
+                    onFilesChange={(updatedFiles) => dispatch(updateFileMetadataInput(updatedFiles))}
                 />}
 
-                {activeStep == 3 && <UploadSuccess />}
+                {activeStep === 3 && <UploadSuccess />}
 
                 {activeStep < 3 && <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
                     <button
                         className="px-6 py-2 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-50 disabled:opacity-50"
-                        onClick={() => setActiveStep(Math.max(1, activeStep - 1))}
-                        disabled={activeStep === 1}
+                        onClick={handlePrevStep}
+                        disabled={activeStep === 1 || uploadStatus === 'saving'}
                     >
                         Previous
                     </button>
                     <button
                         className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
                         disabled={isNextDisabled()}
-                        onClick={() => {
-                            if (activeStep === 2) {
-                                handleUpdateMetadata();
-                            } else {
-                                setActiveStep(Math.min(3, activeStep + 1));
-                            }
-                        }}
+                        onClick={handleNextStep}
                     >
-                        {activeStep == 2 ? 'Save' : 'Next'}
+                        {activeStep === 2 ? (uploadStatus === 'saving' ? 'Saving...' : 'Save') : 'Next'}
                     </button>
                 </div>}
                 {activeStep === 3 && <button
                     className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700"
-                    onClick={() => handleRestart()}
+                    onClick={handleRestart}
                 >
                     Upload more Documents
                 </button>}
