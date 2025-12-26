@@ -36,6 +36,10 @@ export const API_ENDPOINTS = {
         GET_ALL: `${DEBUG_URL}/api/resource`,
         GET_DETAIL: (id: string | number) => `${API_BASE_URL}/resource/document/${id}`,
     },
+    BLOGS: {
+        GET_ALL: `${DEBUG_URL}/api/resource`,
+        GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/blogs/${id}`, // gọi GET cái này để lấy dữ liệu
+    },
     RESOURCE: {
         GET_PRESIGNED_URL: (fileName: string) => `${API_BASE_URL}/resource/presign?fileName=${fileName}`,
         UPDATE_METADATA: `${API_BASE_URL}/resource/metadata`,

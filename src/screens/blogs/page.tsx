@@ -1,16 +1,12 @@
 'use client';
 
-import React from 'react';
 import clsx from 'clsx';
-import { Badge, Button, Container, ActionIcon } from '@mantine/core';
+import { Badge, ActionIcon } from '@mantine/core';
 import { IconArrowLeft, IconCalendar, IconUser, IconEye, IconShare3 } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 interface PageProps {
-    params: {
-        id: string;
-    };
+    id: string;
 }
 
 const BLOG_DATA = {
@@ -64,6 +60,7 @@ export default function BlogDetailPage(params: PageProps) {
                     {data.title}
                 </h1>
 
+                {/*  profile làm sau nha ông  */}
                 <div className="flex items-center justify-between border-t border-b border-gray-100 py-4 mb-8">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
@@ -118,6 +115,10 @@ export default function BlogDetailPage(params: PageProps) {
                         ))}
                     </div>
                 </div>
+
+                {/* <div className="max-w-4xl mx-auto px-4">
+                    <CommentSection params={params} />
+                </div> */}
             </article>
         </div>
     );
