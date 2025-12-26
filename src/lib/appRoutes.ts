@@ -1,4 +1,5 @@
 export const AppRoute = {
+  onboard: "/",
   login: '/login',
   register: '/register',
   forgot_password: "/forgot-password",
@@ -6,9 +7,18 @@ export const AppRoute = {
   library: '/library',
   profile: '/profile',
   courses: '/courses',
-  blog: '/blog',
-  documents: '/documents',
+  blogs: {
+    my: "/blogs",
+    write: "",
+    id: (id: string) => `/articles/${id}`,
+  },
+  documents: {
+    my: "/documents",
+    upload: "/documents/upload",
+    id: (id: string) => `/documents/${id}`
+  },
   messages: '/messages',
   tutors: '/tutors',
   notifications: '/notifications',
+  settings: "/settings",
 };

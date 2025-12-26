@@ -1,13 +1,11 @@
 "use client";
 import { useState } from "react";
-import { useAppDispatch } from "@/lib/redux/hooks";
-// import { login } from "@/lib/redux/features/authSlice"; // Không cần dùng login ở đây vì API register không trả về token
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { registerUser } from "@/lib/redux/features/authSlice"; 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/components/ui/TextInput";
 import { Button } from "@/components/ui/button";
-// Đảm bảo bạn cập nhật đường dẫn API trong file này hoặc thay thế trực tiếp string URL
-import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import { showToast } from "@/lib/redux/features/toastSlice";
 import GoogleIcon from "@/components/icons/google";
 import AppleIcon from "@/components/icons/apple";
@@ -16,12 +14,14 @@ import { AppRoute } from "@/lib/appRoutes";
 export default function RegisterPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const inputClassName = "text-gray-900 font-medium placeholder:text-gray-400";
-  // 1. Quản lý Step (1: Info, 2: Account)
-  const [step, setStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const { status } = useAppSelector((state) => state.auth);
+  const isReduxLoading = status === 'loading';
 
-  // 2. Gom state vào một object chung
+  const inputClassName = "text-gray-900 font-medium placeholder:text-gray-400";
+  
+  const [step, setStep] = useState(1);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -31,7 +31,6 @@ export default function RegisterPage() {
     password: "",
   });
 
-  // Hàm handle thay đổi input chung
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -40,10 +39,8 @@ export default function RegisterPage() {
     }));
   };
 
-  // Chuyển sang bước 2
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
-    // Validate cơ bản nếu cần
     if (
       formData.firstName &&
       formData.lastName &&
@@ -62,75 +59,47 @@ export default function RegisterPage() {
     }
   };
 
-  // Quay lại bước 1
   const handlePrevStep = () => {
     setStep(1);
   };
 
-  // Submit form (Gọi API)
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
 
-    // 3. Chuẩn bị payload đúng format yêu cầu
     const payload = {
       account: {
         username: formData.username,
         password: formData.password,
-        role: "STUDENT", // Hardcode role theo yêu cầu
+        role: "STUDENT",
       },
       firstName: formData.firstName,
       lastName: formData.lastName,
-      dob: formData.dob, // Input type="date" sẽ trả về YYYY-MM-DD đúng chuẩn
+      dob: formData.dob,
       university: formData.university,
     };
 
     try {
-      // Lưu ý: Thay thế URL dưới đây bằng API_ENDPOINTS.AUTH.SIGNUP nếu đã config
-      const response = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      await dispatch(registerUser(payload)).unwrap();
 
-      const data = await response.json();
-      console.log("data register", data);
+      dispatch(
+        showToast({
+          type: "success",
+          title: "Registration Successful!",
+          message: "Account created. Redirecting to login...",
+        })
+      );
 
-      // 4. Check success code 1000
-      if (data.code === 1000) {
-        dispatch(
-          showToast({
-            type: "success",
-            title: "Registration Successful!",
-            message: "Account created. Please login.",
-          })
-        );
+      setTimeout(() => router.push(AppRoute.login), 1500);
 
-        // API này chỉ trả về thông tin user đã tạo, không có token.
-        // Nên ta chuyển hướng về trang Login để người dùng đăng nhập.
-        setTimeout(() => router.push("/login"), 1500);
-      } else {
-        dispatch(
-          showToast({
-            type: "error",
-            title: "Registration Failed",
-            message: data.message || "Could not create account",
-          })
-        );
-      }
-    } catch (error) {
-      console.error("Register error:", error);
+    } catch (errorMsg) {
+      console.error("Register error:", errorMsg);
       dispatch(
         showToast({
           type: "error",
-          title: "Error",
-          message: "Network error. Please try again.",
+          title: "Registration Failed",
+          message: (errorMsg as string) || "Could not create account",
         })
       );
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -178,7 +147,7 @@ export default function RegisterPage() {
                 <Input
                   label="Date of Birth"
                   name="dob"
-                  type="date" // Sử dụng type date để đảm bảo format YYYY-MM-DD
+                  type="date"
                   value={formData.dob}
                   onChange={handleChange}
                   required
@@ -256,19 +225,20 @@ export default function RegisterPage() {
                   >
                     Back
                   </Button>
+                  {/* Sử dụng isReduxLoading để disable nút */}
                   <Button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isReduxLoading}
                     className="bg-[#3F5D38] hover:bg-[#2d4228] w-2/3"
                   >
-                    {isLoading ? "Signing up..." : "Signup"}
+                    {isReduxLoading ? "Signing up..." : "Signup"}
                   </Button>
                 </div>
               </>
             )}
           </form>
 
-          {/* Social Login & Footer (Chỉ hiện nếu cần thiết, hoặc giữ nguyên ở dưới) */}
+          {/* Social & Footer */}
           <div className="relative my-8">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-gray-200"></span>

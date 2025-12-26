@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react"; // Import useState
-import { useAppDispatch } from "@/lib/redux/hooks";
-import { login } from "@/lib/redux/features/authSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { login, loginUser } from "@/lib/redux/features/authSlice";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/components/ui/TextInput";
@@ -15,80 +15,43 @@ import { AppRoute } from "@/lib/appRoutes";
 export default function LoginPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  const inputClassName = "text-gray-900 font-medium placeholder:text-gray-400";
-  // 1. State for form inputs and loading status
+
+  const { status } = useAppSelector((state) => state.auth);
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+
+  const isReduxLoading = status === 'loading';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true); // Start loading
 
     try {
-      // 2. Make the API request
-      const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username,
-          password: password,
-        }),
-      });
+      await dispatch(loginUser({ username, password })).unwrap();
 
-      console.log("response", response);
+      dispatch(
+        showToast({
+          type: "success",
+          title: "Success!",
+          message: "Successfully logged in!",
+        })
+      );
 
-      const data = await response.json();
-      console.log("data", data);
+      setTimeout(() => router.push(AppRoute.home), 1500);
 
-      // 3. Check for success code 1000
-      if (data.code === 1000) {
-        // Dispatch login to Redux (saving token and username)
-        // Note: You might need to update your authSlice to accept a 'token'
-        dispatch(
-          login({
-            name: username,
-            email: username,
-            token: data.result.token,
-          })
-        );
-
-        dispatch(
-          showToast({
-            type: "success",
-            title: "Success!",
-            message: "Successfully logged in!",
-          })
-        );
-
-        // Redirect after a short delay
-        setTimeout(() => router.push("/home"), 1500);
-      } else {
-        // Handle API specific errors (e.g., wrong password)
-        dispatch(
-          showToast({
-            type: "error",
-            title: "Login Failed",
-            message: data.message || "Invalid credentials",
-          })
-        );
-      }
-    } catch (error) {
-      // Handle network errors
-      console.error("Login error:", error);
+    } catch (errorMsg) {
+      console.error("Login failed:", errorMsg);
       dispatch(
         showToast({
           type: "error",
-          title: "Error",
-          message: "Something went wrong. Please try again.",
+          title: "Login Failed",
+          message: (errorMsg as string) || "Invalid credentials",
         })
       );
-    } finally {
-      setIsLoading(false); // Stop loading
     }
   };
+
+  const inputClassName = "text-gray-900 font-medium placeholder:text-gray-400";
 
   return (
     <div className="min-h-screen flex bg-white">
@@ -102,7 +65,6 @@ export default function LoginPage() {
           </h2>
 
           <form onSubmit={handleLogin} className="space-y-5">
-            {/* Username Input */}
             <Input
               label="Username / Email"
               type="text"
@@ -129,7 +91,6 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              {/* Password Input */}
               <Input
                 type="password"
                 placeholder="Enter your password"
@@ -160,13 +121,12 @@ export default function LoginPage() {
               </label>
             </div>
 
-            {/* Submit Button with Loading State */}
             <Button
               type="submit"
               className="bg-[#3F5D38] hover:bg-[#2d4228] w-full"
-              disabled={isLoading}
+              disabled={isReduxLoading}
             >
-              {isLoading ? "Logging in..." : "Login"}
+              {isReduxLoading ? "Logging in..." : "Login"}
             </Button>
           </form>
 

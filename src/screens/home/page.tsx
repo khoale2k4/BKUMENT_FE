@@ -7,7 +7,8 @@ import Pagination from '@/components/ui/Pagination';
 import ContentCardSkeleton from './contentCard/ContentCardSkeleton';
 import ContentCard from './contentCard/ContentCard';
 import { useRouter } from 'next/navigation';
-import { Plus } from 'lucide-react';
+import { AppRoute } from '@/lib/appRoutes';
+import { showToast } from '@/lib/redux/features/toastSlice'; // Giả sử bạn có toast
 
 export default function HomePage() {
     const dispatch = useAppDispatch();
@@ -21,6 +22,22 @@ export default function HomePage() {
 
     useEffect(() => {
         const promise = dispatch(fetchFeed({ category: activeTab, page: page }));
+
+        promise
+            .unwrap()
+            .then((originalPromiseResult) => {
+                console.log("Fetched data successfully:", originalPromiseResult);
+            })
+            .catch((serializedError) => {
+                if (serializedError.name !== 'AbortError') {
+                    console.error("Fetch failed:", serializedError);
+                    dispatch(showToast({
+                        type: 'error',
+                        title: 'Error',
+                        message: 'Failed to load feed. Please try again.'
+                    }));
+                }
+            });
 
         return () => {
             promise.abort();
@@ -38,12 +55,8 @@ export default function HomePage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    const onArticleClick = (id: string) => {
-        router.push(`/articles/${id}`);
-    }
-
     const onDocumentClick = (id: string) => {
-        router.push(`/documents/${id}`);
+        router.push(AppRoute.documents.id(id));
     }
 
     return (
@@ -67,7 +80,7 @@ export default function HomePage() {
                 </div>
 
                 <div>
-                    {status !== 'succeeded' && (
+                    {status !== 'succeeded' && status !== 'idle' && (
                         <div className="space-y-4">
                             {[1, 2, 3, 4, 5].map(i => (
                                 <ContentCardSkeleton key={"skeleton-" + i} />

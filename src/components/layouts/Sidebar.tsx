@@ -10,19 +10,21 @@ import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { AppRoute } from '@/lib/appRoutes';
+import { useEffect, useRef } from 'react';
 
 export default function Sidebar() {
     const { isSidebarOpen } = useAppSelector((state) => state.ui);
     const dispatch = useAppDispatch();
     const pathname = usePathname();
+    const sidebarRef = useRef<HTMLElement>(null);
 
     const mainMenuItems = [
         { icon: Home, label: 'Home', href: AppRoute.home, count: 0 },
         { icon: Book, label: 'Library', href: AppRoute.library, count: 0 },
         { icon: User, label: 'Profile', href: AppRoute.profile, count: 0 },
         { icon: NotebookText, label: 'My Courses', href: AppRoute.courses, count: 0 },
-        { icon: FileText, label: 'My Blog', href: AppRoute.blog, count: 0 },
-        { icon: File, label: 'Documents', href: AppRoute.documents, count: 0 },
+        { icon: FileText, label: 'My Blog', href: AppRoute.blogs.my, count: 0 },
+        { icon: File, label: 'My Documents', href: AppRoute.documents.my, count: 0 },
         { icon: Send, label: 'Messages', href: AppRoute.messages, count: 2 },
         { icon: UserSearch, label: 'Find Tutors', href: AppRoute.tutors, count: 0 },
         { icon: Bell, label: 'Notifications', href: AppRoute.notifications, count: 2 },
@@ -64,6 +66,26 @@ export default function Sidebar() {
             </Link>
         );
     };
+    
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                isSidebarOpen &&
+                sidebarRef.current &&
+                !sidebarRef.current.contains(event.target as Node)
+            ) {
+                if (window.innerWidth >= 768) {
+                   dispatch(closeSidebar());
+                }
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isSidebarOpen, dispatch]);
 
     return (
         <>
@@ -75,6 +97,7 @@ export default function Sidebar() {
             )}
 
             <aside
+                ref={sidebarRef}
                 className={clsx(
                     "fixed md:sticky top-16 left-0 z-40 h-[calc(100vh-64px)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out overflow-y-auto custom-scrollbar",
                     "overflow-hidden",
@@ -90,7 +113,7 @@ export default function Sidebar() {
 
                     <div className="mb-6 px-1">
                         <Link
-                            href="/documents/upload"
+                            href={AppRoute.documents.upload}
                             className="flex items-center justify-center gap-2 w-full bg-[#292929] text-white py-2.5 rounded-full font-medium text-[15px] hover:bg-black transition shadow-sm hover:shadow-md whitespace-nowrap"
                         >
                             <UploadCloud size={18} className="shrink-0" />
