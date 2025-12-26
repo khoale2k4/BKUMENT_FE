@@ -4,6 +4,7 @@ import { Bell, FileText } from "lucide-react";
 import HeaderLeft from "./HeaderLeft";
 import SearchBar from "./SearchBar";
 import UserDropdown from "./UserDropdown";
+import { AppRoute } from "@/lib/appRoutes";
 
 export default function Header() {
   return (
@@ -15,7 +16,7 @@ export default function Header() {
 
       <div className="flex items-center gap-2 md:gap-6">
         <Link
-          href="#"
+          href={AppRoute.blogs.write}
           className="hidden sm:flex items-center gap-1 text-gray-500 hover:text-black text-sm"
         >
           <FileText className="w-5 h-5" strokeWidth={1.5} />

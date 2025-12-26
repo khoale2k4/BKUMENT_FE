@@ -1,4 +1,4 @@
-import FileUpload from '@/screens/fileUpload/page';
+import FileUpload from '@/screens/documents/upload/page';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

@@ -26,7 +26,7 @@ const FileUpload = () => {
             const initRes = await axios.get(API_ENDPOINTS.RESOURCE.GET_PRESIGNED_URL(fileItem.file.name));
 
             const uploadUrl = initRes.data.result.url;
-            const fileId = initRes.data.result.fileId;
+            const fileId = initRes.data.result.assetId;
 
             updateFileState(localId, {
                 status: 'uploading',

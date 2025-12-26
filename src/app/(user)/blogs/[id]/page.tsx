@@ -1,8 +1,8 @@
-import DocumentPage from '@/screens/documents/page';
+import BlogDetailPage from '@/screens/blogs/page';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Documents | VBook",
+  title: "Blogs | VBook",
   description: "Social media for education",
 };
 
@@ -15,6 +15,6 @@ interface PageProps {
 export default async function DocumentApp({ params }: PageProps) {
   const resolvedParams = await params;
   return (
-    <DocumentPage params={resolvedParams}/>
+    <BlogDetailPage params={resolvedParams}/>
   );
 }

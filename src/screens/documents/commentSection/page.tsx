@@ -30,7 +30,6 @@ export default function CommentSection({ params }: { params: { id: string } }) {
 
     const handleSendReply = useCallback((parentId: string | number, text: string) => {
         console.log(`Sending reply to ${parentId}:`, text);
-        // Logic API here...
         dispatch(fetchCommentsByDocId(params.id));
         setReplyingToId(null);
     }, [dispatch, params.id]);

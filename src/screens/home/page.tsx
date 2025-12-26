@@ -55,6 +55,10 @@ export default function HomePage() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    const onBlogClick = (id: string) => {
+        router.push(AppRoute.blogs.id(id));
+    }
+
     const onDocumentClick = (id: string) => {
         router.push(AppRoute.documents.id(id));
     }
@@ -96,7 +100,7 @@ export default function HomePage() {
                                         key={content.id}
                                         data={{
                                             ...content,
-                                            onClick: (activeTab === 'Documents' ? () => onDocumentClick(content.id) : null)
+                                            onClick: (activeTab === 'Documents' ? () => onDocumentClick(content.id) : () => onBlogClick(content.id))
                                         }}
                                     />
                                 ))}

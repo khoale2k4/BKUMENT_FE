@@ -9,8 +9,8 @@ export const AppRoute = {
   courses: '/courses',
   blogs: {
     my: "/blogs",
-    write: "",
-    id: (id: string) => `/articles/${id}`,
+    write: "/blogs/write",
+    id: (id: string) => `/blogs/${id}`,
   },
   documents: {
     my: "/documents",
