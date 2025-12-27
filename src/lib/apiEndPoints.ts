@@ -34,16 +34,18 @@ export const API_ENDPOINTS = {
     },
     DOCUMENTS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
-        GET_DETAIL: (id: string | number) => `${API_BASE_URL}/resource/document/${id}`,
+        UPDATE_METADATA: `${API_BASE_URL}/document/create`,
+        GET_DETAIL: (id: string | number) => `${API_BASE_URL}/document/search?q=${id}`,
     },
     BLOGS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
         GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/blogs/${id}`, // gọi GET cái này để lấy dữ liệu
+        UPLOAD_NEW_BLOG: `${API_BASE_URL}/blog/`
     },
     RESOURCE: {
         GET_PRESIGNED_URL: (fileName: string) => `${API_BASE_URL}/resource/presign?fileName=${fileName}`,
         UPDATE_METADATA: `${API_BASE_URL}/resource/metadata`,
-        LINK_IMAGE_FILEID: (fileId: string) => `${API_BASE_URL}/resource/downloadAsset/${fileId}`,
+        LINK_IMAGE_FILEID: (fileId: string) => `${API_BASE_URL}/resource/download/asset/${fileId}`,
     },
     COMMENTS: {
         GET_BY_DOC: (id: string | number) => `${DEBUG_URL}/api/documents/${id}/comments`,

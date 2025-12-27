@@ -4,12 +4,20 @@ import { IconChevronLeft, IconWorld, IconLock } from '@tabler/icons-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { setVisibility, submitPost } from '@/lib/redux/features/blogSlice';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { AppRoute } from '@/lib/appRoutes';
 
 export default function CreatePostHeader() {
     const dispatch = useAppDispatch();
     const router = useRouter();
-    const { visibility, status } = useAppSelector(state => state.blogs);
+    const { visibility, status, id } = useAppSelector(state => state.blogs);
     const isSubmitting = status === 'submitting';
+
+    useEffect(() => {
+        if (status === 'succeeded' && id) {
+            router.push(AppRoute.blogs.id(id.toString()));
+        }
+    }, [status, router]);
 
     return (
         <header className="bg-white border-b border-gray-200">
@@ -41,7 +49,10 @@ export default function CreatePostHeader() {
                         color="dark"
                         className="px-6 font-medium bg-black hover:bg-gray-800"
                         loading={isSubmitting}
-                        onClick={() => dispatch(submitPost())}
+                        onClick={() => {
+                            console.log("Submiting");
+                            dispatch(submitPost());
+                        }}
                     >
                         Xuất bản
                     </Button>
