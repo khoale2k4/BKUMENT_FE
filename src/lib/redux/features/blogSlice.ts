@@ -50,8 +50,8 @@ export const uploadImage = createAsyncThunk(
 export const submitPost = createAsyncThunk(
     'blog/submitPost',
     async (_, { getState, rejectWithValue }) => {
-        const state = (getState() as any).blog as BlogState;
-
+        const state = (getState() as any).blogs as BlogState;
+    
         if (!state.title.trim()) return rejectWithValue('Tiêu đề không được để trống');
         if (!state.contentHTML.trim()) return rejectWithValue('Nội dung không được để trống');
 
@@ -63,7 +63,7 @@ export const submitPost = createAsyncThunk(
             type: 'POST',
         };
 
-        console.log('Redux Submit Payload:', payload);
+        console.log('Redux Submit Payload at blog Slicesf:', payload);
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         return payload;
