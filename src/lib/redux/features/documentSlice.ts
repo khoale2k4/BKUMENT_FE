@@ -69,7 +69,7 @@ export const fetchDocumentById = createAsyncThunk(
     'documents/fetchDetail',
     async (id: string) => {
         const response = await fetch(`${API_ENDPOINTS.DOCUMENTS.GET_DETAIL(id)}`);
-        const data = (await response.json()).result;
+        const data = (await response.json()).result.content[0];
 
         return {
             id: id,
@@ -174,7 +174,7 @@ export const saveFilesMetadata = createAsyncThunk(
             try {
                 dispatch(updateFileStatus({ localId: file.localId, updates: { status: 'saving' } }));
 
-                await axios.post(API_ENDPOINTS.RESOURCE.UPDATE_METADATA, {
+                await axios.post(API_ENDPOINTS.DOCUMENTS.UPDATE_METADATA, {
                     assetId: file.storageId,
                     title: file.title,
                     university: file.university,

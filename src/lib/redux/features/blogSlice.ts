@@ -2,11 +2,13 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 
 interface BlogState {
+    id?: string;
     title: string;
     contentHTML: string;
     coverImage: string | null;
     visibility: 'PUBLIC' | 'PRIVATE';
     status: 'idle' | 'uploading_cover' | 'submitting' | 'succeeded' | 'failed';
+    assetIds: string[];
     error: string | null;
 }
 
@@ -17,11 +19,13 @@ const initialState: BlogState = {
     visibility: 'PUBLIC',
     status: 'idle',
     error: null,
+    assetIds: [] as string[],
 };
 
 export const uploadImage = createAsyncThunk(
     'blog/uploadImage',
-    async (file: File, { rejectWithValue }) => {
+    async (file: File, { getState, rejectWithValue }) => {
+        const state = (getState() as any).blog as BlogState;
         try {
             const presignedRes = await fetch(
                 `${API_ENDPOINTS.RESOURCE.GET_PRESIGNED_URL(encodeURIComponent(file.name))}`
@@ -42,6 +46,7 @@ export const uploadImage = createAsyncThunk(
 
             return API_ENDPOINTS.RESOURCE.LINK_IMAGE_FILEID(assetId);
         } catch (error: any) {
+            console.error(error.message);
             return rejectWithValue(error.message || 'Upload error');
         }
     }
@@ -51,22 +56,36 @@ export const submitPost = createAsyncThunk(
     'blog/submitPost',
     async (_, { getState, rejectWithValue }) => {
         const state = (getState() as any).blogs as BlogState;
-    
+
         if (!state.title.trim()) return rejectWithValue('Tiêu đề không được để trống');
         if (!state.contentHTML.trim()) return rejectWithValue('Nội dung không được để trống');
 
         const payload = {
             title: state.title,
             coverImage: state.coverImage,
-            contentHTML: state.contentHTML,
+            content: state.contentHTML,
             visibility: state.visibility,
             type: 'POST',
+            assetIds: state.assetIds,
         };
 
         console.log('Redux Submit Payload at blog Slicesf:', payload);
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        return payload;
+
+        const uploadRes = await fetch(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!uploadRes.ok) throw new Error('Upload failed');
+
+        const data = (await uploadRes.json()).result;
+
+        return data;
     }
 );
 
@@ -86,14 +105,18 @@ export const blogSlice = createSlice({
         setVisibility: (state, action: PayloadAction<'PUBLIC' | 'PRIVATE'>) => {
             state.visibility = action.payload;
         },
-        resetEditor: () => initialState,
+        resetEditor: () => ({ ...initialState, assetIds: [] })
     },
     extraReducers: (builder) => {
         builder
+            .addCase(uploadImage.fulfilled, (state, action) => {
+                state.assetIds.push(action.payload);
+            })
             .addCase(submitPost.pending, (state) => {
                 state.status = 'submitting';
             })
-            .addCase(submitPost.fulfilled, (state) => {
+            .addCase(submitPost.fulfilled, (state, action) => {
+                state.id = action.payload.id;
                 state.status = 'succeeded';
             })
             .addCase(submitPost.rejected, (state, action) => {

@@ -4,13 +4,16 @@ import { IconWorld, IconLock } from '@tabler/icons-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { setVisibility, submitPost } from '@/lib/redux/features/blogSlice';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { AppRoute } from '@/lib/appRoutes';
 
 export default function CreatePostHeader() {
     const dispatch = useAppDispatch();
     const router = useRouter();
-    const { visibility, status } = useAppSelector(state => state.blogs);
+    const { visibility, status, id } = useAppSelector(state => state.blogs);
     const isSubmitting = status === 'submitting';
 
+<<<<<<< HEAD
     const handlePublish = async () => {
         try {
             // 1. Gọi dispatch và dùng unwrap() để chờ kết quả trả về
@@ -28,6 +31,13 @@ export default function CreatePostHeader() {
             alert(error); 
         }
     };
+=======
+    useEffect(() => {
+        if (status === 'succeeded' && id) {
+            router.push(AppRoute.blogs.id(id.toString()));
+        }
+    }, [status, router]);
+>>>>>>> 93dd54e3919f111619c531ad07a324ab8603bb13
 
     return (
         <header className="bg-white border-b border-gray-200">
@@ -60,7 +70,14 @@ export default function CreatePostHeader() {
                         color="dark"
                         className="px-6 font-medium bg-black hover:bg-gray-800"
                         loading={isSubmitting}
+<<<<<<< HEAD
                         onClick={handlePublish} 
+=======
+                        onClick={() => {
+                            console.log("Submiting");
+                            dispatch(submitPost());
+                        }}
+>>>>>>> 93dd54e3919f111619c531ad07a324ab8603bb13
                     >
                         Xuất bản
                     </Button>
