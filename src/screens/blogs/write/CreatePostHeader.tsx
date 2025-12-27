@@ -13,31 +13,26 @@ export default function CreatePostHeader() {
     const { visibility, status, id } = useAppSelector(state => state.blogs);
     const isSubmitting = status === 'submitting';
 
-<<<<<<< HEAD
     const handlePublish = async () => {
         try {
-            // 1. Gọi dispatch và dùng unwrap() để chờ kết quả trả về
-            // Nếu validation trong thunk thất bại (thiếu title/content), nó sẽ nhảy xuống catch
             await dispatch(submitPost()).unwrap();
 
-            // 2. Nếu thành công, chuyển hướng sang trang chi tiết
-            // Vì là mock data, ta chuyển sang một đường dẫn giả định, ví dụ ID là 'preview-new'
-            // Đảm bảo bạn đã có file page xử lý đường dẫn này (vd: app/blog/[id]/page.tsx) blogs/9f30a3ce-a937-42ca-a3e5-faff19931f09
             router.push('/blogs/9f30a3ce-a937-42ca-a3e5-faff19931f09'); 
 
         } catch (error) {
             // 3. Xử lý lỗi (ví dụ: chưa nhập tiêu đề)
             // Bạn có thể dùng Mantine notifications ở đây thay vì alert
+            console.log(error);
             alert(error); 
         }
     };
-=======
+
     useEffect(() => {
         if (status === 'succeeded' && id) {
             router.push(AppRoute.blogs.id(id.toString()));
         }
     }, [status, router]);
->>>>>>> 93dd54e3919f111619c531ad07a324ab8603bb13
+
 
     return (
         <header className="bg-white border-b border-gray-200">
@@ -70,14 +65,7 @@ export default function CreatePostHeader() {
                         color="dark"
                         className="px-6 font-medium bg-black hover:bg-gray-800"
                         loading={isSubmitting}
-<<<<<<< HEAD
                         onClick={handlePublish} 
-=======
-                        onClick={() => {
-                            console.log("Submiting");
-                            dispatch(submitPost());
-                        }}
->>>>>>> 93dd54e3919f111619c531ad07a324ab8603bb13
                     >
                         Xuất bản
                     </Button>

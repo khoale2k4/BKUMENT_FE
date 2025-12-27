@@ -73,19 +73,21 @@ export const submitPost = createAsyncThunk(
         await new Promise(resolve => setTimeout(resolve, 1500));
 
 
-        const uploadRes = await fetch(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, {
-            method: 'POST',
-            body: JSON.stringify(payload),
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
+        // const uploadRes = await fetch(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, {
+        //     method: 'POST',
+        //     body: JSON.stringify(payload),
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     }
+        // });
 
-        if (!uploadRes.ok) throw new Error('Upload failed');
+        // if (!uploadRes.ok) throw new Error('Upload failed');
 
-        const data = (await uploadRes.json()).result;
+        // const data = (await uploadRes.json()).result;
 
-        return data;
+        // return data;
+
+        return payload;
     }
 );
 
