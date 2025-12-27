@@ -8,6 +8,11 @@ import { useAppSelector } from "@/lib/redux/hooks";
 
 interface PageProps {
   id: string;
+
+    params: {
+        id: string;
+    };
+
 }
 
   // const BLOG_DATA = {

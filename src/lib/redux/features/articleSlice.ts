@@ -6,42 +6,50 @@ interface ArticleState {
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     currentPage: number;
     totalPages: number;
+    pageSize: number;
 }
 
 const initialState: ArticleState = {
     items: [],
     status: 'idle',
-    currentPage: 1,
-    totalPages: 1,
+    currentPage: 0,
+    totalPages: 0,
+    pageSize: 10,
 };
 
 export const fetchFeed = createAsyncThunk(
     'articles/fetch',
-    async ({ category, page }: { category: string; page: number }) => {
+    async ({ category, page }: { category: string; page: number }, { getState }) => {
+        const state = (getState() as any).articles as ArticleState;
         let url = '';
-        
+
         if (category === 'Documents') {
-            url = `${API_ENDPOINTS.ARTICLES.GET_ALL}?page=${page}&limit=5`;
+            url = API_ENDPOINTS.DOCUMENTS.SEARCH(page, state.pageSize);
         } else {
-            url = `${API_ENDPOINTS.ARTICLES.GET_ALL}?category=${category}&page=${page}&limit=5`;
+            url = API_ENDPOINTS.BLOGS.SEARCH(page, state.pageSize);
         }
 
         const response = await fetch(url);
-        const data = await response.json();
-        
-        const mappedItems = data.map((dta: any) => ({
+        const userData = await ((await fetch(API_ENDPOINTS.ACCOUNT.GET_USER_INFO)).json())
+        const data = (await response.json()).result;
+        const items = data.content;
+
+        const mappedItems = items.map((dta: any) => ({
             id: dta.id || Math.random(),
-            author: dta.author || dta.uploader, 
-            title: dta.title || dta.fileName,
-            time: dta.time || dta.createdAt,
-            
-            content: category === 'Documents' 
-                ? (dta.description || "Tài liệu đính kèm") 
+            author: userData.user,
+            title: dta.name || dta.title,
+            time: dta.createdAt,
+
+            content: category === 'Documents'
+                ? (dta.description || "Tài liệu đính kèm")
                 : (dta.content || ""),
-            
-            assets: dta.assets || dta.image || dta.thumbnailUrl || [], 
-            
-            tags: dta.tags || (category === 'Documents' ? ['PDF', 'Doc'] : [])
+
+            coverImage: dta.coverImage || dta.downloadUrl,
+            type: category === 'Documents'
+                ? 'DOC'
+                : 'BLOG',
+
+            tags: dta.tags || (category === 'Documents' ? ['PDF', 'Doc'] : ['Hot', '24h'])
         }));
 
         return {
@@ -55,7 +63,14 @@ export const fetchFeed = createAsyncThunk(
 const articleSlice = createSlice({
     name: 'articles',
     initialState,
-    reducers: {},
+    reducers: {
+        resetFeed: (state) => {
+            state.items = [];
+            state.status = 'idle';
+            state.currentPage = 0;
+            state.totalPages = 0;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchFeed.pending, (state) => {
@@ -73,4 +88,5 @@ const articleSlice = createSlice({
     },
 });
 
+export const { resetFeed } = articleSlice.actions;
 export default articleSlice.reducer;

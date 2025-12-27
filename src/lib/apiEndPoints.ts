@@ -34,11 +34,13 @@ export const API_ENDPOINTS = {
     },
     DOCUMENTS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
+        SEARCH: (page: number, size: number) => `${API_BASE_URL}/document/search?page=${page}&size=${size}`,
         UPDATE_METADATA: `${API_BASE_URL}/document/create`,
         GET_DETAIL: (id: string | number) => `${API_BASE_URL}/document/search?q=${id}`,
     },
     BLOGS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
+        SEARCH: (page: number, size: number) => `${API_BASE_URL}/blog/search?page=${page}&size=${size}`,
         GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/blogs/${id}`, // gọi GET cái này để lấy dữ liệu
         UPLOAD_NEW_BLOG: `${API_BASE_URL}/blog/`
     },

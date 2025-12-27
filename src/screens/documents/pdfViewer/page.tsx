@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { Loader2 } from 'lucide-react'; // Nếu bạn có lucide-react
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import { PDFLoadingSkeleton } from './skeleton';

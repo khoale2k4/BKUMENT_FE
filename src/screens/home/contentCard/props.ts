@@ -1,8 +1,9 @@
 export interface CardProp {
     id: string,
     title: string,
-    assets: string[],
+    coverImage: string,
     author: string,
+    type: 'DOC' | 'BLOG',
     time: string,
     content: string,
     tags: string[],
