@@ -1,14 +1,15 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { fetchFeed } from '@/lib/redux/features/articleSlice';
+import { fetchFeed, resetFeed } from '@/lib/redux/features/articleSlice';
 import clsx from 'clsx';
 import Pagination from '@/components/ui/Pagination';
 import ContentCardSkeleton from './contentCard/ContentCardSkeleton';
 import ContentCard from './contentCard/ContentCard';
 import { useRouter } from 'next/navigation';
 import { AppRoute } from '@/lib/appRoutes';
-import { showToast } from '@/lib/redux/features/toastSlice'; // Giả sử bạn có toast
+import { showToast } from '@/lib/redux/features/toastSlice';
+import { Frown } from 'lucide-react';
 
 export default function HomePage() {
     const dispatch = useAppDispatch();
@@ -16,12 +17,14 @@ export default function HomePage() {
     const router = useRouter();
 
     const [activeTab, setActiveTab] = useState('Following');
-    const [page, setPage] = useState(1);
 
     const tabs = ['Following', 'Recommended', 'Documents'];
 
     useEffect(() => {
-        const promise = dispatch(fetchFeed({ category: activeTab, page: page }));
+        const promise = dispatch(fetchFeed({
+            category: activeTab,
+            page: currentPage
+        }));
 
         promise
             .unwrap()
@@ -42,16 +45,17 @@ export default function HomePage() {
         return () => {
             promise.abort();
         }
-    }, [activeTab, page, dispatch]);
+    }, [activeTab, currentPage, dispatch]);
 
     const onTabChange = (tab: string) => {
         if (tab === activeTab) return;
+
         setActiveTab(tab);
-        setPage(1);
-    }
+        dispatch(resetFeed());
+    };
+
 
     const onPageChange = (newPage: number) => {
-        setPage(newPage);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -62,6 +66,38 @@ export default function HomePage() {
     const onDocumentClick = (id: string) => {
         router.push(AppRoute.documents.id(id));
     }
+
+    function EmptyState({ tab }: { tab: string }) {
+        const messageMap: Record<string, { title: string; desc: string }> = {
+            Following: {
+                title: 'Chưa có nội dung',
+                desc: 'Hãy theo dõi thêm tác giả để xem bài viết mới.',
+            },
+            Recommended: {
+                title: 'Chưa có đề xuất',
+                desc: 'Chúng tôi sẽ gợi ý nội dung phù hợp hơn sớm thôi.',
+            },
+            Documents: {
+                title: 'Chưa có tài liệu',
+                desc: 'Hiện chưa có tài liệu nào được chia sẻ.',
+            },
+        };
+
+        const { title, desc } = messageMap[tab] ?? messageMap.Following;
+
+        return (
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+                <Frown/>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    {title}
+                </h3>
+                <p className="text-sm text-gray-500 max-w-sm">
+                    {desc}
+                </p>
+            </div>
+        );
+    }
+
 
     return (
         <div className="flex w-full items-start justify-center gap-8">
@@ -94,24 +130,35 @@ export default function HomePage() {
 
                     {status === 'succeeded' && (
                         <>
-                            <div className="divide-y divide-gray-100">
-                                {items.map((content: any) => (
-                                    <ContentCard
-                                        key={content.id}
-                                        data={{
-                                            ...content,
-                                            onClick: (activeTab === 'Documents' ? () => onDocumentClick(content.id) : () => onBlogClick(content.id))
+                            {items.length === 0 ? (
+                                <EmptyState tab={activeTab} />
+                            ) : (
+                                <>
+                                    <div className="divide-y divide-gray-100">
+                                        {items.map((content: any) => (
+                                            <ContentCard
+                                                key={content.id}
+                                                data={{
+                                                    ...content,
+                                                    onClick: activeTab === 'Documents'
+                                                        ? () => onDocumentClick(content.id)
+                                                        : () => onBlogClick(content.id),
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                    <Pagination
+                                        currentPage={currentPage + 1}
+                                        totalPages={totalPages}
+                                        onPageChange={(newPage) => {
+                                            dispatch(fetchFeed({
+                                                category: activeTab,
+                                                page: newPage
+                                            }));
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }}
                                     />
-                                ))}
-                            </div>
-
-                            {items.length > 0 && (
-                                <Pagination
-                                    currentPage={page}
-                                    totalPages={totalPages}
-                                    onPageChange={onPageChange}
-                                />
+                                </>
                             )}
                         </>
                     )}

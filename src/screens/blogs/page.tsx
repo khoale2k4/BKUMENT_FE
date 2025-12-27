@@ -6,7 +6,9 @@ import { IconArrowLeft, IconCalendar, IconUser, IconEye, IconShare3 } from '@tab
 import { useRouter } from 'next/navigation';
 
 interface PageProps {
-    id: string;
+    params: {
+        id: string;
+    };
 }
 
 const BLOG_DATA = {
