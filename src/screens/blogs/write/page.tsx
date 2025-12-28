@@ -12,15 +12,7 @@ import TiptapEditor from './TiptapEditor';
 export default function CreatePostPage() {
     const dispatch = useAppDispatch();
 
-    // useEffect(() => {
-    //     return () => {
-    //         dispatch(resetEditor());
-    //     };
-    // }, [dispatch]);
-
     useEffect(() => {
-        // Chỉ gọi resetEditor ngay khi component được render lần đầu (Mount)
-        // Để đảm bảo mỗi lần vào trang tạo bài mới là một trang trắng.
         dispatch(resetEditor());
     }, [dispatch]);
 

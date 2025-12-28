@@ -17,11 +17,10 @@ export default function CreatePostHeader() {
         try {
             await dispatch(submitPost()).unwrap();
 
-            router.push('/blogs/9f30a3ce-a937-42ca-a3e5-faff19931f09'); 
+            // chỗ này nối API vô thì ko cần nữa
+            // router.push('/blogs/9f30a3ce-a937-42ca-a3e5-faff19931f09'); 
 
         } catch (error) {
-            // 3. Xử lý lỗi (ví dụ: chưa nhập tiêu đề)
-            // Bạn có thể dùng Mantine notifications ở đây thay vì alert
             console.log(error);
             alert(error); 
         }
@@ -38,7 +37,6 @@ export default function CreatePostHeader() {
         <header className="bg-white border-b border-gray-200">
             <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    {/* Phần bên trái Header (nếu có) */}
                 </div>
 
                 <div className="flex items-center gap-3">

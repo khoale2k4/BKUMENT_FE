@@ -41,7 +41,7 @@ export const API_ENDPOINTS = {
     BLOGS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
         SEARCH: (page: number, size: number) => `${API_BASE_URL}/blog/search?page=${page}&size=${size}`,
-        GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/blogs/${id}`, // gọi GET cái này để lấy dữ liệu
+        GET_DETAIL: (id: string | number) => `${API_BASE_URL}/blog/search?q=${id}`,
         UPLOAD_NEW_BLOG: `${API_BASE_URL}/blog/`
     },
     RESOURCE: {

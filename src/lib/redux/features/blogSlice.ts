@@ -4,22 +4,26 @@ import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 interface BlogState {
     id?: string;
     title: string;
+    authorId: string;
     contentHTML: string;
     coverImage: string | null;
     visibility: 'PUBLIC' | 'PRIVATE';
-    status: 'idle' | 'uploading_cover' | 'submitting' | 'succeeded' | 'failed';
+    status: 'idle' | 'uploading_cover' | 'submitting' | 'getting' | 'succeeded' | 'failed';
     assetIds: string[];
     error: string | null;
+    createdAt: string | null;
 }
 
 const initialState: BlogState = {
     title: '',
     contentHTML: '',
     coverImage: null,
+    authorId: '',
     visibility: 'PUBLIC',
     status: 'idle',
     error: null,
     assetIds: [] as string[],
+    createdAt: null,
 };
 
 export const uploadImage = createAsyncThunk(
@@ -68,26 +72,33 @@ export const submitPost = createAsyncThunk(
             type: 'POST',
             assetIds: state.assetIds,
         };
+        console.log('Redux Submit Payload at blog Slicesf:', payload)
 
-        console.log('Redux Submit Payload at blog Slicesf:', payload);
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const uploadRes = await fetch(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, {
+            method: 'POST',
+            body: JSON.stringify(payload),
+            headers: { 'Content-Type': 'application/json' },
+        });
 
+        if (!uploadRes.ok) throw new Error('Upload failed');
 
-        // const uploadRes = await fetch(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, {
-        //     method: 'POST',
-        //     body: JSON.stringify(payload),
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     }
-        // });
+        const data = (await uploadRes.json()).result;
+        return data;
+    }
+);
 
-        // if (!uploadRes.ok) throw new Error('Upload failed');
+export const fetchPost = createAsyncThunk(
+    'blog/fetchPost',
+    async (blogId: string) => {
+        const fetchRes = await fetch(API_ENDPOINTS.BLOGS.GET_DETAIL(blogId), {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+        });
 
-        // const data = (await uploadRes.json()).result;
+        if (!fetchRes.ok) throw new Error('Upload failed');
 
-        // return data;
-
-        return payload;
+        const data = (await fetchRes.json()).result;
+        return data.content[0];
     }
 );
 
@@ -125,6 +136,19 @@ export const blogSlice = createSlice({
                 state.status = 'failed';
                 state.error = action.payload as string;
             });
+
+        builder
+            .addCase(fetchPost.fulfilled, (state, action) => {
+                state.contentHTML = action.payload.content;
+                state.coverImage = action.payload.coverImage;
+                state.title = action.payload.name;
+                state.authorId = action.payload.authorId;
+                state.createdAt = action.payload.createdAt;
+                state.status = 'succeeded';
+            })
+            .addCase(fetchPost.pending, (state) => {
+                state.status = 'getting';
+            })
     }
 });
 

@@ -54,11 +54,6 @@ export default function HomePage() {
         dispatch(resetFeed());
     };
 
-
-    const onPageChange = (newPage: number) => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
     const onBlogClick = (id: string) => {
         router.push(AppRoute.blogs.id(id));
     }
@@ -153,7 +148,7 @@ export default function HomePage() {
                                         onPageChange={(newPage) => {
                                             dispatch(fetchFeed({
                                                 category: activeTab,
-                                                page: newPage
+                                                page: newPage - 1
                                             }));
                                             window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }}
