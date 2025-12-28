@@ -46,7 +46,13 @@ export default function TiptapEditor() {
     const editor = useEditor({
         extensions: [
             StarterKit, Underline, Link, Highlight, TextStyle, FontFamily,
-            TiptapImage.configure({ inline: true, allowBase64: false }),
+            TiptapImage.configure({
+                inline: false,
+                allowBase64: false,
+                HTMLAttributes: {
+                    class: 'editor-image',
+                },
+            }),
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
             Placeholder.configure({ placeholder: 'Hãy kể câu chuyện của bạn...' }),
         ],
@@ -103,7 +109,7 @@ export default function TiptapEditor() {
                     onImageUpload={() => editorInputRef.current?.click()}
                     isUploadingImage={isUploading}
                 />
-                <RichTextEditor.Content className="prose prose-lg max-w-none leading-relaxed prose-p:my-4" />
+                <RichTextEditor.Content className="prose prose-lg max-w-none leading-relaxed prose-p:my-4 prose-img:w-full prose-img:my-8" />
             </RichTextEditor>
         </div>
     );
