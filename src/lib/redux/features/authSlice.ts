@@ -26,7 +26,7 @@ export interface RegisterPayload {
     account: {
         username: string;
         password: string;
-        role: string; // VD: "STUDENT"
+        role: string; 
     };
     firstName: string;
     lastName: string;
@@ -79,11 +79,11 @@ export const registerUser = createAsyncThunk(
 
             const data = await response.json();
 
-            if (data.code === 1000) {
-                return data.result;
-            } else {
-                return rejectWithValue(data.message || 'Registration failed');
-            }
+            // if (data.code === 1000) {
+            //     return data.result;
+            // } else {
+            //     return rejectWithValue(data.message || 'Registration failed');
+            // }
         } catch (error: any) {
             return rejectWithValue(error.message || 'Network error');
         }

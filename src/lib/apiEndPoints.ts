@@ -16,7 +16,7 @@ const DEBUG_URL = ''
 export const API_ENDPOINTS = {
     AUTH: {
         LOGIN: `${IDENTITY_URL}/auth/login`,
-        SIGNUP: `${IDENTITY_URL}/accounts/users`,
+        SIGNUP: `${IDENTITY_URL}/accounts`,
         LOGOUT: `${IDENTITY_URL}/auth/logout`,
         PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
     },
@@ -36,6 +36,8 @@ export const API_ENDPOINTS = {
         GET_ALL: `${DEBUG_URL}/api/resource`,
         SEARCH: (page: number, size: number) => `${API_BASE_URL}/document/search?page=${page}&size=${size}`,
         UPDATE_METADATA: `${API_BASE_URL}/document/create`,
+        ANALYSE_DOCUMENT: (id: string) => `${DEBUG_URL}/api/documents/analyse?id=${id}`,
+        TOPICS: `${DEBUG_URL}/api/documents/topics`,
         GET_DETAIL: (id: string | number) => `${API_BASE_URL}/document/search?q=${id}`,
     },
     BLOGS: {

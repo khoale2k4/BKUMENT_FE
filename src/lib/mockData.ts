@@ -92,6 +92,52 @@ export const INITIAL_COMMENTS = [
     }
 ];
 
+export const TOPICS = {
+    topics: [
+        "Toán học",
+        "Ngữ văn",
+        "Tiếng Anh",
+        "Vật lý",
+        "Hóa học",
+        "Sinh học",
+        "Lịch sử",
+        "Địa lý",
+        "Giáo dục công dân",
+        "Tin học",
+        "Công nghệ",
+        "Âm nhạc",
+        "Mỹ thuật",
+        "Giáo dục thể chất"
+    ]
+}
+
+export const DOCUMENT_ANALYSE = {
+    keywords: [
+        "HTML5",
+        "CSS",
+        "JavaScript",
+        "PHP",
+        "Responsive Design",
+        "Databases",
+        "Database Management Systems",
+        "JQuery",
+        "AJAX",
+        "Cookies",
+        "Sessions",
+        "SEO",
+        "Web Security",
+        "Web Development Lifecycle",
+        "Client-Server Model",
+        "URL",
+        "Web Browsers",
+        "Web Servers",
+        "TCP/IP",
+        "HTTP",
+        "W3C"
+    ],
+    summary: "This document outlines the fundamentals of web development, covering topics such as HTML5, CSS, JavaScript, PHP, and database management. It explores the client-server model, web browsers, servers, URL formats, and the web development lifecycle. Additionally, it introduces concepts like cookies, sessions, SEO, web security, and relevant web standards from W3C."
+}
+
 export const DOCUMENT_DATA = {
     id: "doc-123",
     title: "Báo cáo môn Software Testing: Black Box Testing Campaign",
