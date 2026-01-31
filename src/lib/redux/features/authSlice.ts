@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { API_ENDPOINTS } from '@/lib/apiEndPoints'; // Đảm bảo import đúng đường dẫn
+import * as authService from '@/lib/services/auth.service';
 
 interface AuthState {
     isAuthenticated: boolean;
@@ -26,7 +26,7 @@ export interface RegisterPayload {
     account: {
         username: string;
         password: string;
-        role: string; 
+        role: string;
     };
     firstName: string;
     lastName: string;
@@ -38,27 +38,8 @@ export const loginUser = createAsyncThunk(
     'auth/loginUser',
     async (credentials: LoginPayload, { rejectWithValue }) => {
         try {
-            const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(credentials),
-            });
-
-            const data = await response.json();
-
-            if (data.code === 1000) {
-                return {
-                    token: data.result.token,
-                    user: {
-                        name: credentials.username,
-                        email: credentials.username
-                    }
-                };
-            } else {
-                return rejectWithValue(data.message || 'Login failed');
-            }
+            const result = await authService.login(credentials);
+            return result;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Network error');
         }
@@ -69,21 +50,8 @@ export const registerUser = createAsyncThunk(
     'auth/registerUser',
     async (payload: RegisterPayload, { rejectWithValue }) => {
         try {
-            const response = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
-
-            const data = await response.json();
-
-            // if (data.code === 1000) {
-            //     return data.result;
-            // } else {
-            //     return rejectWithValue(data.message || 'Registration failed');
-            // }
+            const result = await authService.register(payload);
+            return result;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Network error');
         }
@@ -94,20 +62,8 @@ export const logoutUser = createAsyncThunk(
     'auth/logoutUser',
     async (token: string, { rejectWithValue }) => {
         try {
-            const response = await fetch(API_ENDPOINTS.AUTH.LOGOUT, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ token }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Logout API failed');
-            }
-
-            const data = await response.json();
-            return data;
+            const result = await authService.logout(token);
+            return result;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Logout failed');
         }

@@ -1,5 +1,6 @@
-import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import * as articleService from '@/lib/services/article.service';
+import * as userService from '@/lib/services/user.service';
 
 interface ArticleState {
     items: any[];
@@ -21,17 +22,15 @@ export const fetchFeed = createAsyncThunk(
     'articles/fetch',
     async ({ category, page }: { category: string; page: number }, { getState }) => {
         const state = (getState() as any).articles as ArticleState;
-        let url = '';
 
+        let data;
         if (category === 'Documents') {
-            url = API_ENDPOINTS.DOCUMENTS.SEARCH(page, state.pageSize);
+            data = await articleService.searchDocuments(page, state.pageSize);
         } else {
-            url = API_ENDPOINTS.BLOGS.SEARCH(page, state.pageSize);
+            data = await articleService.searchBlogs(page, state.pageSize);
         }
 
-        const response = await fetch(url);
-        const userData = await ((await fetch(API_ENDPOINTS.ACCOUNT.GET_USER_INFO)).json())
-        const data = (await response.json()).result;
+        const userData = await userService.getUserInfo();
         const items = data.content;
 
         const mappedItems = items.map((dta: any) => ({
@@ -55,7 +54,7 @@ export const fetchFeed = createAsyncThunk(
         return {
             items: mappedItems,
             page: page,
-            totalPages: data.totalPages || 10
+            totalPages: data.totalPages
         };
     }
 );
