@@ -1,6 +1,208 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { API_ENDPOINTS } from '@/lib/apiEndPoints'; // Đảm bảo import đúng đường dẫn
+// import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+// import { API_ENDPOINTS } from '@/lib/apiEndPoints'; // Đảm bảo import đúng đường dẫn
 
+// interface AuthState {
+//     isAuthenticated: boolean;
+//     token: string | null;
+//     user: { name: string; email: string } | null;
+//     status: 'idle' | 'loading' | 'succeeded' | 'failed';
+//     error: string | null;
+// }
+
+// const initialState: AuthState = {
+//     isAuthenticated: false,
+//     token: null,
+//     user: null,
+//     status: 'idle',
+//     error: null,
+// };
+
+// interface LoginPayload {
+//     username: string;
+//     password: string;
+// }
+
+// export interface RegisterPayload {
+//     account: {
+//         username: string;
+//         password: string;
+//         role: string; 
+//     };
+//     firstName: string;
+//     lastName: string;
+//     dob: string;
+//     university: string;
+// }
+
+// export const loginUser = createAsyncThunk(
+//     'auth/loginUser',
+//     async (credentials: LoginPayload, { rejectWithValue }) => {
+//         try {
+//             const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                 },
+//                 body: JSON.stringify(credentials),
+//             });
+
+//             const data = await response.json();
+
+//             if (data.code === 1000) {
+//                 return {
+//                     token: data.result.token,
+//                     user: {
+//                         name: credentials.username,
+//                         email: credentials.username
+//                     }
+//                 };
+//             } else {
+//                 return rejectWithValue(data.message || 'Login failed');
+//             }
+//         } catch (error: any) {
+//             return rejectWithValue(error.message || 'Network error');
+//         }
+//     }
+// );
+
+// export const registerUser = createAsyncThunk(
+//     'auth/registerUser',
+//     async (payload: RegisterPayload, { rejectWithValue }) => {
+//         try {
+//             const response = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                 },
+//                 body: JSON.stringify(payload),
+//             });
+
+//             const data = await response.json();
+
+//             // if (data.code === 1000) {
+//             //     return data.result;
+//             // } else {
+//             //     return rejectWithValue(data.message || 'Registration failed');
+//             // }
+//         } catch (error: any) {
+//             return rejectWithValue(error.message || 'Network error');
+//         }
+//     }
+// );
+
+// export const logoutUser = createAsyncThunk(
+//     'auth/logoutUser',
+//     async (token: string, { rejectWithValue }) => {
+//         try {
+//             const response = await fetch(API_ENDPOINTS.AUTH.LOGOUT, {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                 },
+//                 body: JSON.stringify({ token }),
+//             });
+
+//             if (!response.ok) {
+//                 throw new Error('Logout API failed');
+//             }
+
+//             const data = await response.json();
+//             return data;
+//         } catch (error: any) {
+//             return rejectWithValue(error.message || 'Logout failed');
+//         }
+//     }
+// );
+
+// export const authSlice = createSlice({
+//     name: 'auth',
+//     initialState,
+//     reducers: {
+//         login: (state, action: PayloadAction<{ name: string; email: string; token: string }>) => {
+//             state.isAuthenticated = true;
+//             state.user = {
+//                 name: action.payload.name,
+//                 email: action.payload.email
+//             };
+//             state.token = action.payload.token;
+//             state.status = 'idle';
+//             state.error = null;
+//         },
+//         forceLogout: (state) => {
+//             state.isAuthenticated = false;
+//             state.user = null;
+//             state.token = null;
+//             state.status = 'idle';
+//         },
+//     },
+//     extraReducers: (builder) => {
+//         builder
+//             .addCase(loginUser.pending, (state) => {
+//                 state.status = 'loading';
+//                 state.error = null;
+//             })
+//             .addCase(loginUser.fulfilled, (state, action) => {
+//                 state.status = 'succeeded';
+//                 state.isAuthenticated = true;
+//                 state.token = action.payload.token;
+//                 state.user = action.payload.user;
+//             })
+//             .addCase(loginUser.rejected, (state, action) => {
+//                 state.status = 'failed';
+//                 state.error = action.payload as string;
+//                 state.isAuthenticated = false;
+//             });
+
+//         builder
+//             .addCase(registerUser.pending, (state) => {
+//                 state.status = 'loading';
+//                 state.error = null;
+//             })
+//             .addCase(registerUser.fulfilled, (state) => {
+//                 state.status = 'succeeded';
+//             })
+//             .addCase(registerUser.rejected, (state, action) => {
+//                 state.status = 'failed';
+//                 state.error = action.payload as string;
+//             });
+
+//         builder
+//             .addCase(logoutUser.pending, (state) => {
+//                 state.status = 'loading';
+//                 state.error = null;
+//             })
+//             .addCase(logoutUser.fulfilled, (state) => {
+//                 state.status = 'succeeded';
+//                 state.isAuthenticated = false;
+//                 state.user = null;
+//                 state.token = null;
+//             })
+//             .addCase(logoutUser.rejected, (state, action) => {
+//                 state.status = 'failed';
+//                 state.error = action.payload as string;
+
+//                 state.isAuthenticated = false;
+//                 state.user = null;
+//                 state.token = null;
+//             });
+//     }
+// });
+
+// export const { login, forceLogout } = authSlice.actions;
+// export default authSlice.reducer;
+
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { API_ENDPOINTS } from '@/lib/apiEndPoints'; 
+
+// --- Helper to get token from LocalStorage (Safe for Next.js SSR) ---
+const getStoredToken = () => {
+    if (typeof window !== 'undefined') {
+        return localStorage.getItem('accessToken');
+    }
+    return null;
+};
+
+// --- Interfaces ---
 interface AuthState {
     isAuthenticated: boolean;
     token: string | null;
@@ -10,9 +212,9 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-    isAuthenticated: false,
-    token: null,
-    user: null,
+    isAuthenticated: !!getStoredToken(), // Auto-set to true if token exists
+    token: getStoredToken(),             // Load token from storage
+    user: null, // Note: You might want to fetch user profile separately if token exists
     status: 'idle',
     error: null,
 };
@@ -34,6 +236,8 @@ export interface RegisterPayload {
     university: string;
 }
 
+// --- Async Thunks ---
+
 export const loginUser = createAsyncThunk(
     'auth/loginUser',
     async (credentials: LoginPayload, { rejectWithValue }) => {
@@ -49,6 +253,7 @@ export const loginUser = createAsyncThunk(
             const data = await response.json();
 
             if (data.code === 1000) {
+                // Return data
                 return {
                     token: data.result.token,
                     user: {
@@ -78,12 +283,8 @@ export const registerUser = createAsyncThunk(
             });
 
             const data = await response.json();
-
-            // if (data.code === 1000) {
-            //     return data.result;
-            // } else {
-            //     return rejectWithValue(data.message || 'Registration failed');
-            // }
+            // Assuming simplified logic for now as per your original code
+            return data; 
         } catch (error: any) {
             return rejectWithValue(error.message || 'Network error');
         }
@@ -103,6 +304,9 @@ export const logoutUser = createAsyncThunk(
             });
 
             if (!response.ok) {
+                // Even if API fails, we should still clear local state usually, 
+                // but here we throw to let the reducer handle rejected if needed.
+                // However, usually logout should always clear client state.
                 throw new Error('Logout API failed');
             }
 
@@ -114,10 +318,13 @@ export const logoutUser = createAsyncThunk(
     }
 );
 
+// --- Slice ---
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
+        // Standard reducer for manual login updates
         login: (state, action: PayloadAction<{ name: string; email: string; token: string }>) => {
             state.isAuthenticated = true;
             state.user = {
@@ -127,15 +334,23 @@ export const authSlice = createSlice({
             state.token = action.payload.token;
             state.status = 'idle';
             state.error = null;
+            
+            // Sync with LocalStorage
+            localStorage.setItem('accessToken', action.payload.token);
         },
+        // Force logout (e.g., when token expires)
         forceLogout: (state) => {
             state.isAuthenticated = false;
             state.user = null;
             state.token = null;
             state.status = 'idle';
+            
+            // Sync with LocalStorage
+            localStorage.removeItem('accessToken');
         },
     },
     extraReducers: (builder) => {
+        // --- Login ---
         builder
             .addCase(loginUser.pending, (state) => {
                 state.status = 'loading';
@@ -146,6 +361,9 @@ export const authSlice = createSlice({
                 state.isAuthenticated = true;
                 state.token = action.payload.token;
                 state.user = action.payload.user;
+                
+                // SAVE TO STORAGE
+                localStorage.setItem('accessToken', action.payload.token);
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.status = 'failed';
@@ -153,6 +371,7 @@ export const authSlice = createSlice({
                 state.isAuthenticated = false;
             });
 
+        // --- Register ---
         builder
             .addCase(registerUser.pending, (state) => {
                 state.status = 'loading';
@@ -166,6 +385,7 @@ export const authSlice = createSlice({
                 state.error = action.payload as string;
             });
 
+        // --- Logout ---
         builder
             .addCase(logoutUser.pending, (state) => {
                 state.status = 'loading';
@@ -176,14 +396,19 @@ export const authSlice = createSlice({
                 state.isAuthenticated = false;
                 state.user = null;
                 state.token = null;
+                
+                // REMOVE FROM STORAGE
+                localStorage.removeItem('accessToken');
             })
             .addCase(logoutUser.rejected, (state, action) => {
                 state.status = 'failed';
                 state.error = action.payload as string;
-
+                
+                // Even if API fails, we forcefully logout the user on client side
                 state.isAuthenticated = false;
                 state.user = null;
                 state.token = null;
+                localStorage.removeItem('accessToken');
             });
     }
 });
