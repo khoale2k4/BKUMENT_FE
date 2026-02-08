@@ -6,7 +6,8 @@ import blogReducer from './features/blogSlice';
 import notificationReducer from './features/modalSlice';
 import documentReducer from './features/documentSlice';
 import toastReducer from './features/toastSlice';
-
+import tutorCourseReducer from './features/tutorCourseSlice';
+import profileReducer from './features/profileSlice';
 export const makeStore = () => {
     return configureStore({
         reducer: {
@@ -17,6 +18,9 @@ export const makeStore = () => {
             ui: layoutReducer,
             notification: notificationReducer,
             toastNotification: toastReducer,
+            tutorCourse: tutorCourseReducer, 
+            profile: profileReducer,
+
         },
     });
 };
