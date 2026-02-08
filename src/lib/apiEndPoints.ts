@@ -9,7 +9,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 //local
 // const IDENTITY_URL = 'http://localhost:8888/api/v1/identity'
 // local của tui là 8080
-const IDENTITY_URL = 'http://localhost:8080/identity'
+const IDENTITY_URL = 'http://localhost:8080/identity';
+
+const LMS_URL = 'http://localhost:8082/lms';
 //local
 const DEBUG_URL = ''
 
@@ -23,6 +25,7 @@ export const API_ENDPOINTS = {
     ACCOUNT: {
         PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
         GET_USER_INFO: `${DEBUG_URL}/api/user/info`,
+        TUTOR_GETS:`${DEBUG_URL}/api/user/tutors`
     },
     ARTICLES: {
         GET_ALL: `${DEBUG_URL}/api/articles`,
@@ -61,5 +64,9 @@ export const API_ENDPOINTS = {
     HOME: {
         SEARCH: (query: string, page: number, size: number) => `${API_BASE_URL}/ai/search?query=${query}&page=${page + 1}&size=${size}`,
     }
+    LMS: {
+        GET_TUTOR_CLASSES: `${LMS_URL}/classes`,
+        
+    },
 };
 
