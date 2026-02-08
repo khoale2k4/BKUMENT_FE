@@ -1,8 +1,9 @@
-export type UploadStatus = 'idle' | 'getting_url' | 'uploading' | 'uploaded' | 'saving' | 'success' | 'error';
+export type UploadStatus = 'idle' | 'getting_url' | 'analyzing' | 'uploading' | 'uploaded' | 'saving' | 'success' | 'error';
 export type VisibilityStatus = 'PUBLIC' | 'PRIVATE' | 'OTHER';
 
 export interface FileUploadItem {
     localId: string;
+    docId: string | undefined;
     file?: File;
     name: string;
     size: number;
@@ -10,9 +11,13 @@ export interface FileUploadItem {
     progress: number;
     presignedUrl?: string;
     storageId?: string;
+    topic?: string;
+    subject?: string;
     title?: string;
     university?: string;
     description?: string;
+    keywords?: string[];
+    summary?: string;
     course?: string;
     status: UploadStatus;
     errorMessage?: string;

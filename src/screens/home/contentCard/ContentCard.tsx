@@ -3,12 +3,7 @@
 import { formatTimeAgo } from "@/utils/formatTimeAgo";
 import { CardProp } from "./props";
 import { BookmarkPlus, MoreHorizontal } from "lucide-react";
-import dynamic from "next/dynamic";
-
-const PdfPreview = dynamic(
-    () => import('./PDFViewer'),
-    { ssr: false }
-);
+import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 
 export default function ContentCard({ data }: { data: CardProp }) {
     const timeRead = Math.ceil(data.content.split(" ").length / 200);
@@ -41,17 +36,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                 </div>
 
                 <div className="w-28 h-28 sm:w-36 sm:h-28 flex-shrink-0 overflow-hidden rounded bg-gray-100">
-                    {data.type === 'DOC' && (
-                        <PdfPreview url={data.coverImage} />
-                    )}
-
-                    {data.type === 'BLOG' && (
-                        <img
-                            src={data.coverImage}
-                            alt={data.title}
-                            className="w-full h-full object-cover"
-                        />
-                    )}
+                    <AuthenticatedImage src={data.coverImage} alt={data.title} className="w-full h-full object-cover" />
                 </div>
 
             </div>

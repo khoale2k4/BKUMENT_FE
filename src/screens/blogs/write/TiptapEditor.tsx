@@ -1,6 +1,7 @@
 'use client';
 import { useRef, useState, useEffect } from 'react';
-import { useEditor } from '@tiptap/react';
+import { ReactNodeViewRenderer, useEditor } from '@tiptap/react';
+import TiptapImage from '@tiptap/extension-image';
 import StarterKit from '@tiptap/starter-kit';
 import Highlight from '@tiptap/extension-highlight';
 import Underline from '@tiptap/extension-underline';
@@ -8,12 +9,18 @@ import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle } from '@tiptap/extension-text-style';
 import FontFamily from '@tiptap/extension-font-family';
 import Placeholder from '@tiptap/extension-placeholder';
-import TiptapImage from '@tiptap/extension-image';
 import { Link } from '@mantine/tiptap';
 import { RichTextEditor } from '@mantine/tiptap';
 import { useAppDispatch } from '@/lib/redux/hooks';
 import { setContent, uploadImage } from '@/lib/redux/features/blogSlice';
 import EditorToolbar from './EditorToolbar';
+import { TiptapAuthImage } from './TiptapAuthImage';
+
+const SecureImageExtension = TiptapImage.extend({
+    addNodeView() {
+        return ReactNodeViewRenderer(TiptapAuthImage);
+    },
+});
 
 export default function TiptapEditor() {
     const dispatch = useAppDispatch();
@@ -55,6 +62,7 @@ export default function TiptapEditor() {
             }),
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
             Placeholder.configure({ placeholder: 'Hãy kể câu chuyện của bạn...' }),
+            SecureImageExtension.configure({ inline: false }),
         ],
         content: '',
         immediatelyRender: false,

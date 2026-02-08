@@ -26,7 +26,7 @@ export const API_ENDPOINTS = {
     },
     ARTICLES: {
         GET_ALL: `${DEBUG_URL}/api/articles`,
-        
+
         GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
         CREATE: `${DEBUG_URL}/api/articles`,
         UPDATE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
@@ -35,10 +35,11 @@ export const API_ENDPOINTS = {
     DOCUMENTS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
         SEARCH: (page: number, size: number) => `${API_BASE_URL}/document/search?page=${page}&size=${size}`,
-        UPDATE_METADATA: `${API_BASE_URL}/document/create`,
-        ANALYSE_DOCUMENT: (id: string) => `${DEBUG_URL}/api/documents/analyse?id=${id}`,
+        UPDATE_METADATA: `${API_BASE_URL}/document/updateMetadata`,
+        ANALYSE_DOCUMENT: (asset_id: string, file_name: string | undefined) => `${API_BASE_URL}/document/analyze/${asset_id}?${file_name != undefined ? "fileName=" + file_name : ""}`,
         TOPICS: `${DEBUG_URL}/api/documents/topics`,
         GET_DETAIL: (id: string | number) => `${API_BASE_URL}/document/search?q=${id}`,
+        RELATED_DOCUMENTS: (id: string, page: number, size: number) => `${API_BASE_URL}/document/related/${id}?page=${page}&size=${size}`,
     },
     BLOGS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
@@ -56,6 +57,9 @@ export const API_ENDPOINTS = {
     },
     USERS: {
         LIST: `${DEBUG_URL}/api/users`,
+    },
+    HOME: {
+        SEARCH: (query: string, page: number, size: number) => `${API_BASE_URL}/ai/search?query=${query}&page=${page + 1}&size=${size}`,
     }
 };
 

@@ -16,7 +16,7 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
     const handleDrop = (e: any) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (onDrop) {
             onDrop(e);
         }
@@ -73,45 +73,71 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                 <p className="mt-4 text-xs text-gray-500">Supported files: PDF, DOC, DOCX</p>
             </div>
 
-            <div className="mt-8 flex-1 overflow-y-auto border rounded-lg space-y-4 p-4 max-h-[400px]">
+            <div className="mt-8 flex-1 overflow-y-auto border border-gray-100 rounded-xl space-y-4 p-2 max-h-[400px] shadow-inner bg-gray-50/50">
                 {files.length === 0 ? (
-                    <div className="text-center text-gray-500 py-10">
-                        Chưa có file nào được upload
+                    <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                        <FileText className="w-12 h-12 mb-3 opacity-20" />
+                        <p>No files uploaded yet</p>
                     </div>
                 ) : (
                     files.map((file) => (
                         <div
                             key={file.localId}
-                            className="flex justify-between items-center p-4 border-b border-gray-200 last:border-0"
+                            className={`group flex justify-between items-center p-4 bg-white border border-gray-100 rounded-xl shadow-sm transition-all hover:shadow-md ${file.status === 'analyzing' ? 'ring-2 ring-blue-100 border-blue-200' : ''}`}
                         >
-                            <div className="flex items-center space-x-3">
-                                {getFileIcon(file.name)}
-                                <span className="font-medium text-gray-800 truncate max-w-[200px]" title={file.name}>
-                                    {file.name}
-                                </span>
+                            <div className="flex items-center space-x-4 overflow-hidden">
+                                <div className="shrink-0 transition-transform group-hover:scale-105">
+                                    {getFileIcon(file.name)}
+                                </div>
+                                <div className="flex flex-col min-w-0">
+                                    <span className="font-semibold text-gray-700 truncate max-w-[180px] sm:max-w-[250px]" title={file.name}>
+                                        {file.name}
+                                    </span>
+                                    <span className="text-xs text-gray-400">
+                                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                                    </span>
+                                </div>
                             </div>
 
-                            <div className="flex items-center space-x-4">
+                            <div className="flex items-center space-x-3">
                                 {file.status === 'error' ? (
-                                    <span className="text-xs text-red-500 font-medium">Error</span>
+                                    <div className="flex items-center text-red-500 bg-red-50 px-3 py-1 rounded-full border border-red-100">
+                                        <span className="text-xs font-semibold">Error</span>
+                                    </div>
+                                ) : file.status === 'analyzing' ? (
+                                    <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                                        <div className="flex space-x-1">
+                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
+                                        </div>
+                                        <span className="text-xs font-semibold text-blue-600">Analyzing...</span>
+                                    </div>
                                 ) : (
-                                    <span className="text-xs font-medium text-blue-600">
-                                        {file.progress === 100 ? "Ready" : `${file.progress}%`}
-                                    </span>
+                                    <div className="flex items-center space-x-2">
+                                        {file.progress === 100 ? (
+                                            <div className="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                                                <span className="text-xs font-semibold">Ready</span>
+                                            </div>
+                                        ) : (
+                                            <div className="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">
+                                                {file.progress}%
+                                            </div>
+                                        )}
+                                    </div>
                                 )}
 
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onDeleteFile && onDeleteFile(file.localId);
-                                    }}
-                                    className="text-gray-400 hover:text-red-600 transition-colors"
-                                >
-                                    <Trash className="w-5 h-5" />
-                                </button>
-                                <button className="text-gray-400 hover:text-gray-800 transition-colors">
-                                    <EllipsisVertical className="w-5 h-5" />
-                                </button>
+                                <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onDeleteFile && onDeleteFile(file.localId);
+                                        }}
+                                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                    >
+                                        <Trash className="w-4 h-4" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))

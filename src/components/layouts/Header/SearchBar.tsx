@@ -1,16 +1,36 @@
-import { Search } from "lucide-react";
+'use client';
+
+import { useState } from 'react';
+import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function SearchBar() {
+    const [searchQuery, setSearchQuery] = useState('');
+    const router = useRouter();
+
+    const handleSearch = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (searchQuery.trim()) {
+            router.push(`/home?search=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
+
     return (
-        <div className="hidden md:flex flex-1 max-w-lg mx-8 relative">
-            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                <Search className="w-5 h-5 text-gray-400" />
-            </div>
+        <form onSubmit={handleSearch} className="relative flex-1 max-w-2xl mx-4">
             <input
                 type="text"
-                placeholder="Search"
-                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-full focus:ring-black focus:border-black block pl-10 p-2.5 outline-none transition"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm kiếm tài liệu, bài viết..."
+                className="w-full px-4 py-2 pl-10 bg-gray-100 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             />
-        </div>
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <button
+                type="submit"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black text-white px-4 py-1 rounded-full text-sm font-medium hover:bg-gray-800 transition cursor-pointer"
+            >
+                Tìm
+            </button>
+        </form>
     );
 }

@@ -48,10 +48,10 @@ const FileUpload = () => {
             progress: 0,
             status: 'idle',
             title: file.name.split('.')[0],
-            university: '',
+            university: 'Bach khoa University',
             course: '',
             description: ''
-        }));
+        } as FileUploadItem));
 
         const newFilesForRedux = newFilesFull.map(({ file, ...rest }) => rest);
 
@@ -85,7 +85,7 @@ const FileUpload = () => {
     const isNextDisabled = () => {
         if (activeStep === 1) {
             if (files.length === 0) return true;
-            return files.some(f => f.status !== 'uploaded' && f.status !== 'success');
+            return files.some(f => f.status !== 'uploaded' && f.status !== 'success' && f.status !== 'analyzing');
         }
         if (activeStep === 2) {
             return uploadStatus === 'saving';

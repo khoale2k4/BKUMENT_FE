@@ -1,10 +1,18 @@
 'use client';
-import { Download, Eye, Share2, Bookmark } from 'lucide-react';
+import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { useEffect } from 'react';
-import { clearCurrentDocument, fetchAuthorById, fetchCommentsByDocId, fetchDocumentById } from '@/lib/redux/features/documentSlice';
+import { useEffect, useState } from 'react';
+import { clearCurrentDocument, fetchAuthorById, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments } from '@/lib/redux/features/documentSlice';
 import CommentSection from './commentSection/page';
+import { getAccessToken } from '@/lib/utils/token.util';
+import Pagination from '@/components/ui/Pagination';
+import ContentCard from '../home/contentCard/ContentCard';
+import ContentCardSkeleton from '../home/contentCard/ContentCardSkeleton';
+import { AppRoute } from '@/lib/appRoutes';
+import { useRouter } from 'next/navigation';
+import RelatedDocumentCard from './RelatedDocumentCard';
+import { DescriptionWithShowMore } from './DescriptionWithShowMore/page';
 
 const PDFViewer = dynamic(() => import('./pdfViewer/page'), { ssr: false, });
 const WordViewer = dynamic(() => import('./wordViewer/page'), { ssr: false });
@@ -15,19 +23,28 @@ const Skeleton = ({ className }: { className: string }) => (
 
 export default function DocumentDetailPage({ params }: { params: { id: string } }) {
     const dispatch = useAppDispatch();
-    const { currentDocument, currentAuthor, detailStatus, authorStatus } = useAppSelector((state) => state.documents);
+    const { currentDocument, currentAuthor, detailStatus, authorStatus, relatedDocuments, relatedStatus, relatedPage, relatedTotalPages } = useAppSelector((state) => state.documents);
+    const [token, setToken] = useState<string | null>(() => getAccessToken());
+    const router = useRouter();
+
 
     useEffect(() => {
         if (params.id) {
-            dispatch(fetchDocumentById(params.id));
-            dispatch(fetchAuthorById(params.id));
-            dispatch(fetchCommentsByDocId(params.id));
+            if (params.id) {
+                dispatch(fetchDocumentById(params.id));
+                dispatch(fetchAuthorById(params.id));
+                dispatch(fetchCommentsByDocId(params.id));
+                dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
+            }
+            return () => {
+                dispatch(clearCurrentDocument());
+            };
         }
-
-        return () => {
-            dispatch(clearCurrentDocument());
-        };
     }, [params.id, dispatch]);
+
+    const onRelatedPageChange = (newPage: number) => {
+        dispatch(fetchRelatedDocuments({ docId: params.id, page: newPage - 1, size: 5 }));
+    };
 
     const renderViewer = () => {
         if (detailStatus === 'loading' || !currentDocument) {
@@ -38,14 +55,14 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             );
         }
 
-        if (!currentDocument.downloadUrl) return <div className="p-8 text-center text-gray-500">Không có tài liệu</div>;
+        if (!currentDocument.viewUrl) return <div className="p-8 text-center text-gray-500">Không có tài liệu</div>;
 
-        const fileExtension = currentDocument.documentType || 'application/pdf'; // Giả sử fallback
+        const fileExtension = currentDocument.documentType || 'application/pdf';
 
         if (fileExtension === 'application/pdf') {
             return (
                 <div className="bg-gray-100 rounded-xl overflow-hidden border border-gray-200 mb-8 shadow-sm">
-                    <PDFViewer fileUrl={currentDocument.downloadUrl} />
+                    <PDFViewer fileUrl={currentDocument.viewUrl} token={token} />
                 </div>
             );
         }
@@ -156,9 +173,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                             <Skeleton className="h-4 w-2/3" />
                         </div>
                     ) : (
-                        <p className="text-gray-600 leading-relaxed text-justify">
-                            {currentDocument?.description}
-                        </p>
+                        <DescriptionWithShowMore description={currentDocument?.description} />
                     )}
                 </div>
 
@@ -184,6 +199,45 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                         </>
                     )}
                 </div>
+            </div>
+
+            {/* Related Documents Section */}
+            <div className="max-w-4xl mx-auto px-4 mb-16 border-t border-gray-100 pt-8">
+                <h3 className="text-xl font-bold text-gray-900 mb-6">Tài liệu liên quan</h3>
+
+                {relatedStatus === 'loading' ? (
+                    <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="min-w-[280px] w-[280px] h-[380px] bg-gray-200 animate-pulse rounded-xl flex-shrink-0" />
+                        ))}
+                    </div>
+                ) : relatedDocuments.length > 0 ? (
+                    <div className="relative group/container">
+                        <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-1 no-scrollbar scroll-smooth" id="related-docs-container">
+                            {relatedDocuments.map((doc: any) => (
+                                <RelatedDocumentCard
+                                    key={doc.id}
+                                    data={{
+                                        id: doc.id,
+                                        title: doc.title,
+                                        createdAt: doc.createdAt,
+                                        coverImage: doc.previewImageUrl,
+                                        author: doc.university,
+                                        onClick: () => router.push(AppRoute.documents.id(doc.id))
+                                    }}
+                                />
+                            ))}
+                            <div
+                                className="min-w-[100px] flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-50 rounded-xl border border-dashed border-gray-300 transition"
+                                onClick={() => onRelatedPageChange(relatedPage + 2)} 
+                            >
+                                <span className="text-sm font-medium text-gray-500">Xem thêm</span>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">Không có tài liệu liên quan nào.</div>
+                )}
             </div>
 
             <div className="max-w-4xl mx-auto px-4">

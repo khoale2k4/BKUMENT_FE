@@ -29,3 +29,15 @@ export const searchBlogs = async (page: number, size: number): Promise<SearchRes
         totalPages: response.data.result.totalPages || 10,
     };
 };
+
+/**
+ * Search content by keyword với pagination
+ */
+export const searchContent = async (query: string, page: number, size: number): Promise<SearchResponse> => {
+    const response = await httpClient.get(API_ENDPOINTS.HOME.SEARCH(query, page, size));
+
+    return {
+        content: response.data.results || [],
+        totalPages: Math.ceil((response.data.results?.length || 0) / size) || 1,
+    };
+};

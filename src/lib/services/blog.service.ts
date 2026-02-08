@@ -1,4 +1,6 @@
 import { API_ENDPOINTS } from '@/lib/apiEndPoints';
+import httpClient from './http';
+import axios from 'axios';
 
 interface BlogPost {
     title: string;
@@ -19,33 +21,27 @@ interface BlogDetail {
 }
 
 /**
+ * Lấy presigned URL để upload file
+ */
+export const getPresignedUrl = async (fileName: string): Promise<{ url: string; assetId: string }> => {
+    const response = await httpClient.get(API_ENDPOINTS.RESOURCE.GET_PRESIGNED_URL(fileName));
+    return {
+        url: response.data.result.url,
+        assetId: response.data.result.assetId,
+    };
+};
+
+/**
  * Upload image và trả về URL
  */
 export const uploadImage = async (file: File): Promise<string> => {
     // Get presigned URL
-    const presignedRes = await fetch(
-        API_ENDPOINTS.RESOURCE.GET_PRESIGNED_URL(encodeURIComponent(file.name))
-    );
-    const presignedData = await presignedRes.json();
+    const { url, assetId } = await getPresignedUrl(file.name);
 
-    if (presignedData.code !== 1000) {
-        throw new Error(presignedData.message);
-    }
-
-    const { url: uploadUrl, assetId } = presignedData.result;
-
-    // Upload to storage
-    const uploadRes = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
+    await axios.put(url, file, {
         headers: { 'Content-Type': file.type },
     });
 
-    if (!uploadRes.ok) {
-        throw new Error('Upload failed');
-    }
-
-    // Return image URL
     return API_ENDPOINTS.RESOURCE.LINK_IMAGE_FILEID(assetId);
 };
 
@@ -53,33 +49,28 @@ export const uploadImage = async (file: File): Promise<string> => {
  * Submit blog post mới
  */
 export const submitPost = async (post: BlogPost): Promise<any> => {
-    const response = await fetch(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, {
-        method: 'POST',
-        body: JSON.stringify(post),
+    const response = await httpClient.post(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, JSON.stringify(post), {
         headers: { 'Content-Type': 'application/json' },
     });
 
-    if (!response.ok) {
-        throw new Error('Upload failed');
-    }
+    // if (!response.ok) {
+    //     throw new Error('Upload failed');
+    // }
 
-    const data = await response.json();
-    return data.result;
+    // const data = await response.json();
+    // return data.result;
 };
 
 /**
  * Fetch blog post theo ID
  */
 export const fetchPostById = async (blogId: string): Promise<BlogDetail> => {
-    const response = await fetch(API_ENDPOINTS.BLOGS.GET_DETAIL(blogId), {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await httpClient.get(API_ENDPOINTS.BLOGS.GET_DETAIL(blogId));
 
-    if (!response.ok) {
-        throw new Error('Fetch failed');
-    }
+    // if (!response.ok) {
+    //     throw new Error('Fetch failed');
+    // }
 
-    const data = await response.json();
-    return data.result.content[0];
+    // const data = await response.json();
+    // return data.result.content[0];
 };
