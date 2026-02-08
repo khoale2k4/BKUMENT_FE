@@ -193,6 +193,7 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { API_ENDPOINTS } from '@/lib/apiEndPoints'; 
+import * as authService from '@/lib/services/auth.service';
 
 // --- Helper to get token from LocalStorage (Safe for Next.js SSR) ---
 const getStoredToken = () => {
@@ -228,7 +229,7 @@ export interface RegisterPayload {
     account: {
         username: string;
         password: string;
-        role: string; 
+        role: string;
     };
     firstName: string;
     lastName: string;
@@ -242,28 +243,8 @@ export const loginUser = createAsyncThunk(
     'auth/loginUser',
     async (credentials: LoginPayload, { rejectWithValue }) => {
         try {
-            const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(credentials),
-            });
-
-            const data = await response.json();
-
-            if (data.code === 1000) {
-                // Return data
-                return {
-                    token: data.result.token,
-                    user: {
-                        name: credentials.username,
-                        email: credentials.username
-                    }
-                };
-            } else {
-                return rejectWithValue(data.message || 'Login failed');
-            }
+            const result = await authService.login(credentials);
+            return result;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Network error');
         }
@@ -274,17 +255,8 @@ export const registerUser = createAsyncThunk(
     'auth/registerUser',
     async (payload: RegisterPayload, { rejectWithValue }) => {
         try {
-            const response = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(payload),
-            });
-
-            const data = await response.json();
-            // Assuming simplified logic for now as per your original code
-            return data; 
+            const result = await authService.register(payload);
+            return result;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Network error');
         }
@@ -295,23 +267,8 @@ export const logoutUser = createAsyncThunk(
     'auth/logoutUser',
     async (token: string, { rejectWithValue }) => {
         try {
-            const response = await fetch(API_ENDPOINTS.AUTH.LOGOUT, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ token }),
-            });
-
-            if (!response.ok) {
-                // Even if API fails, we should still clear local state usually, 
-                // but here we throw to let the reducer handle rejected if needed.
-                // However, usually logout should always clear client state.
-                throw new Error('Logout API failed');
-            }
-
-            const data = await response.json();
-            return data;
+            const result = await authService.logout(token);
+            return result;
         } catch (error: any) {
             return rejectWithValue(error.message || 'Logout failed');
         }
