@@ -12,6 +12,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 const IDENTITY_URL = 'http://localhost:8080/identity';
 
 const LMS_URL = 'http://localhost:8082/lms';
+const SOCKET_URL = 'http://localhost:8099';
 //local
 const DEBUG_URL = ''
 
@@ -77,5 +78,8 @@ export const API_ENDPOINTS = {
         GET_TUTOR_CLASSES: `${LMS_URL}/classes`,
 
     },
+    SOCKET: {
+        CONNECT_URL: `${SOCKET_URL}`
+    }
 };
 
