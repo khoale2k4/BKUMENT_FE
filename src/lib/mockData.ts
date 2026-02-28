@@ -1,4 +1,144 @@
 // Mock data for document analysis
+import { ParticipantInfo, Conversation, ChatMessage, PaginatedResponse } from "./services/chat.service";
+
+// --- MOCK PARTICIPANTS ---
+export const MOCK_PARTICIPANTS: Record<string, ParticipantInfo> = {
+    me: { userId: "u0", username: "toi_la_ai", firstName: "Lê Võ Đăng", lastName: "Khoa", avatar: "https://i.pravatar.cc/150?u=0" },
+    kiet: { userId: "u1", username: "kiet_nguyen", firstName: "Nguyễn Tuấn", lastName: "Kiệt", avatar: "https://i.pravatar.cc/150?u=1" },
+    nhaan: { userId: "u2", username: "nhaan_ne", firstName: "Nhaan", lastName: "", avatar: "https://i.pravatar.cc/150?u=10" },
+    nhan: { userId: "u3", username: "nhan_tran", firstName: "Nhân", lastName: "", avatar: "https://i.pravatar.cc/150?u=11" },
+    nguoila: { userId: "u4", username: "nguoi_la", firstName: "Người", lastName: "Lạ", avatar: "https://i.pravatar.cc/150?u=12" },
+    tien: { userId: "u5", username: "tien_thuy", firstName: "Trần Thủy", lastName: "Tiên", avatar: "https://i.pravatar.cc/150?u=3" },
+};
+
+// --- MOCK DANH SÁCH CUỘC TRÒ CHUYỆN (Có phân trang) ---
+export const mockConversationsResponse: PaginatedResponse<Conversation> = {
+    content: [
+        {
+            id: "c1",
+            type: "DIRECT",
+            name: null, // DIRECT thì có thể không cần tên (UI sẽ lấy tên người kia)
+            participantsHash: "hash_u0_u1",
+            participants: [MOCK_PARTICIPANTS.me, MOCK_PARTICIPANTS.kiet],
+            createdDate: new Date(Date.now() - 36000000).toISOString(),
+            lastMessage: "Bạn: hehe",
+            lastMessageTime: new Date(Date.now() - 3600000).toISOString(), // 1 giờ trước
+            modifiedDate: new Date(Date.now() - 3600000).toISOString(),
+        },
+        {
+            id: "c2",
+            type: "GROUP",
+            name: "Tình một đêm", // GROUP thì có tên
+            participantsHash: "hash_u0_u2_u3_u4",
+            participants: [MOCK_PARTICIPANTS.me, MOCK_PARTICIPANTS.nhaan, MOCK_PARTICIPANTS.nhan, MOCK_PARTICIPANTS.nguoila],
+            createdDate: new Date(Date.now() - 86400000).toISOString(),
+            lastMessage: "Nhaan: Có",
+            lastMessageTime: new Date(Date.now() - 7200000).toISOString(), // 2 giờ trước
+            modifiedDate: new Date(Date.now() - 7200000).toISOString(),
+        },
+        {
+            id: "c3",
+            type: "DIRECT",
+            name: null,
+            participantsHash: "hash_u0_u5",
+            participants: [MOCK_PARTICIPANTS.me, MOCK_PARTICIPANTS.tien],
+            createdDate: new Date(Date.now() - 100000000).toISOString(),
+            lastMessage: "Em ăn cơm chưa?",
+            lastMessageTime: new Date(Date.now() - 86400000).toISOString(), // Hôm qua
+            modifiedDate: new Date(Date.now() - 86400000).toISOString(),
+        }
+    ],
+    page: 0,
+    size: 10,
+    totalElements: 3,
+    totalPages: 1,
+    last: true
+};
+
+// --- MOCK TIN NHẮN (Cho cuộc trò chuyện "c2" - Tình một đêm) ---
+export const mockMessagesData: ChatMessage[] = [
+    {
+        id: "m1",
+        conversationId: "c2",
+        type: "TEXT",
+        message: "Chỗ cũ nha",
+        sender: MOCK_PARTICIPANTS.nhaan,
+        createdDate: new Date(Date.now() - 7300000).toISOString()
+    },
+    {
+        id: "m2",
+        conversationId: "c2",
+        type: "TEXT",
+        message: "Đức",
+        sender: MOCK_PARTICIPANTS.me,
+        createdDate: new Date(Date.now() - 7290000).toISOString()
+    },
+    {
+        id: "m3",
+        conversationId: "c2",
+        type: "TEXT",
+        message: "Ông tới chưa",
+        sender: MOCK_PARTICIPANTS.nhaan,
+        createdDate: new Date(Date.now() - 7250000).toISOString() // Giả lập cách tin nhắn trên 40 phút để trigger thời gian
+    },
+    {
+        id: "m4",
+        conversationId: "c2",
+        type: "TEXT",
+        message: "Có cái bàn này tụi mình ngồi được nè",
+        sender: MOCK_PARTICIPANTS.nhaan,
+        createdDate: new Date(Date.now() - 7240000).toISOString()
+    },
+    {
+        id: "m4_img",
+        conversationId: "c2",
+        type: "IMAGE",
+        message: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1470&auto=format&fit=crop",
+        sender: MOCK_PARTICIPANTS.nhaan,
+        createdDate: new Date(Date.now() - 7235000).toISOString()
+    },
+    {
+        id: "m5",
+        conversationId: "c2",
+        type: "TEXT",
+        message: "Giữ bàn đi",
+        sender: MOCK_PARTICIPANTS.me,
+        createdDate: new Date(Date.now() - 7220000).toISOString()
+    },
+    {
+        id: "m6",
+        conversationId: "c2",
+        type: "TEXT",
+        message: "Tui còn ngoài nhà xe, vô liền",
+        sender: MOCK_PARTICIPANTS.me,
+        createdDate: new Date(Date.now() - 7215000).toISOString()
+    },
+    {
+        id: "m7",
+        conversationId: "c2",
+        type: "TEXT",
+        message: "Mấy ông đâu z",
+        sender: MOCK_PARTICIPANTS.nhan,
+        createdDate: new Date(Date.now() - 7210000).toISOString()
+    },
+    {
+        id: "m8",
+        conversationId: "c2",
+        type: "TEXT",
+        message: "Ko thấy ai hết",
+        sender: MOCK_PARTICIPANTS.nguoila,
+        createdDate: new Date(Date.now() - 7205000).toISOString()
+    },
+    {
+        id: "m9",
+        conversationId: "c2",
+        type: "TEXT",
+        message: "Có",
+        sender: MOCK_PARTICIPANTS.nhaan,
+        createdDate: new Date(Date.now() - 7200000).toISOString()
+    }
+];
+
 export const MOCK_ANALYSIS_KEYWORDS = [
     "Machine Learning",
     "Deep Learning",

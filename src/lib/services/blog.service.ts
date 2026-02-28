@@ -64,7 +64,7 @@ export const submitPost = async (post: BlogPost): Promise<any> => {
 /**
  * Fetch blog post theo ID
  */
-export const fetchPostById = async (blogId: string): Promise<BlogDetail> => {
+export const fetchPostById = async (blogId: string) => {
     const response = await httpClient.get(API_ENDPOINTS.BLOGS.GET_DETAIL(blogId));
 
     // if (!response.ok) {

@@ -59,6 +59,11 @@ export const API_ENDPOINTS = {
         UPDATE_METADATA: `${API_BASE_URL}/resource/metadata`,
         LINK_IMAGE_FILEID: (fileId: string) => `${API_BASE_URL}/resource/download/asset/${fileId}`,
     },
+    CHAT:{
+        GET_CONVERSATIONS: (page: number, size: number) => `${DEBUG_URL}/api/chats?page=${page}&size=${size}`,
+        GET_MESSAGES: (conversationId: string) => `${DEBUG_URL}/api/chats/${conversationId}`,
+        SEND_MESSAGE: `${DEBUG_URL}/api/chats/messages`,
+    },
     COMMENTS: {
         GET_BY_DOC: (id: string | number) => `${DEBUG_URL}/api/documents/${id}/comments`,
     },
