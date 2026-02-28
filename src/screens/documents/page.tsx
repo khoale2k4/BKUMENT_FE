@@ -13,6 +13,7 @@ import { AppRoute } from '@/lib/appRoutes';
 import { useRouter } from 'next/navigation';
 import RelatedDocumentCard from './RelatedDocumentCard';
 import { DescriptionWithShowMore } from './DescriptionWithShowMore/page';
+import httpClient from '@/lib/services/http';
 
 const PDFViewer = dynamic(() => import('./pdfViewer/page'), { ssr: false, });
 const WordViewer = dynamic(() => import('./wordViewer/page'), { ssr: false });
@@ -26,6 +27,31 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     const { currentDocument, currentAuthor, detailStatus, authorStatus, relatedDocuments, relatedStatus, relatedPage, relatedTotalPages } = useAppSelector((state) => state.documents);
     const [token, setToken] = useState<string | null>(() => getAccessToken());
     const router = useRouter();
+
+    const handleDownload = async () => {
+        if (!currentDocument) return;
+
+        try {
+            const response = await httpClient.get(currentDocument.downloadUrl, {
+                responseType: 'blob',
+            });
+
+            const blob = new Blob([response.data], { type: response.headers['content-type'] });
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', currentDocument.title || 'document.pdf');
+            document.body.appendChild(link);
+            link.click();
+
+            link.parentNode?.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error("Tải file thất bại:", error);
+            alert("Không thể tải file, vui lòng thử lại.");
+        }
+    };
 
 
     useEffect(() => {
@@ -141,7 +167,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                     <div className="flex items-center justify-center gap-3">
                         <button
                             disabled={isDocLoading || !currentDocument?.downloadable}
-                            onClick={() => currentDocument && window.open(currentDocument.downloadUrl, '_blank')}
+                            onClick={() => handleDownload()}
                             className={`
                                 flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition
                                 ${!isDocLoading && currentDocument?.downloadable

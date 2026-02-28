@@ -48,7 +48,7 @@ const FileUpload = () => {
             progress: 0,
             status: 'idle',
             title: file.name.split('.')[0],
-            university: 'Bach khoa University',
+            university: '',
             course: '',
             description: ''
         } as FileUploadItem));

@@ -1,167 +1,252 @@
-export const ARTICLES_DATA = [
-    {
-        id: "9f30a3ce-a937-42ca-a3e5-faff19931f09",
-        author: "Le võ dang khoa ly thanh nhat quang phuc non",
-        time: "2025-11-20 09:30:00",
-        title: "Your portfolio is stopping you from getting that job",
-        content: "An intense way to learn about the process and practice your designs skills — My 1st hackathon Hackathons have been on my mind since I heard it was a good way to gain experience as a junior UX designer. As my portfolio...",
-        assets: ["https://placehold.co/400x400/1e293b/FFF?text=Portfolio"],
-        tags: ["Career", "Design"],
-    },
-    {
-        id: "02ef68d6-fa93-4ffa-9ad5-53ef3d11b804",
-        author: "Amit Das",
-        time: "2025-11-19 14:20:15",
-        title: "Melody mobile app: a UI UX case study",
-        content: "Music is something that everyone loves. But how do we design an app that not only plays music but understands the user's mood? Here is my journey of designing the Melody App...",
-        assets: ["https://placehold.co/400x400/3b82f6/FFF?text=Mobile+App"],
-        tags: ["UI/UX Design", "Case Study"],
-    },
-    {
-        id: "a6a32582-f025-4091-9675-6ad8f774dbf6",
-        author: "Sarah Jenkins",
-        time: "2025-11-18 10:15:00",
-        title: "Why Redux Toolkit is a game changer for React Developers",
-        content: "Gone are the days of complex boilerplate code. Redux Toolkit simplifies state management in React applications effectively. Let's dive into createSlice and createAsyncThunk...",
-        assets: ["https://placehold.co/400x400/7c3aed/FFF?text=Redux"],
-        tags: ["React", "Development"],
-    },
-    {
-        id: "e58907a3-e4f3-486f-ade8-4901f7d2d3c4",
-        author: "David Nguyen",
-        time: "2025-11-17 08:45:00",
-        title: "The Art of Minimalist Web Design",
-        content: "Whitespace is not empty space. It is an active element of design. Learn how to use negative space to guide user attention and improve readability in your next web project...",
-        assets: ["https://placehold.co/400x400/10b981/FFF?text=Minimalism"],
-        tags: ["Design", "Web"],
-    },
-    {
-        id: "da895b67-9fb3-4ca3-8235-6396cb775c2a",
-        author: "Emily Watson",
-        time: "2025-11-16 16:50:00",
-        title: "10 Tips to Ace Your Frontend Interview",
-        content: "Technical skills are important, but soft skills and problem-solving approaches matter just as much. Here are the top 10 things interviewers look for in a Senior Frontend Developer...",
-        assets: ["https://placehold.co/400x400/f59e0b/FFF?text=Interview"],
-        tags: ["Career", "Tips"],
-    },
-    {
-        id: "a0a36ef5-aac7-4ec9-8ae1-d31bed2e5c81",
-        author: "Michael Chen",
-        time: "2025-11-15 11:00:00",
-        title: "Understanding Next.js 15 Server Actions",
-        content: "Next.js 15 introduces powerful Server Actions that allow you to mutate data directly from your components without creating API routes. Is this the future of full-stack React?",
-        assets: ["https://placehold.co/400x400/000000/FFF?text=Next.js"],
-        tags: ["Technology", "Next.js"],
-    },
-    {
-        id: "09d3734c-5847-451b-8475-1f885a144236",
-        author: "Jessica Lee",
-        time: "2025-11-14 09:10:00",
-        title: "Color Theory for Developers: A Crash Course",
-        content: "You don't need to be a designer to pick good colors. Understanding complementary, analogous, and monochromatic schemes can help you build better-looking UIs...",
-        assets: ["https://placehold.co/400x400/ec4899/FFF?text=Colors"],
-        tags: ["Design", "Tutorial"],
-    },
-    {
-        id: "094b687d-f40c-40d5-bb88-d569f89d64ae",
-        author: "Robert Fox",
-        time: "2025-11-13 13:25:00",
-        title: "My setup for maximum productivity in 2025",
-        content: "From VS Code extensions to desk setup. Here is how I configure my environment to stay focused and code faster without burning out...",
-        assets: ["https://placehold.co/400x400/6366f1/FFF?text=Setup"],
-        tags: ["Productivity", "Lifestyle"],
-    },
+// Mock data for document analysis
+export const MOCK_ANALYSIS_KEYWORDS = [
+    "Machine Learning",
+    "Deep Learning",
+    "Neural Networks",
+    "Artificial Intelligence",
+    "Data Science"
 ];
 
-export const INITIAL_COMMENTS = [
+export const MOCK_ANALYSIS_RESULT = {
+    keywords: MOCK_ANALYSIS_KEYWORDS,
+    summary: "This document discusses advanced concepts in machine learning and artificial intelligence, with a focus on neural networks and deep learning applications."
+};
+
+// Mock data for articles
+export const ARTICLESDATA = [
     {
         id: 1,
-        user: "Sarah Nguyen",
-        avatar: "https://placehold.co/100x100/orange/white?text=S",
-        content: "Tài liệu rất chi tiết, cảm ơn bạn đã chia sẻ! Phần test case mẫu rất hữu ích.",
-        time: "2 hours ago",
-        likes: 5
+        imageUrl: "/images/article-1.jpg",
+        title: "Understanding Machine Learning Basics",
+        description: "A comprehensive guide to getting started with machine learning concepts and applications.",
+        createdAt: "2024-01-15",
+        author: {
+            id: "user1",
+            name: "John Doe",
+            avatar: "/avatars/john.jpg"
+        },
+        likes: 45,
+        comments: 12
     },
     {
         id: 2,
-        user: "David Tran",
-        avatar: "https://placehold.co/100x100/3b82f6/white?text=D",
-        content: "Bạn có thể chia sẻ thêm về phần Automation Testing không?",
-        time: "5 hours ago",
-        likes: 2
+        imageUrl: "/images/article-2.jpg",
+        title: "Deep Learning in Practice",
+        description: "Exploring real-world applications of deep learning in various industries.",
+        createdAt: "2024-01-20",
+        author: {
+            id: "user2",
+            name: "Jane Smith",
+            avatar: "/avatars/jane.jpg"
+        },
+        likes: 67,
+        comments: 23
     }
 ];
 
-export const TOPICS = {
-    topics: [
-        "Toán học",
-        "Ngữ văn",
-        "Tiếng Anh",
-        "Vật lý",
-        "Hóa học",
-        "Sinh học",
-        "Lịch sử",
-        "Địa lý",
-        "Giáo dục công dân",
-        "Tin học",
-        "Công nghệ",
-        "Âm nhạc",
-        "Mỹ thuật",
-        "Giáo dục thể chất"
-    ]
-}
-
-export const DOCUMENT_ANALYSE = {
-    keywords: [
-        "HTML5",
-        "CSS",
-        "JavaScript",
-        "PHP",
-        "Responsive Design",
-        "Databases",
-        "Database Management Systems",
-        "JQuery",
-        "AJAX",
-        "Cookies",
-        "Sessions",
-        "SEO",
-        "Web Security",
-        "Web Development Lifecycle",
-        "Client-Server Model",
-        "URL",
-        "Web Browsers",
-        "Web Servers",
-        "TCP/IP",
-        "HTTP",
-        "W3C"
-    ],
-    summary: "This document outlines the fundamentals of web development, covering topics such as HTML5, CSS, JavaScript, PHP, and database management. It explores the client-server model, web browsers, servers, URL formats, and the web development lifecycle. Additionally, it introduces concepts like cookies, sessions, SEO, web security, and relevant web standards from W3C."
-}
-
-export const DOCUMENT_DATA = {
-    id: "doc-123",
-    title: "Báo cáo môn Software Testing: Black Box Testing Campaign",
-    description: "Tài liệu chi tiết về chiến dịch kiểm thử hộp đen cho dự án thương mại điện tử. Bao gồm kế hoạch kiểm thử, thiết kế test case, và báo cáo lỗi chi tiết. Phù hợp cho sinh viên và người mới bắt đầu tìm hiểu QA/QC.",
-    author: {
-        name: "Amit Das",
-        role: "Senior QA Engineer",
-        avatar: "https://placehold.co/100x100/3b82f6/white?text=A",
-        followers: "2.5K"
+// Mock data for comments
+export const COMMENTSDATA = [
+    {
+        id: "comment1",
+        userId: "user1",
+        userName: "John Doe",
+        userAvatar: "/avatars/john.jpg",
+        content: "Great article! Very informative.",
+        createdAt: "2024-01-16",
+        likes: 5
     },
-    stats: {
-        views: 1240,
-        downloads: 350,
-        pages: 24,
-        date: "Dec 20, 2024"
+    {
+        id: "comment2",
+        userId: "user2",
+        userName: "Jane Smith",
+        userAvatar: "/avatars/jane.jpg",
+        content: "Thanks for sharing this resource.",
+        createdAt: "2024-01-17",
+        likes: 3
+    }
+];
+
+// Mock data for topics
+export const TOPICSDATA = [
+    { id: "topic1", name: "Machine Learning", icon: "🤖" },
+    { id: "topic2", name: "Web Development", icon: "🌐" },
+    { id: "topic3", name: "Data Science", icon: "📊" },
+    { id: "topic4", name: "Mobile Development", icon: "📱" },
+    { id: "topic5", name: "Cloud Computing", icon: "☁️" },
+    { id: "topic6", name: "Cybersecurity", icon: "🔒" },
+    { id: "topic7", name: "DevOps", icon: "⚙️" },
+    { id: "topic8", name: "Blockchain", icon: "⛓️" }
+];
+
+// NEW ARTICLE STRUCTURE - with tags
+export const ARTICLESDATA_NEW = [
+    {
+        id: 1,
+        imageUrl: "/images/article-1.jpg",
+        title: "Understanding Machine Learning Basics",
+        description: "A comprehensive guide to getting started with machine learning concepts and applications.",
+        content: "Full article content here...",
+        createdAt: "2024-01-15",
+        author: {
+            id: "user1",
+            name: "John Doe",
+            avatar: "/avatars/john.jpg"
+        },
+        likes: 45,
+        comments: 12,
+        tags: ["Machine Learning", "AI", "Data Science"]
+    }
+];
+
+// Mock data for search with tabs
+export const SEARCH_RESULTS = {
+    all: {
+        documents: [
+            {
+                id: "doc1",
+                title: "Introduction to Neural Networks",
+                type: "document",
+                university: "Bach Khoa University",
+                course: "Machine Learning"
+            }
+        ],
+        articles: [
+            {
+                id: "article1",
+                title: "Deep Learning Guide",
+                type: "article",
+                author: "John Doe"
+            }
+        ],
+        users: [
+            {
+                id: "user1",
+                name: "Jane Smith",
+                type: "user",
+                avatar: "/avatars/jane.jpg"
+            }
+        ]
     },
-    fileUrl: "https://pdfobject.com/pdf/sample-3pp.pdf"
+    documents: [],
+    articles: [],
+    users: []
 };
 
-export const BLOD_DATA = {
-    "title": "Nghi vấn 'bắt tay' từng khiến U.23 Việt Nam bị loại đau đớn khỏi U.23 châu Á",
-    "description": "abcdef",
-    "coverImage": "https://images2.thanhnien.vn/528068263637045248/2025/12/26/cang-hang-khong-quoc-te-phu-quoc-nha-ga-t2-1766733981877227298326.jpg",
-    "contentHTML": "<h2><strong>Song song với chiến tích đoạt ngôi á quân năm 2018, U.23 Việt Nam từng chứng kiến nhiều kỷ niệm buồn khi ra 'biển lớn' U.23 châu Á.</strong></h2><h2><strong>U.23 Việt Nam và ký ức khó quên</strong></h2><p>Kỳ tích Thường Châu với tấm HCB U.23 châu Á năm 2018 đã thay đổi vĩnh viễn lịch sử bóng đá trẻ Việt Nam. Với bệ phóng á quân, <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"seo-suggest-link link-inline-content\" href=\"https://thanhnien.vn/u23-viet-nam-len-duong-sang-qatar-tap-huan-san-sang-tao-tieng-vang-o-vck-u23-chau-a-185251226045853965.htm\">U.23 Việt Nam</a> dần khẳng định bản lĩnh ở \"biển lớn\". Hai kỳ U.23 châu Á gần nhất (năm 2024 và 2022), toàn đội đều vượt qua vòng bảng.</p><p>Tuy nhiên, U.23 Việt Nam cũng có những ký ức buồn, diễn vào vào năm 2020. Khi ấy, đội bóng của HLV Park Hang-seo đang là đương kim á quân giải đấu, trước đó cũng hừng hực khí thế với chức vô địch SEA Games 30 (năm 2019) đầy thuyết phục trên đất Philippines.</p><p>Việc nằm ở bảng đấu vừa vặn với U.23 Jordan, U.23 UAE và U.23 CHDCND Triều Tiên, U.23 Việt Nam được chờ đợi dễ dàng đoạt vé vào tứ kết. Song, thực tế diễn ra ngược lại.</p><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"detail-img-lightbox\" href=\"https://images2.thanhnien.vn/528068263637045248/2025/12/16/u23-vietnam-2-17658561303842145453005.jpg\"><img src=\"https://images2.thanhnien.vn/thumb_w/640/528068263637045248/2025/12/16/u23-vietnam-2-17658561303842145453005.jpg\" alt=\"Nghi vấn 'bắt tay' từng khiến U.23 Việt Nam bị loại đau đớn khỏi U.23 châu Á- Ảnh 1.\" title=\"Nghi vấn 'bắt tay' từng khiến U.23 Việt Nam bị loại đau đớn khỏi U.23 châu Á- Ảnh 1.\" width=\"2560\" height=\"1706\"></a>Dù có hàng thủ chắc chắn mang thương hiệu Park Hang-seo, nhưng do khâu tấn công không còn được gồng gánh bởi những đàn anh quá tuổi như Đỗ Hùng Dũng, Nguyễn Trọng Hoàng tại SEA Games 30, nên U.23 Việt Nam không thể ghi bàn. Học trò ông Park để hòa 0-0 trước U.23 Jordan và U.23 UAE, dẫn đến mất quyền tự quyết. Trước thềm lượt đấu cuối, U.23 Jordan và U.23 UAE cùng có 4 điểm (do cùng hòa U.23 Việt Nam và thắng U.23 CHDCND Triều Tiên), còn U.23 Việt Nam chỉ có 2 điểm. Đồng nghĩa, muốn đi tiếp, U.23 Việt Nam phải thắng U.23 CHDCND Triều Tiên, đồng thời mong trận U.23 Jordan gặp U.23 UAE ở lượt cuối phải phân định thắng bại, hoặc hòa không bàn thắng.&nbsp;</p><p>Nếu U.23 Jordan và U.23 UAE hòa có bàn thắng, U.23 Việt Nam có thắng với tỷ số nào đi nữa cũng phải dừng cuộc chơi, do kém đối thủ số bàn thắng ghi được trong những cuộc đối đầu trực tiếp.&nbsp;</p><p>Thầy trò HLV Park Hang-seo sau cùng đã không làm được cả... điều kiện cần, khi bất ngờ thua 1-2 trước U.23 CHDCND Triều Tiên. Dù vậy, kể cả khi thắng, U.23 Việt Nam cũng sẽ bị loại, khi U.23 UAE và U.23 Jordan hòa nhau với tỷ số 1-1. Kết quả vừa đủ để đánh bật đương kim á quân U.23 Việt Nam khỏi cuộc chơi.&nbsp;</p><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"category-page__name\" href=\"https://thanhnien.vn/the-thao.htm\"><strong>Thể thao</strong></a> <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://thanhnien.vn/the-thao/bong-da-viet-nam.htm\"><strong>Bóng đá Việt Nam</strong></a></p><h1><strong>Nghi vấn 'bắt tay' từng khiến U.23 Việt Nam bị loại đau đớn khỏi U.23 châu Á</strong></h1><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"avatar author-data\" href=\"https://thanhnien.vn/author/hong-nam-18515655.htm\"><img src=\"https://images2.thanhnien.vn/zoom/80_80/528068263637045248/2023/7/8/img6578-16888121214401842466449.jpg\" alt=\"Hồng Nam\"></a></p><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"name\" href=\"https://thanhnien.vn/author/hong-nam-18515655.htm\"><strong>Hồng Nam</strong></a>- <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"mailto:nammoc95@gmail.com\">nammoc95@gmail.com</a></p><p>26/12/2025 09:13 GMT+7</p><h2><strong>Song song với chiến tích đoạt ngôi á quân năm 2018, U.23 Việt Nam từng chứng kiến nhiều kỷ niệm buồn khi ra 'biển lớn' U.23 châu Á.</strong></h2><h2><strong>U.23 Việt Nam và ký ức khó quên</strong></h2><p>Kỳ tích Thường Châu với tấm HCB U.23 châu Á năm 2018 đã thay đổi vĩnh viễn lịch sử bóng đá trẻ Việt Nam. Với bệ phóng á quân, <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"seo-suggest-link link-inline-content\" href=\"https://thanhnien.vn/u23-viet-nam-len-duong-sang-qatar-tap-huan-san-sang-tao-tieng-vang-o-vck-u23-chau-a-185251226045853965.htm\">U.23 Việt Nam</a> dần khẳng định bản lĩnh ở \"biển lớn\". Hai kỳ U.23 châu Á gần nhất (năm 2024 và 2022), toàn đội đều vượt qua vòng bảng.</p><p>Tuy nhiên, U.23 Việt Nam cũng có những ký ức buồn, diễn vào vào năm 2020. Khi ấy, đội bóng của HLV Park Hang-seo đang là đương kim á quân giải đấu, trước đó cũng hừng hực khí thế với chức vô địch SEA Games 30 (năm 2019) đầy thuyết phục trên đất Philippines.</p><p>Việc nằm ở bảng đấu vừa vặn với U.23 Jordan, U.23 UAE và U.23 CHDCND Triều Tiên, U.23 Việt Nam được chờ đợi dễ dàng đoạt vé vào tứ kết. Song, thực tế diễn ra ngược lại.</p><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"detail-img-lightbox\" href=\"https://images2.thanhnien.vn/528068263637045248/2025/12/16/u23-vietnam-2-17658561303842145453005.jpg\"><img src=\"https://images2.thanhnien.vn/thumb_w/640/528068263637045248/2025/12/16/u23-vietnam-2-17658561303842145453005.jpg\" alt=\"Nghi vấn 'bắt tay' từng khiến U.23 Việt Nam bị loại đau đớn khỏi U.23 châu Á- Ảnh 1.\" title=\"Nghi vấn 'bắt tay' từng khiến U.23 Việt Nam bị loại đau đớn khỏi U.23 châu Á- Ảnh 1.\" width=\"2560\" height=\"1706\"></a></p><p>U.23 Việt Nam chuẩn bị bước ra sân chơi U.23 châu Á</p><p>ẢNH: ĐỒNG NGUYÊN KHANG</p><p>Dù có hàng thủ chắc chắn mang thương hiệu Park Hang-seo, nhưng do khâu tấn công không còn được gồng gánh bởi những đàn anh quá tuổi như Đỗ Hùng Dũng, Nguyễn Trọng Hoàng tại SEA Games 30, nên U.23 Việt Nam không thể ghi bàn. Học trò ông Park để hòa 0-0 trước U.23 Jordan và U.23 UAE, dẫn đến mất quyền tự quyết. Trước thềm lượt đấu cuối, U.23 Jordan và U.23 UAE cùng có 4 điểm (do cùng hòa U.23 Việt Nam và thắng U.23 CHDCND Triều Tiên), còn U.23 Việt Nam chỉ có 2 điểm. Đồng nghĩa, muốn đi tiếp, U.23 Việt Nam phải thắng U.23 CHDCND Triều Tiên, đồng thời mong trận U.23 Jordan gặp U.23 UAE ở lượt cuối phải phân định thắng bại, hoặc hòa không bàn thắng.&nbsp;</p><p>Advertisements</p><p>Ads end in 13</p><p><strong>X</strong></p><p>Nếu U.23 Jordan và U.23 UAE hòa có bàn thắng, U.23 Việt Nam có thắng với tỷ số nào đi nữa cũng phải dừng cuộc chơi, do kém đối thủ số bàn thắng ghi được trong những cuộc đối đầu trực tiếp.&nbsp;</p><p>Thầy trò HLV Park Hang-seo sau cùng đã không làm được cả... điều kiện cần, khi bất ngờ thua 1-2 trước U.23 CHDCND Triều Tiên. Dù vậy, kể cả khi thắng, U.23 Việt Nam cũng sẽ bị loại, khi U.23 UAE và U.23 Jordan hòa nhau với tỷ số 1-1. Kết quả vừa đủ để đánh bật đương kim á quân U.23 Việt Nam khỏi cuộc chơi.&nbsp;</p><p style=\"text-align: center;\">U.23 Việt Nam ‘mổ băng’ từng đối thủ, đặt mục tiêu lớn ở đấu trường châu Á</p><h2><strong>Bài học&nbsp;</strong></h2><p>Thế nhưng, bỏ qua nghi vấn liệu đối thủ có \"bắt tay\" để loại U.23 Việt Nam hay không, rõ ràng, đội bóng trẻ của ông Park chỉ có thể tự trách mình.&nbsp;</p><p>U.23 Việt Nam không thể thắng và cũng... chẳng thể ghi bàn vào lưới những đối thủ cạnh tranh trực tiếp, nên hiển nhiên không có quyền tự quyết trước lượt cuối.&nbsp;</p><p><a target=\"_blank\" rel=\"noopener noreferrer nofollow\" class=\"detail-img-lightbox\" href=\"https://images2.thanhnien.vn/528068263637045248/2025/9/9/u23-4-1757426321549226478879.jpg\"><img src=\"https://images2.thanhnien.vn/thumb_w/640/528068263637045248/2025/9/9/u23-4-1757426321549226478879.jpg\" alt=\"Nghi vấn 'bắt tay' từng khiến U.23 Việt Nam bị loại đau đớn khỏi U.23 châu Á- Ảnh 2.\" title=\"Nghi vấn 'bắt tay' từng khiến U.23 Việt Nam bị loại đau đớn khỏi U.23 châu Á- Ảnh 2.\" width=\"2560\" height=\"1706\"></a>Tại vòng chung kết U.23 châu Á 2026, U.23 Việt Nam sẽ tái ngộ U.23 Jordan cùng một đội Tây Á khác (chủ nhà U.23 Ả Rập Xê Út). Khó khăn chồng chất cho thầy trò ông Kim, khi đối thủ đã quen với khí hậu và điều kiện thi đấu nóng nực khắc nghiệt tại Ả Rập Xê Út, còn U.23 Việt Nam phải thích nghi.</p><p>Tuy nhiên, U.23 Việt Nam vẫn có cơ hội của riêng mình. Chuỗi 11 chiến thắng ở các giải chính thức trong năm 2025, cùng cơ hội cọ xát với U.23 Trung Quốc, U.23 Hàn Quốc và U.23 Uzbekistan ở giải giao hữu quốc tế đã giúp học trò HLV Kim Sang-sik trưởng thành. Vậy nhưng, hãy nhớ bài học của chính U.23 Việt Nam năm xưa. Bên cạnh nhiệm vụ phòng ngự, U.23 Việt Nam chỉ có thể đi tiếp nếu tấn công và ghi bàn để định đoạt chiến thắng. Có như thế, đội mới có quyền tự quyết, thay vì để số phận nằm trên bàn tay đối thủ khác.</p><p>Bởi thế, HLV Kim Sang-sik đang quyết liệt rèn lại khâu dứt điểm cho các cầu thủ, triển khai nhiều mảng miếng tấn công đa dạng hơn, thay vì phụ thuộc vào phản công hay bóng bổng. Sự trở lại của tiền đạo Bùi Vĩ Hào đã thổi luồng gió mới, giúp ông Kim thêm lựa chọn.&nbsp;</p><p>Cuộc lội ngược dòng trước U.23 Thái Lan ở chung kết cho thấy, U.23 Việt Nam có thể khai mở tiềm năng tấn công, chỉ cần dám cầm bóng áp đặt thế trận, dám chơi trực diện, sòng phẳng và có tâm lý vững vàng.&nbsp;</p><p>Trước khi nghĩ đến kỳ tích, Nguyễn Đình Bắc cùng đồng đội cần chiến thắng chính mình.&nbsp;</p>",
-    "visibility": "PUBLIC",
-    "type": "POST"
-} 
+// Mock data for document list with tabs
+export const DOCUMENTS_BY_TAB = {
+    all: [],
+    recent: [],
+    trending: [],
+    saved: []
+};
+
+// Example document structure
+export const DOCUMENT_EXAMPLE = {
+    id: "doc123",
+    title: "Introduction to Machine Learning",
+    description: "A comprehensive guide covering the basics of ML",
+    downloadUrl: "https://example.com/downloads/ml-intro.pdf",
+    previewImageUrl: "https://example.com/previews/ml-intro.jpg",
+    downloadCount: 150,
+    documentType: "PDF",
+    downloadable: true,
+    university: "Bach Khoa University",
+    course: "Computer Science",
+    topic: "Machine Learning",
+    keywords: ["ML", "AI", "Data Science"],
+    visibility: "PUBLIC",
+    createdAt: "2024-01-15T10:00:00Z",
+    author: {
+        id: "user1",
+        name: "John Doe",
+        avatar: "/avatars/john.jpg"
+    }
+};
+
+// Mock data for universities
+export const UNIVERSITIES_DATA = [
+    { id: 1, name: "Trường Đại học Bách Khoa - ĐHQG TP.HCM", abbreviation: "HCMUT", logoUrl: null },
+    { id: 2, name: "Trường Đại học Khoa học Tự nhiên - ĐHQG TP.HCM", abbreviation: "HCMUS", logoUrl: null },
+    { id: 3, name: "Trường Đại học Khoa học Xã hội và Nhân văn - ĐHQG TP.HCM", abbreviation: "HCMUSSH", logoUrl: null },
+    { id: 4, name: "Trường Đại học Kinh tế - ĐHQG TP.HCM", abbreviation: "UEH", logoUrl: null },
+    { id: 5, name: "Trường Đại học Y Dược TP.HCM", abbreviation: "UMP", logoUrl: null },
+    { id: 6, name: "Trường Đại học Sư phạm TP.HCM", abbreviation: "HCMUE", logoUrl: null },
+    { id: 18, name: "Trường Đại học Ngân hàng TP.HCM", abbreviation: "HUB", logoUrl: null },
+    { id: 25, name: "Trường Đại học Bách Khoa Hà Nội", abbreviation: "HUST", logoUrl: null },
+    { id: 29, name: "Trường Đại học Bách Khoa - ĐH Đà Nẵng", abbreviation: "DUT", logoUrl: null },
+    { id: 30, name: "Trường Đại học Công nghệ Thông tin - ĐHQG TP.HCM", abbreviation: "UIT", logoUrl: null },
+];
+
+// Mock data for courses with nested topics
+export const COURSES_DATA = [
+    {
+        id: "INT1003",
+        name: "Lập trình Hướng đối tượng (Java)",
+        topics: [
+            { id: "c7fd7656-df18-446b-9018-b257d09d60d5", name: "Tính kế thừa và Đa hình" },
+            { id: "71fef4b1-46f5-4e2f-9f63-2019f0932799", name: "Lớp và Đối tượng (Class & Object)" },
+            { id: "c888d93c-5724-4133-8d46-365279bdf239", name: "Xử lý ngoại lệ (Exception Handling)" }
+        ]
+    },
+    {
+        id: "WEB1012",
+        name: "Lập trình Web Backend",
+        topics: [
+            { id: "0de769a1-a6c5-4857-87ad-4861d91239a4", name: "Kết nối cơ sở dữ liệu với ORM" },
+            { id: "fbfe3969-8f91-46e8-a954-b43b3c31c082", name: "Kiến trúc RESTful API" }
+        ]
+    },
+    {
+        id: "MOB1013",
+        name: "Lập trình thiết bị di động (Android/iOS)",
+        topics: [
+            { id: "67539a30-f82e-47ef-b2ab-b1bdfa8cd451", name: "Thiết kế giao diện Mobile" },
+            { id: "85a1b0b5-0443-4f3e-a542-e1eb9a620b21", name: "Vòng đời ứng dụng (Activity Lifecycle)" }
+        ]
+    },
+    {
+        id: "SEC1015",
+        name: "An toàn và bảo mật thông tin",
+        topics: [
+            { id: "fb9098e1-58f8-4ae3-81a3-65c6895c067e", name: "Mã hóa đối xứng và bất đối xứng" },
+            { id: "06cde5de-1174-41ec-92b7-959737268137", name: "Các lỗ hổng web phổ biến (OWASP)" }
+        ]
+    },
+    {
+        id: "DATA1016",
+        name: "Khoa học dữ liệu",
+        topics: [
+            { id: "4d0f9c67-f435-445c-8e14-d17e304d387f", name: "Trực quan hóa dữ liệu" },
+            { id: "92ddc249-0206-4e8c-a45a-1ec67a424edd", name: "Tiền xử lý dữ liệu (Data Preprocessing)" }
+        ]
+    },
+    {
+        id: "ENG4001",
+        name: "Tiếng Anh cơ bản 1",
+        topics: [
+            { id: "f309dc56-9138-420c-8fc3-14b7d209a4e8", name: "Thì hiện tại đơn và tiếp diễn" },
+            { id: "25e87704-329f-4a8a-a182-fce2352b594e", name: "Từ vựng về gia đình và công việc" }
+        ]
+    },
+    {
+        id: "ENG4002",
+        name: "Tiếng Anh cơ bản 2",
+        topics: []
+    },
+    {
+        id: "ENG4003",
+        name: "Tiếng Anh chuyên ngành",
+        topics: [
+            { id: "cd1a09ba-c5c9-4ade-a050-5c9bb664628f", name: "Đọc hiểu tài liệu kỹ thuật" },
+            { id: "93bdd519-f477-47cc-9686-0cefdfe7397f", name: "Viết Email công việc" }
+        ]
+    },
+    {
+        id: "SKL5001",
+        name: "Kỹ năng giao tiếp và làm việc nhóm",
+        topics: [
+            { id: "ac9d3f71-fb59-4bc1-875b-915ecd4b0cf4", name: "Kỹ năng lắng nghe tích cực" },
+            { id: "a55171c2-7b9c-4585-98b6-f58cc29d22c6", name: "Giải quyết xung đột nhóm" }
+        ]
+    }
+];

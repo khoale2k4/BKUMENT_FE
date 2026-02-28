@@ -10,7 +10,7 @@ interface SearchResponse {
  * Search documents với pagination
  */
 export const searchDocuments = async (page: number, size: number): Promise<SearchResponse> => {
-    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.SEARCH(page, size));
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.RECOMMENDED_DOCUMENTS(page, size));
 
     return {
         content: response.data.result.content,

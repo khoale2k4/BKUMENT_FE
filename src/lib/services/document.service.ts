@@ -20,7 +20,10 @@ interface FileUploadMetadata {
     id: string | undefined;
     title: string;
     university: string;
+    universityId?: string;
     course: string;
+    courseId?: string;
+    topicId?: string;
     description: string;
     resourceType: string;
     visibility: string;
@@ -77,5 +80,21 @@ export const analyseDocument = async (body: AnalyseDocumentBody): Promise<Analys
 
 export const getRelatedDocuments = async (id: string, page: number, size: number): Promise<any> => {
     const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.RELATED_DOCUMENTS(id, page, size));
+    return response.data.result;
+};
+
+/**
+ * Search universities by query
+ */
+export const searchUniversities = async (query: string): Promise<{ id: number; name: string; abbreviation: string; logoUrl: string | null }[]> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.UNIVERSITIES(query));
+    return response.data.result;
+};
+
+/**
+ * Search courses by query
+ */
+export const searchCourses = async (query: string): Promise<{ id: string; name: string; topics: { id: string; name: string }[] }[]> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.COURSES(query));
     return response.data.result;
 };

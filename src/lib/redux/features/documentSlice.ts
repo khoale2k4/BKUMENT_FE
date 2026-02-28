@@ -34,6 +34,24 @@ export interface UserInfo {
     user: string;
     avatar: string;
 }
+export interface University {
+    id: number;
+    name: string;
+    abbreviation: string;
+    logoUrl: string | null;
+}
+
+export interface Course {
+    id: string;
+    name: string;
+    topics: Topic[];
+}
+
+export interface Topic {
+    id: string;
+    name: string;
+}
+
 interface UploadState {
     files: FileUploadItem[];
     activeStep: number;
@@ -55,6 +73,15 @@ interface DocumentState {
     comments: Comment[];
     commentsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
+    universities: University[];
+    universitiesStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+
+    courses: Course[];
+    coursesStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+
+    topics: Topic[];
+    topicsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+
     upload: UploadState;
 }
 
@@ -72,6 +99,15 @@ const initialState: DocumentState = {
 
     comments: [],
     commentsStatus: 'idle',
+
+    universities: [],
+    universitiesStatus: 'idle',
+
+    courses: [],
+    coursesStatus: 'idle',
+
+    topics: [],
+    topicsStatus: 'idle',
 
     upload: {
         files: [],
@@ -130,6 +166,20 @@ export const fetchRelatedDocuments = createAsyncThunk(
             page: page,
             totalPages: response.totalPages
         };
+    }
+);
+
+export const searchUniversities = createAsyncThunk(
+    'documents/searchUniversities',
+    async (query: string) => {
+        return await documentService.searchUniversities(query);
+    }
+);
+
+export const searchCourses = createAsyncThunk(
+    'documents/searchCourses',
+    async (query: string) => {
+        return await documentService.searchCourses(query);
     }
 );
 
@@ -217,7 +267,10 @@ export const saveFilesMetadata = createAsyncThunk(
                     id: file.docId,
                     title: file.title || '',
                     university: file.university || '',
+                    universityId: file.universityId,
                     course: file.course || '',
+                    courseId: file.courseId,
+                    topicId: file.topicId,
                     description: file.description || '',
                     resourceType: 'DOCUMENT',
                     visibility: file.visibility,
@@ -340,6 +393,30 @@ const documentSlice = createSlice({
             })
             .addCase(fetchRelatedDocuments.rejected, (state) => {
                 state.relatedStatus = 'failed';
+            });
+
+        builder
+            .addCase(searchUniversities.pending, (state) => {
+                state.universitiesStatus = 'loading';
+            })
+            .addCase(searchUniversities.fulfilled, (state, action: PayloadAction<University[]>) => {
+                state.universitiesStatus = 'succeeded';
+                state.universities = action.payload;
+            })
+            .addCase(searchUniversities.rejected, (state) => {
+                state.universitiesStatus = 'failed';
+            });
+
+        builder
+            .addCase(searchCourses.pending, (state) => {
+                state.coursesStatus = 'loading';
+            })
+            .addCase(searchCourses.fulfilled, (state, action: PayloadAction<Course[]>) => {
+                state.coursesStatus = 'succeeded';
+                state.courses = action.payload;
+            })
+            .addCase(searchCourses.rejected, (state) => {
+                state.coursesStatus = 'failed';
             });
 
         builder.addCase(saveFilesMetadata.pending, (state) => {

@@ -15,6 +15,9 @@ export interface FileUploadItem {
     subject?: string;
     title?: string;
     university?: string;
+    universityId?: string;
+    courseId?: string;
+    topicId?: string;
     description?: string;
     keywords?: string[];
     summary?: string;

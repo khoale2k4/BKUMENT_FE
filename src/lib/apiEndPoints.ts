@@ -25,7 +25,7 @@ export const API_ENDPOINTS = {
     ACCOUNT: {
         PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
         GET_USER_INFO: `${DEBUG_URL}/api/user/info`,
-        TUTOR_GETS:`${DEBUG_URL}/api/user/tutors`
+        TUTOR_GETS: `${DEBUG_URL}/api/user/tutors`
     },
     ARTICLES: {
         GET_ALL: `${DEBUG_URL}/api/articles`,
@@ -43,6 +43,10 @@ export const API_ENDPOINTS = {
         TOPICS: `${DEBUG_URL}/api/documents/topics`,
         GET_DETAIL: (id: string | number) => `${API_BASE_URL}/document/search?q=${id}`,
         RELATED_DOCUMENTS: (id: string, page: number, size: number) => `${API_BASE_URL}/document/related/${id}?page=${page}&size=${size}`,
+        RECOMMENDED_DOCUMENTS: (page: number, size: number) => `${API_BASE_URL}/document/recommendations?page=${page}&size=${size}`,
+        UNIVERSITIES: (query: string) => `${API_BASE_URL}/document/search-universities?q=${encodeURIComponent(query)}`,
+        COURSES: (query: string) => `${API_BASE_URL}/lms/subjects/search?q=${query}`,
+        TOPICS_BY_COURSE: (courseId: string, query: string) => `${DEBUG_URL}/api/documents/topics-by-course?courseId=${courseId}&query=${encodeURIComponent(query)}`,
     },
     BLOGS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
@@ -63,10 +67,10 @@ export const API_ENDPOINTS = {
     },
     HOME: {
         SEARCH: (query: string, page: number, size: number) => `${API_BASE_URL}/ai/search?query=${query}&page=${page + 1}&size=${size}`,
-    }
+    },
     LMS: {
         GET_TUTOR_CLASSES: `${LMS_URL}/classes`,
-        
+
     },
 };
 
