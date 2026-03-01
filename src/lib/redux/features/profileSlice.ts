@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { RootState } from '@/lib/redux/store'; 
+import { getUserInfo, updateUserInfo } from '@/lib/services/user.service';
 
 // --- 1. Interfaces ---
-
 export interface UserProfile {
     id: string;
     accountId: string;
@@ -11,14 +10,13 @@ export interface UserProfile {
     lastName: string;
     university: string | null;
     universityId: number | null;
-    dob: string; // YYYY-MM-DD
+    dob: string; 
     bio: string;
-    avatarUrl: string;
+    avatarUrl: string | null; 
     email: string;
     points: number;
     followerCount: number | null;
     followingCount: number | null;
-    // Thêm các trường có thể có trong response hoặc cần thiết cho UI
     address?: string;
     phone?: string;
 }
@@ -36,8 +34,8 @@ export interface UpdateProfileRequest {
 
 interface ProfileState {
     user: UserProfile | null;
-    isLoading: boolean;   // Trạng thái khi đang fetch profile
-    isUpdating: boolean;  // Trạng thái khi đang update (để hiện loading ở nút Save)
+    isLoading: boolean;
+    isUpdating: boolean;
     error: string | null;
 }
 
@@ -53,93 +51,39 @@ const initialState: ProfileState = {
 // Feature 1: Get My Profile
 export const getMyProfile = createAsyncThunk(
     'profile/getMyProfile',
-    async (_, { getState, rejectWithValue }) => {
+    async (_, { rejectWithValue }) => {
         try {
-            const state = getState() as RootState;
-            const token = state.auth.token;
-
-            if (!token) {
-                return rejectWithValue('Unauthenticated: Missing access token');
-            }
-
-            const response = await fetch('http://localhost:8081/profile/my-profile', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-            });
-
-        
-
-            const data = await response.json();
-
-            console.log("Fetched profile data:", data);
-            
-            if (data.code !== 1000) {
-                throw new Error(data.message || 'Failed to fetch profile');
-            }
-            
-            return data.result as UserProfile;
+            const data = await getUserInfo();
+            return data;
         } catch (error: any) {
-            return rejectWithValue(error.message);
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to fetch profile');
         }
     }
 );
 
-// Feature 2: Edit My Profile (PATCH)
+// Feature 2: Edit My Profile
 export const updateMyProfile = createAsyncThunk(
     'profile/updateMyProfile',
-    async (updateData: UpdateProfileRequest, { getState, rejectWithValue }) => {
+    async (updateData: UpdateProfileRequest, { rejectWithValue }) => {
         try {
-            const state = getState() as RootState;
-            const token = state.auth.token;
-
-            if (!token) {
-                return rejectWithValue('Unauthenticated: Missing access token');
-            }
-
-            console.log("Updating profile with data:", updateData);
-
-            const response = await fetch('http://localhost:8081/profile/update', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(updateData),
-            });
-
-            const data = await response.json();
-
-
-
-            if (data.code !== 1000) {
-                throw new Error(data.message || 'Failed to update profile');
-            }
-
-            // Trả về chính dữ liệu đã gửi để cập nhật UI ngay lập tức (Optimistic Update)
-            // Hoặc trả về data.result nếu API backend trả về User Object mới sau khi update
-            return data.result ? data.result : updateData;
+            const data = await updateUserInfo(updateData);
+            return data ? data : updateData;
         } catch (error: any) {
-            return rejectWithValue(error.message);
+            return rejectWithValue(error.response?.data?.message || error.message || 'Failed to update profile');
         }
     }
 );
 
 // --- 3. Slice ---
-
 const profileSlice = createSlice({
     name: 'profile',
     initialState,
     reducers: {
-        // Action để reset profile khi logout
         clearProfile: (state) => {
             state.user = null;
             state.error = null;
             state.isLoading = false;
         },
-        // Action cập nhật cục bộ nếu cần (ví dụ update avatar xong muốn set ngay)
         setLocalProfile: (state, action: PayloadAction<Partial<UserProfile>>) => {
             if (state.user) {
                 state.user = { ...state.user, ...action.payload };
@@ -147,7 +91,6 @@ const profileSlice = createSlice({
         }
     },
     extraReducers: (builder) => {
-        // --- Xử lý getMyProfile ---
         builder
             .addCase(getMyProfile.pending, (state) => {
                 state.isLoading = true;
@@ -155,14 +98,13 @@ const profileSlice = createSlice({
             })
             .addCase(getMyProfile.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.user = action.payload;
+                state.user = action.payload as UserProfile; 
             })
             .addCase(getMyProfile.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload as string;
             });
 
-        // --- Xử lý updateMyProfile ---
         builder
             .addCase(updateMyProfile.pending, (state) => {
                 state.isUpdating = true;
@@ -170,10 +112,8 @@ const profileSlice = createSlice({
             })
             .addCase(updateMyProfile.fulfilled, (state, action) => {
                 state.isUpdating = false;
-                // Cập nhật lại state.user với dữ liệu mới
                 if (state.user) {
-                    // Merge dữ liệu cũ với dữ liệu mới cập nhật
-                    state.user = { ...state.user, ...action.payload };
+                    state.user = { ...state.user, ...(action.payload as Partial<UserProfile>) };
                 }
             })
             .addCase(updateMyProfile.rejected, (state, action) => {

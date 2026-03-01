@@ -7,7 +7,7 @@ import CreatePostHeader from './CreatePostHeader';
 import PostCoverImage from './PostCoverImage';
 import PostTitleInput from './PostTitleInput';
 import TiptapEditor from './TiptapEditor';
-import { getAccessToken } from '@/lib/utils/token.util';
+import { getAccessToken } from '@/lib/utils/token';
 
 
 export default function CreatePostPage() {

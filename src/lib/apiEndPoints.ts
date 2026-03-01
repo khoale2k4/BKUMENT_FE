@@ -25,7 +25,7 @@ export const API_ENDPOINTS = {
     },
     ACCOUNT: {
         PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
-        GET_USER_INFO: `${DEBUG_URL}/api/user/info`,
+        GET_USER_INFO: `${API_BASE_URL}/profile/my-profile`,
         TUTOR_GETS: `${DEBUG_URL}/api/user/tutors`
     },
     ARTICLES: {
@@ -61,9 +61,11 @@ export const API_ENDPOINTS = {
         LINK_IMAGE_FILEID: (fileId: string) => `${API_BASE_URL}/resource/download/asset/${fileId}`,
     },
     CHAT:{
-        GET_CONVERSATIONS: (page: number, size: number) => `${DEBUG_URL}/api/chats?page=${page}&size=${size}`,
-        GET_MESSAGES: (conversationId: string) => `${DEBUG_URL}/api/chats/${conversationId}`,
-        SEND_MESSAGE: `${DEBUG_URL}/api/chats/messages`,
+        GET_CONVERSATIONS: (page: number, size: number) => `${API_BASE_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
+        START_CONVERSATIONS: `${API_BASE_URL}/communication/conversations/create`,
+        UPDATE_CONVERSATION: (con_id: string) => `${API_BASE_URL}/communication/conversations/${con_id}/metadata`,
+        GET_MESSAGES: (conversationId: string) => `${API_BASE_URL}/communication/messages?conversationId=${conversationId}`,
+        SEND_MESSAGE: `${API_BASE_URL}/communication/messages/create`,
     },
     COMMENTS: {
         GET_BY_DOC: (id: string | number) => `${DEBUG_URL}/api/documents/${id}/comments`,

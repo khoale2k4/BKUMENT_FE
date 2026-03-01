@@ -5,6 +5,7 @@ import * as userService from '@/lib/services/user.service';
 import * as commentService from '@/lib/services/comment.service';
 import { showToast } from './toastSlice';
 import axios from 'axios';
+import { DocumentDetail } from '@/lib/services/document.service';
 
 export interface Comment {
     id: string | number;
@@ -13,21 +14,6 @@ export interface Comment {
     content: string;
     time: string;
     likes: number;
-}
-
-export interface DocumentDetail {
-    id: string;
-    title: string;
-    description: string;
-    downloadUrl: string;
-    viewUrl: string;
-    previewImageUrl: string;
-    downloadCount: number;
-    documentType?: string;
-    downloadable: boolean;
-    university?: string;
-    course?: string;
-    createdAt: Date;
 }
 
 export interface UserInfo {
@@ -132,8 +118,8 @@ export const fetchAuthorById = createAsyncThunk(
 
         return {
             id: id,
-            user: data.user,
-            avatar: data.avatar
+            user: data.fullName,
+            avatar: data.avatarUrl
         } as UserInfo;
     }
 );

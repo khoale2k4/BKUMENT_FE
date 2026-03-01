@@ -4,15 +4,16 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { socketService } from '@/lib/services/socket.service';
 import { RootState, AppDispatch } from '@/lib/redux/store';
+import { getMyProfile } from '@/lib/redux/features/profileSlice';
 
 export default function SocketProvider({ children }: { children: React.ReactNode }) {
     const dispatch = useDispatch<AppDispatch>();
     
-    const token = useSelector((state: RootState) => state.auth.token);
+    const { token } = useSelector((state: RootState) => state.auth);
 
     useEffect(() => {
         if (token) {
-            console.log("Đã có token, bắt đầu gọi socket connect...");
+            dispatch(getMyProfile());
             socketService.connect(token, dispatch);
         }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { formatTimeAgo } from "@/utils/formatTimeAgo";
+import { formatTimeAgo } from "@/lib/utils/formatTimeAgo";
 import { CardProp } from "./props";
 import { BookmarkPlus, MoreHorizontal } from "lucide-react";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";

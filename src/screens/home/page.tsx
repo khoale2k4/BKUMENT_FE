@@ -10,7 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AppRoute } from '@/lib/appRoutes';
 import { showToast } from '@/lib/redux/features/toastSlice';
 import { Frown } from 'lucide-react';
-import { getAccessToken } from '@/lib/utils/token.util';
+import { getAccessToken } from '@/lib/utils/token';
 
 export default function HomePage() {
     const dispatch = useAppDispatch();

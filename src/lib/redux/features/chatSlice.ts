@@ -1,7 +1,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import * as chatService from '@/lib/services/chat.service'; 
-
-// 1. CẬP NHẬT INTERFACES KHỚP VỚI ENTITY JAVA
+import * as chatService from '@/lib/services/chat.service';
+import { Conversation, updateConversationAvatar } from '@/lib/services/chat.service';
+import { getPresignedUrl } from '@/lib/services/document.service';
+import { API_ENDPOINTS } from '@/lib/apiEndPoints';
+import axios from 'axios';
+import { RootState } from '../store';
 
 export interface ParticipantInfo {
     userId: string;
@@ -11,32 +14,15 @@ export interface ParticipantInfo {
     avatar: string;
 }
 
-export interface Conversation {
-    id: string;
-    type: 'GROUP' | 'DIRECT'; // Theo Java
-    name: string | null;      // Direct chat có thể null
-    participantsHash: string;
-    participants: ParticipantInfo[];
-    createdDate: string;      
-    lastMessage: string;
-    lastMessageTime: string;
-    modifiedDate: string;
-    // unreadCount: number;   // Nếu backend chưa có, bạn có thể comment lại hoặc xử lý sau
-}
-
 export interface ChatMessage {
     id: string;
     conversationId: string;
-    type: 'TEXT' | 'IMAGE' | 'FILE'; // Backend trả về chữ in hoa
-    message: string;                 // Thay vì 'content'
-    sender: ParticipantInfo;         // Thay vì ChatUser
-    createdDate: string;             // Thay vì 'timestamp'
-    
-    // Field này không có ở Backend, Frontend tự thêm vào để UI biết tin nhắn của ai
-    isSelf?: boolean; 
+    type: 'TEXT' | 'IMAGE' | 'FILE';
+    message: string;
+    sender: ParticipantInfo;
+    createdDate: string;
+    isSelf?: boolean;
 }
-
-// 2. CẬP NHẬT CHAT STATE
 
 interface ChatState {
     conversations: Conversation[];
@@ -45,7 +31,7 @@ interface ChatState {
     conversationsTotalPages: number;
 
     activeConversationId: string | null;
-    currentMessages: ChatMessage[]; // Đổi từ Message sang ChatMessage
+    currentMessages: ChatMessage[];
     messagesStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
@@ -60,16 +46,15 @@ const initialState: ChatState = {
     messagesStatus: 'idle',
 };
 
-// 3. ASYNC THUNKS (Giữ nguyên logic, chỉ cập nhật type)
-
 export const fetchConversations = createAsyncThunk(
     'chat/fetchConversations',
     async ({ page, size }: { page: number; size: number }) => {
         const response = await chatService.getConversations(page, size);
+        console.log(response)
         return {
-            items: response.content as Conversation[],
-            page: page,
-            totalPages: response.totalPages
+            items: response as unknown as Conversation[],
+            page: 0,
+            totalPages: 1
         };
     }
 );
@@ -78,14 +63,109 @@ export const fetchMessagesByConversationId = createAsyncThunk(
     'chat/fetchMessages',
     async (conversationId: string) => {
         const response = await chatService.getMessages(conversationId);
+        
+        const sortedMessages = [...response].sort((a, b) => {
+            const timeA = new Date(a.createdDate).getTime();
+            const timeB = new Date(b.createdDate).getTime();
+            return timeA - timeB;
+        });
+
         return {
             conversationId,
-            messages: response as ChatMessage[] // Đổi type
+            messages: sortedMessages
         };
     }
 );
 
-// 4. SLICE
+export const sendMessageAsync = createAsyncThunk(
+    'chat/sendMessage',
+    async ({ conversationId, message, type }: { conversationId: string; message: string; type: 'TEXT' | 'IMAGE' | 'FILE' }, { rejectWithValue }) => {
+        try {
+            const typeLower = type.toLowerCase() as 'text' | 'image' | 'file';
+            const response = await chatService.sendMessage(conversationId, message, typeLower);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to send message');
+        }
+    }
+);
+
+export const createChatAsync = createAsyncThunk(
+    'chat/createChat',
+    async ({ type = 'DIRECT', userIds }: { type?: 'GROUP' | 'DIRECT'; userIds: string[] }, { rejectWithValue }) => {
+        try {
+            const response = await chatService.createChat(type, userIds);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to create chat');
+        }
+    }
+);
+
+export const uploadConversationAvatarAsync = createAsyncThunk(
+    'chat/uploadAvatar',
+    async ({ conversationId, file }: { conversationId: string; file: File }, { dispatch, rejectWithValue }) => {
+        try {
+            const { url, assetId } = await getPresignedUrl(file.name);
+
+            await axios.put(url, file, {
+                headers: { 'Content-Type': file.type },
+            });
+
+            await updateConversationAvatar(conversationId, API_ENDPOINTS.RESOURCE.LINK_IMAGE_FILEID(assetId));
+
+            await dispatch(fetchConversations({ page: 0, size: 20 })).unwrap();
+
+            return assetId;
+        } catch (error: any) {
+            console.error("Lỗi upload avatar:", error);
+            return rejectWithValue(error.message || 'Lỗi khi cập nhật ảnh đại diện');
+        }
+    }
+);
+
+export const sendImageMessageAsync = createAsyncThunk(
+    'chat/sendImageMessage',
+    async ({ conversationId, file }: { conversationId: string; file: File }, { dispatch, rejectWithValue }) => {
+        try {
+            const { url, assetId } = await getPresignedUrl(file.name);
+
+            await axios.put(url, file, {
+                headers: { 'Content-Type': file.type },
+            });
+
+            const imageUrl = API_ENDPOINTS.RESOURCE.LINK_IMAGE_FILEID(assetId);
+
+            const result = await dispatch(sendMessageAsync({
+                conversationId,
+                message: imageUrl,
+                type: 'IMAGE'
+            })).unwrap();
+
+            return result;
+        } catch (error: any) {
+            console.error("Lỗi gửi tin nhắn ảnh:", error);
+            return rejectWithValue(error.message || 'Lỗi khi gửi ảnh');
+        }
+    }
+);
+
+export const receiveSocketMessageThunk = createAsyncThunk(
+    'chat/receiveSocketMessage',
+    async (incomingMessage: ChatMessage, { dispatch, getState }) => {
+        const state = getState() as RootState;
+        
+        const isConversationExist = state.chat.conversations.some(
+            (c) => c.id === incomingMessage.conversationId
+        );
+
+        dispatch(chatSlice.actions.addMessage(incomingMessage));
+
+        if (!isConversationExist) {
+            dispatch(fetchConversations({ page: 0, size: 20 }));
+        }
+    }
+);
 
 const chatSlice = createSlice({
     name: 'chat',
@@ -93,25 +173,27 @@ const chatSlice = createSlice({
     reducers: {
         setActiveConversation: (state, action: PayloadAction<string>) => {
             state.activeConversationId = action.payload;
-            state.currentMessages = []; 
+            state.currentMessages = [];
             state.messagesStatus = 'idle';
         },
         clearChatState: () => {
             return initialState;
         },
         addMessage: (state, action: PayloadAction<ChatMessage>) => {
-            // Cập nhật tin nhắn vào khung chat hiện tại
-            if (state.activeConversationId === action.payload.conversationId) {
-                state.currentMessages.push(action.payload);
+            const newMessage = action.payload;
+
+            if (state.activeConversationId === newMessage.conversationId) {
+                const isDuplicate = state.currentMessages.some(m => m.id === newMessage.id);
+                if (!isDuplicate) {
+                    state.currentMessages.push(newMessage);
+                }
             }
-            // Cập nhật lastMessage ở sidebar
-            const index = state.conversations.findIndex(c => c.id === action.payload.conversationId);
+
+            const index = state.conversations.findIndex(c => c.id === newMessage.conversationId);
             if (index !== -1) {
-                // Đổi thành .message và .createdDate cho khớp với ChatMessage
-                state.conversations[index].lastMessage = action.payload.message; 
-                state.conversations[index].lastMessageTime = action.payload.createdDate; 
-                
-                // Đẩy conversation có tin nhắn mới lên đầu
+                state.conversations[index].lastMessage = newMessage.message;
+                state.conversations[index].lastMessageTime = newMessage.createdDate;
+
                 const [chat] = state.conversations.splice(index, 1);
                 state.conversations.unshift(chat);
             }
@@ -150,6 +232,18 @@ const chatSlice = createSlice({
             })
             .addCase(fetchMessagesByConversationId.rejected, (state) => {
                 state.messagesStatus = 'failed';
+            });
+
+        builder
+            .addCase(sendMessageAsync.fulfilled, (state, action) => {
+                chatSlice.caseReducers.addMessage(state, { payload: action.payload, type: 'chat/addMessage' });
+            });
+
+        builder
+            .addCase(createChatAsync.fulfilled, (state, action) => {
+                state.activeConversationId = action.payload.conversationId;
+                state.currentMessages = [];
+                state.messagesStatus = 'idle';
             });
     },
 });

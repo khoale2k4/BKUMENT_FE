@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Clapperboard, HandHeart, MessageCircle, MoreHorizontal } from "lucide-react";
 import { CommentInput } from "./CommentInput";
-import { formatDate } from "@/utils/formatDate";
+import { formatDate } from "@/lib/utils/formatDate";
 
 interface CommentItemProps {
     comment: AppComment;

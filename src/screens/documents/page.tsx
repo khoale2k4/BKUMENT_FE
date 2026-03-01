@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { useEffect, useState } from 'react';
 import { clearCurrentDocument, fetchAuthorById, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments } from '@/lib/redux/features/documentSlice';
 import CommentSection from './commentSection/page';
-import { getAccessToken } from '@/lib/utils/token.util';
+import { getAccessToken } from '@/lib/utils/token';
 import Pagination from '@/components/ui/Pagination';
 import ContentCard from '../home/contentCard/ContentCard';
 import ContentCardSkeleton from '../home/contentCard/ContentCardSkeleton';

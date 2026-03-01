@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import { getAccessToken } from '@/lib/utils/token.util';
+import { getAccessToken } from '@/lib/utils/token';
 
 /**
  * HTTP client dùng chung cho toàn bộ ứng dụng

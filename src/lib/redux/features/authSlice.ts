@@ -108,7 +108,6 @@ export const authSlice = createSlice({
                 const savedUser = localStorage.getItem('user');
 
                 if (token) {
-            console.log('ok');
                     state.isAuthenticated = true;
                     state.token = token;
                     
