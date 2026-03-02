@@ -52,13 +52,13 @@ const TagManager: React.FC<TagManagerProps> = ({
                     {tags.map((tag, index) => (
                         <span
                             key={index}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-gray-700 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors"
                         >
                             {tag}
                             <button
                                 type="button"
                                 onClick={() => onRemove(tag)}
-                                className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                                className="hover:bg-gray-200 rounded-full p-0.5 transition-colors"
                             >
                                 <X className="w-3 h-3" />
                             </button>

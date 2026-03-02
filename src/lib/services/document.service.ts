@@ -6,8 +6,9 @@ export interface DocumentDetail {
     title: string;
     description: string;
     downloadUrl: string;
-    downloadCount: number;
+    viewUrl: string;
     previewImageUrl: string;
+    downloadCount: number;
     documentType?: string;
     downloadable: boolean;
     university?: string;

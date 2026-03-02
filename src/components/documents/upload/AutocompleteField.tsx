@@ -13,7 +13,7 @@ interface AutocompleteFieldProps<T> {
     disabled?: boolean;
     placeholder?: string;
     renderItem: (item: T) => React.ReactNode;
-    dropdownRef: RefObject<HTMLDivElement>;
+    dropdownRef: React.RefObject<HTMLDivElement | null>;
     className?: string;
 }
 

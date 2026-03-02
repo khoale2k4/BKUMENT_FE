@@ -63,7 +63,7 @@ export default function BlogDetailPage(params: PageProps) {
             <article className="max-w-3xl mx-auto px-4 mt-8 sm:mt-12">
                 <div className="flex items-center gap-3 mb-6">
                     <Badge
-                        color={visibility === "PUBLIC" ? "green" : "red"}
+                        color="black"
                         variant="light"
                         size="sm"
                     >

@@ -40,19 +40,19 @@ const FileItemEditor = ({
     const [showUniversityDropdown, setShowUniversityDropdown] = useState(false);
     const [selectedUniversityId, setSelectedUniversityId] = useState<string | null>(null);
     const universityDebounceTimer = useRef<NodeJS.Timeout | null>(null);
-    const universityDropdownRef = useRef<HTMLDivElement | null>(null);
+    const universityDropdownRef = useRef<HTMLDivElement>(null);
 
     // Course autocomplete states
     const [courseQuery, setCourseQuery] = useState(file.subject || "");
     const [showCourseDropdown, setShowCourseDropdown] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
     const courseDebounceTimer = useRef<NodeJS.Timeout | null>(null);
-    const courseDropdownRef = useRef<HTMLDivElement | null>(null);
+    const courseDropdownRef = useRef<HTMLDivElement>(null);
 
     // Topic autocomplete states (no API calls, filter from selected course)  
     const [topicQuery, setTopicQuery] = useState(file.topic || "");
     const [showTopicDropdown, setShowTopicDropdown] = useState(false);
-    const topicDropdownRef = useRef<HTMLDivElement | null>(null);
+    const topicDropdownRef = useRef<HTMLDivElement>(null);
 
     // Filtered topics from selected course
     const [filteredTopics, setFilteredTopics] = useState<{ id: string; name: string }[]>([]);
