@@ -46,7 +46,7 @@ export const fetchFeed = createAsyncThunk(
 
         const mappedItems = items.map((dta: any) => ({
             id: dta.id || Math.random(),
-            author: userData.user,
+            author: userData,
             title: dta.name || dta.title,
             time: dta.createdAt,
 
@@ -78,7 +78,7 @@ export const searchKeyword = createAsyncThunk(
 
         const mappedItems = data.content.map((result: any) => ({
             id: result.id,
-            author: userData.user,
+            author: userData,
             title: result.title,
             time: result.created_at || new Date().toISOString(),
             content: result.description || "Kết quả tìm kiếm",

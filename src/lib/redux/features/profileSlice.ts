@@ -12,7 +12,7 @@ export interface UserProfile {
     universityId: number | null;
     dob: string; 
     bio: string;
-    avatarUrl: string | null; 
+    avatarUrl?: string | null; 
     email: string;
     points: number;
     followerCount: number | null;
@@ -26,7 +26,7 @@ export interface UpdateProfileRequest {
     lastName?: string;
     dob?: string;
     bio?: string;
-    avatarUrl?: string;
+    avatarUrl?: string | null;
     address?: string;
     phone?: string;
     universityId?: number;
