@@ -1,6 +1,8 @@
-import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 import { FileUploadItem } from '@/types/FileUpload';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import * as documentService from '@/lib/services/document.service';
+import * as userService from '@/lib/services/user.service';
+import * as commentService from '@/lib/services/comment.service';
 import axios from 'axios';
 
 export interface Comment {
@@ -32,7 +34,7 @@ export interface UserInfo {
 interface UploadState {
     files: FileUploadItem[];
     activeStep: number;
-    uploadStatus: 'idle' | 'uploading' | 'saving' | 'success' | 'error'; 
+    uploadStatus: 'idle' | 'uploading' | 'saving' | 'success' | 'error';
 }
 
 interface DocumentState {
@@ -68,29 +70,14 @@ const initialState: DocumentState = {
 export const fetchDocumentById = createAsyncThunk(
     'documents/fetchDetail',
     async (id: string) => {
-        const response = await fetch(`${API_ENDPOINTS.DOCUMENTS.GET_DETAIL(id)}`);
-        const data = (await response.json()).result.content[0];
-
-        return {
-            id: id,
-            title: data.title || "Untitled Document",
-            description: data.description || "No description available.",
-            downloadUrl: data.downloadUrl || "",
-            createdAt: data.createdAt,
-            documentType: data.documentType,
-            downloadable: data.downloadable,
-            downloadCount: data.downloadCount,
-            course: data.course,
-            university: data.university,
-        } as DocumentDetail;
+        return await documentService.getDocumentById(id);
     }
 );
 
 export const fetchAuthorById = createAsyncThunk(
     'documents/fetchAuthor',
     async (id: string) => {
-        const response = await fetch(`${API_ENDPOINTS.ACCOUNT.GET_USER_INFO}`);
-        const data = await response.json();
+        const data = await userService.getUserInfo();
 
         return {
             id: id,
@@ -103,17 +90,7 @@ export const fetchAuthorById = createAsyncThunk(
 export const fetchCommentsByDocId = createAsyncThunk(
     'documents/fetchComments',
     async (documentId: string) => {
-        const response = await fetch(`${API_ENDPOINTS.COMMENTS.GET_BY_DOC(documentId)}`);
-        const data = await response.json();
-
-        return data.map((c: any) => ({
-            id: c.id,
-            user: c.user || c.author,
-            avatar: c.avatar || "https://placehold.co/100x100/gray/white?text=U",
-            content: c.content,
-            time: c.createdAt || "Just now",
-            likes: c.likes || 0
-        })) as Comment[];
+        return await commentService.getCommentsByDocId(documentId);
     }
 );
 
@@ -121,14 +98,12 @@ export const uploadFile = createAsyncThunk(
     'documents/uploadFile',
     async (fileItem: FileUploadItem, { dispatch, rejectWithValue }) => {
         const { localId, file } = fileItem;
-        if(!file) return;
+        if (!file) return;
 
         try {
             dispatch(updateFileStatus({ localId, updates: { status: 'getting_url' } }));
 
-            const initRes = await axios.get(API_ENDPOINTS.RESOURCE.GET_PRESIGNED_URL(file.name));
-            const uploadUrl = initRes.data.result.url;
-            const fileId = initRes.data.result.assetId;
+            const { url: uploadUrl, assetId: fileId } = await documentService.getPresignedUrl(file.name);
 
             dispatch(updateFileStatus({
                 localId,
@@ -151,7 +126,6 @@ export const uploadFile = createAsyncThunk(
 
             dispatch(updateFileStatus({ localId, updates: { status: 'uploaded', progress: 100 } }));
             return localId;
-
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || 'Upload failed';
             dispatch(updateFileStatus({ localId, updates: { status: 'error', errorMessage } }));
@@ -174,12 +148,12 @@ export const saveFilesMetadata = createAsyncThunk(
             try {
                 dispatch(updateFileStatus({ localId: file.localId, updates: { status: 'saving' } }));
 
-                await axios.post(API_ENDPOINTS.DOCUMENTS.UPDATE_METADATA, {
-                    assetId: file.storageId,
-                    title: file.title,
-                    university: file.university,
-                    course: file.course,
-                    description: file.description,
+                await documentService.saveDocumentMetadata({
+                    assetId: file.storageId || '',
+                    title: file.title || '',
+                    university: file.university || '',
+                    course: file.course || '',
+                    description: file.description || '',
                     resourceType: 'DOCUMENT',
                     visibility: file.visibility,
                     downloadable: true,

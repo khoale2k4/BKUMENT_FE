@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { API_ENDPOINTS } from '@/lib/apiEndPoints';
+import * as blogService from '@/lib/services/blog.service';
 
 interface BlogState {
     id?: string;
@@ -28,27 +28,9 @@ const initialState: BlogState = {
 
 export const uploadImage = createAsyncThunk(
     'blog/uploadImage',
-    async (file: File, { getState, rejectWithValue }) => {
-        const state = (getState() as any).blog as BlogState;
+    async (file: File, { rejectWithValue }) => {
         try {
-            const presignedRes = await fetch(
-                `${API_ENDPOINTS.RESOURCE.GET_PRESIGNED_URL(encodeURIComponent(file.name))}`
-            );
-            const presignedData = await presignedRes.json();
-
-            if (presignedData.code !== 1000) throw new Error(presignedData.message);
-
-            const { url: uploadUrl, assetId } = presignedData.result;
-
-            const uploadRes = await fetch(uploadUrl, {
-                method: 'PUT',
-                body: file,
-                headers: { 'Content-Type': file.type },
-            });
-
-            if (!uploadRes.ok) throw new Error('Upload failed');
-
-            return API_ENDPOINTS.RESOURCE.LINK_IMAGE_FILEID(assetId);
+            return await blogService.uploadImage(file);
         } catch (error: any) {
             console.error(error.message);
             return rejectWithValue(error.message || 'Upload error');
@@ -72,33 +54,20 @@ export const submitPost = createAsyncThunk(
             type: 'POST',
             assetIds: state.assetIds,
         };
-        console.log('Redux Submit Payload at blog Slicesf:', payload)
+        console.log('Redux Submit Payload at blog Slicesf:', payload);
 
-        const uploadRes = await fetch(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, {
-            method: 'POST',
-            body: JSON.stringify(payload),
-            headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!uploadRes.ok) throw new Error('Upload failed');
-
-        const data = (await uploadRes.json()).result;
-        return data;
+        try {
+            return await blogService.submitPost(payload);
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Submit failed');
+        }
     }
 );
 
 export const fetchPost = createAsyncThunk(
     'blog/fetchPost',
     async (blogId: string) => {
-        const fetchRes = await fetch(API_ENDPOINTS.BLOGS.GET_DETAIL(blogId), {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-        });
-
-        if (!fetchRes.ok) throw new Error('Upload failed');
-
-        const data = (await fetchRes.json()).result;
-        return data.content[0];
+        return await blogService.fetchPostById(blogId);
     }
 );
 
