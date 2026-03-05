@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { useAppSelector } from '@/lib/redux/hooks';
 
 // Import các components con
-import ProfileHeader, { TabType } from "./components/ProfileHeader"
-import HomeTab from './components/HomeTab';
-import MyClassTab from './components/MyClassTab';
-import AboutTab from './components/AboutTab';
+import ProfileHeader, { TabType } from "./tabs/ProfileHeader"
+import HomeTab from './tabs/Home/HomeTab';
+import MyClassTab from './tabs/MyClass/MyClassTab';
+import AboutTab from './tabs/About/AboutTab';
 
 const ProfilePage = () => {
   // State quản lý tab đang active

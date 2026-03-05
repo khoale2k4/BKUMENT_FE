@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Clock, BarChart3, Users } from 'lucide-react';
+import { Clock, BarChart3 } from 'lucide-react';
 
-// Định nghĩa Interface Props khớp với CourseItem trong slice
-interface CourseCardProps {
+// Định nghĩa Interface Props (hoặc import từ Slice nếu đã export)
+interface CourseProps {
   course: {
     id: string;
     name: string;
@@ -15,11 +15,11 @@ interface CourseCardProps {
     startDate: string;
     endDate: string;
     status: string;
-    schedules: any[]; // Hoặc define kỹ hơn nếu cần
+    schedules: any[];
   };
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
+const CourseCard: React.FC<CourseProps> = ({ course }) => {
   const router = useRouter();
 
   return (
@@ -31,7 +31,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
           alt={course.name} 
           className="w-full h-full object-cover"
           onError={(e) => {
-            // Tự động chuyển sang ảnh placeholder nếu ảnh gốc lỗi
             (e.target as HTMLImageElement).src = 'https://placehold.co/300x200/eee/999?text=No+Image';
           }}
         />
@@ -48,7 +47,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             {course.name}
           </h3>
           
-          {/* Tags (Subject & Topic) */}
+          {/* Tags */}
           <div className="flex gap-2 mb-4">
             <span className="px-3 py-1 bg-[#7294ff] text-white text-[10px] font-bold rounded-md uppercase tracking-wider">
               {course.subjectName}
@@ -61,23 +60,18 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
           {/* Meta Stats */}
           <div className="flex flex-wrap gap-4 text-[11px] font-bold text-gray-500">
             <span className="flex items-center gap-1">
-              <Clock size={14} className="text-orange-500" /> 
-              {course.startDate} - {course.endDate}
+              <Clock size={14} className="text-orange-500" /> {course.startDate}
             </span>
             <span className="flex items-center gap-1 uppercase">
-              <BarChart3 size={14} className="text-orange-500" /> 
-              {course.schedules.length} Buổi/Tuần
-            </span>
-            <span className="flex items-center gap-1">
-               <Users size={14} className="text-orange-500" /> {course.status}
+              <BarChart3 size={14} className="text-orange-500" /> {course.schedules.length} Buổi/Tuần
             </span>
           </div>
         </div>
 
-        {/* Footer Card */}
+        {/* Footer */}
         <div className="flex justify-between items-end mt-4">
-          <span className={`text-xs font-bold px-2 py-1 rounded ${course.status === 'ENROLLING' ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}`}>
-            {course.status === 'ENROLLING' ? 'Active' : course.status}
+          <span className={`text-xs font-bold px-2 py-1 rounded ${course.status === 'ENROLLING' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+            {course.status}
           </span>
           <button 
             onClick={() => router.push(`/courses/${course.id}`)} 

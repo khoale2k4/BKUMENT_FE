@@ -1,4 +1,4 @@
-import CreateCoursePage from '@/screens/courses/createCourse/CreateCoursePage';
+import CreateCoursePage from '@/screens/courses/createCourse/page';
 import CourseOverview from '@/screens/courses/page';
 import HomePage from '@/screens/home/page';
 import { Metadata } from 'next';
