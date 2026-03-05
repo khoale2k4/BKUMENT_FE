@@ -57,6 +57,8 @@ interface TutorCourseState {
   members: any[]; // Có thể định nghĩa interface riêng cho member nếu cần
   pendingMembers: any[]; // Danh sách thành viên chờ duyệt
   loadingMembers: boolean;
+  viewedTutorClasses: CourseItem[];
+  loadingViewedClasses: boolean;
 }
 
 const initialState: TutorCourseState = {
@@ -76,6 +78,8 @@ const initialState: TutorCourseState = {
   members: [],
   pendingMembers: [],
   loadingMembers: false,
+  viewedTutorClasses: [],
+  loadingViewedClasses: false,
 };
 
 // --- Async Thunks ---
@@ -319,6 +323,42 @@ export const getMemberPendingInCourse = createAsyncThunk(
   },
 );
 
+export const getClassesByTutorId = createAsyncThunk(
+  "tutorClasses/getClassesByTutorId",
+  async (tutorId: string, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      // Nếu API này yêu cầu đăng nhập thì gửi kèm token, nếu là public thì hệ thống tự bỏ qua
+      const token = state.auth?.token;
+
+      const response = await fetch(
+        `http://localhost:8082/lms/classes/class/${tutorId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        },
+      );
+
+      const data = await response.json();
+      console.log("API Response for getClassesByTutorId:", data); // Debug log
+
+      // Xử lý dữ liệu trả về (Giả định backend trả về code 1000 là thành công)
+      if (data.code !== 1000) {
+        throw new Error(
+          data.message || "Không thể tải danh sách khóa học của gia sư",
+        );
+      }
+
+      return data.result as CourseItem[];
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
 // Trong file tutorCourseSlice.ts
 
 export const approveMember = createAsyncThunk(
@@ -496,6 +536,20 @@ const tutorCourseSlice = createSlice({
       .addCase(approveMember.rejected, (state, action) => {
         // Có thể xử lý thông báo lỗi toàn cục ở đây nếu cần
         console.error("Lỗi duyệt:", action.payload);
+      });
+
+    builder
+      .addCase(getClassesByTutorId.pending, (state) => {
+        state.loadingViewedClasses = true;
+        state.error = null;
+      })
+      .addCase(getClassesByTutorId.fulfilled, (state, action) => {
+        state.loadingViewedClasses = false;
+        state.viewedTutorClasses = action.payload; // Gán vào biến này để không đè lên 'classes'
+      })
+      .addCase(getClassesByTutorId.rejected, (state, action) => {
+        state.loadingViewedClasses = false;
+        state.error = action.payload as string;
       });
   },
 });

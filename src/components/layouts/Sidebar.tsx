@@ -22,7 +22,7 @@ export default function Sidebar() {
         { icon: Home, label: 'Home', href: AppRoute.home, count: 0 },
         { icon: Book, label: 'Library', href: AppRoute.library, count: 0 },
         { icon: User, label: 'Profile', href: AppRoute.profile, count: 0 },
-        { icon: NotebookText, label: 'My Courses', href: AppRoute.courses, count: 0 },
+        { icon: NotebookText, label: 'Find Tutors', href: AppRoute.tutors, count: 0 },
         { icon: FileText, label: 'My Blog', href: AppRoute.blogs.my, count: 0 },
         { icon: File, label: 'My Documents', href: AppRoute.documents.my, count: 0 },
         { icon: Send, label: 'Messages', href: AppRoute.messages, count: 2 },

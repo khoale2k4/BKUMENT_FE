@@ -9,6 +9,7 @@ import documentReducer from './features/documentSlice';
 import toastReducer from './features/toastSlice';
 import tutorCourseReducer from './features/tutorCourseSlice';
 import profileReducer from './features/profileSlice';
+import tutorFindingReducer from './features/tutorFindingSlice';
 export const makeStore = () => {
     return configureStore({
         reducer: {
@@ -22,7 +23,7 @@ export const makeStore = () => {
             toastNotification: toastReducer,
             tutorCourse: tutorCourseReducer, 
             profile: profileReducer,
-
+            tutorFinding: tutorFindingReducer,
         },
     });
 };

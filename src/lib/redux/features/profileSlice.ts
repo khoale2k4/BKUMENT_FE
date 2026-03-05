@@ -39,6 +39,7 @@ interface ProfileState {
     error: string | null;
 }
 
+
 const initialState: ProfileState = {
     user: null,
     isLoading: false,
