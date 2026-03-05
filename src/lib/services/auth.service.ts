@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from '@/lib/apiEndPoints';
-import { setAccessToken, removeAccessToken } from '@/lib/utils/token.util';
+import { setAccessToken, removeAccessToken } from '@/lib/utils/token';
 
 interface LoginCredentials {
     username: string;

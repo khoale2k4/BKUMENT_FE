@@ -3,7 +3,9 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import * as documentService from '@/lib/services/document.service';
 import * as userService from '@/lib/services/user.service';
 import * as commentService from '@/lib/services/comment.service';
+import { showToast } from './toastSlice';
 import axios from 'axios';
+import { DocumentDetail } from '@/lib/services/document.service';
 
 export interface Comment {
     id: string | number;
@@ -14,38 +16,57 @@ export interface Comment {
     likes: number;
 }
 
-export interface DocumentDetail {
-    id: string;
-    title: string;
-    description: string;
-    downloadUrl: string;
-    downloadCount: number;
-    documentType?: string;
-    downloadable: boolean;
-    university?: string;
-    course?: string;
-    createdAt: Date;
-}
-
 export interface UserInfo {
     user: string;
     avatar: string;
 }
+export interface University {
+    id: number;
+    name: string;
+    abbreviation: string;
+    logoUrl: string | null;
+}
+
+export interface Course {
+    id: string;
+    name: string;
+    topics: Topic[];
+}
+
+export interface Topic {
+    id: string;
+    name: string;
+}
+
 interface UploadState {
     files: FileUploadItem[];
     activeStep: number;
-    uploadStatus: 'idle' | 'uploading' | 'saving' | 'success' | 'error';
+    uploadStatus: 'idle' | 'analyzing' | 'uploading' | 'saving' | 'success' | 'error';
 }
 
 interface DocumentState {
     currentDocument: DocumentDetail | null;
     detailStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
+    relatedDocuments: DocumentDetail[];
+    relatedStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+    relatedPage: number;
+    relatedTotalPages: number;
+
     currentAuthor: UserInfo | null;
     authorStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
     comments: Comment[];
     commentsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+
+    universities: University[];
+    universitiesStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+
+    courses: Course[];
+    coursesStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+
+    topics: Topic[];
+    topicsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
     upload: UploadState;
 }
@@ -54,11 +75,25 @@ const initialState: DocumentState = {
     currentDocument: null,
     detailStatus: 'idle',
 
+    relatedDocuments: [],
+    relatedStatus: 'idle',
+    relatedPage: 0,
+    relatedTotalPages: 0,
+
     currentAuthor: null,
     authorStatus: 'idle',
 
     comments: [],
     commentsStatus: 'idle',
+
+    universities: [],
+    universitiesStatus: 'idle',
+
+    courses: [],
+    coursesStatus: 'idle',
+
+    topics: [],
+    topicsStatus: 'idle',
 
     upload: {
         files: [],
@@ -70,7 +105,9 @@ const initialState: DocumentState = {
 export const fetchDocumentById = createAsyncThunk(
     'documents/fetchDetail',
     async (id: string) => {
-        return await documentService.getDocumentById(id);
+        const response = await documentService.getDocumentById(id);
+        console.log(response);
+        return response;
     }
 );
 
@@ -81,8 +118,8 @@ export const fetchAuthorById = createAsyncThunk(
 
         return {
             id: id,
-            user: data.user,
-            avatar: data.avatar
+            user: data.fullName,
+            avatar: data.avatarUrl
         } as UserInfo;
     }
 );
@@ -91,6 +128,44 @@ export const fetchCommentsByDocId = createAsyncThunk(
     'documents/fetchComments',
     async (documentId: string) => {
         return await commentService.getCommentsByDocId(documentId);
+    }
+);
+
+export const fetchRelatedDocuments = createAsyncThunk(
+    'documents/fetchRelated',
+    async ({ docId, page, size }: { docId: string, page: number; size: number }) => {
+        const response = await documentService.getRelatedDocuments(docId, page, size);
+        return {
+            items: response.content.map((dta: any) => ({
+                id: dta.id,
+                title: dta.name || dta.title,
+                description: dta.description,
+                downloadUrl: dta.downloadUrl,
+                previewImageUrl: dta.previewImageUrl,
+                downloadCount: 0,
+                documentType: dta.documentType,
+                downloadable: dta.downloadable,
+                university: dta.university,
+                course: dta.course,
+                createdAt: dta.createdAt
+            })),
+            page: page,
+            totalPages: response.totalPages
+        };
+    }
+);
+
+export const searchUniversities = createAsyncThunk(
+    'documents/searchUniversities',
+    async (query: string) => {
+        return await documentService.searchUniversities(query);
+    }
+);
+
+export const searchCourses = createAsyncThunk(
+    'documents/searchCourses',
+    async (query: string) => {
+        return await documentService.searchCourses(query);
     }
 );
 
@@ -124,11 +199,36 @@ export const uploadFile = createAsyncThunk(
                 },
             });
 
-            dispatch(updateFileStatus({ localId, updates: { status: 'uploaded', progress: 100 } }));
+            dispatch(updateFileStatus({ localId, updates: { status: 'analyzing', progress: 100 } }));
+
+            const { docId, keywords, summary } = await documentService.analyseDocument({
+                assetId: fileId,
+                fileName: file.name
+            });
+
+            // console.log(docAnalyseResult);
+
+            dispatch(updateFileStatus({
+                localId,
+                updates: {
+                    status: 'success',
+                    progress: 100,
+                    docId,
+                    keywords,
+                    summary,
+                    // Auto-fill description if summary is available
+                    description: summary
+                }
+            }));
             return localId;
         } catch (err: any) {
             const errorMessage = err.response?.data?.message || 'Upload failed';
             dispatch(updateFileStatus({ localId, updates: { status: 'error', errorMessage } }));
+            dispatch(showToast({
+                type: 'error',
+                title: 'Upload Failed',
+                message: errorMessage
+            }));
             return rejectWithValue({ localId, errorMessage });
         }
     }
@@ -150,9 +250,13 @@ export const saveFilesMetadata = createAsyncThunk(
 
                 await documentService.saveDocumentMetadata({
                     assetId: file.storageId || '',
+                    id: file.docId,
                     title: file.title || '',
                     university: file.university || '',
+                    universityId: file.universityId,
                     course: file.course || '',
+                    courseId: file.courseId,
+                    topicId: file.topicId,
                     description: file.description || '',
                     resourceType: 'DOCUMENT',
                     visibility: file.visibility,
@@ -187,6 +291,10 @@ const documentSlice = createSlice({
             state.comments = [];
             state.detailStatus = 'idle';
             state.authorStatus = 'idle';
+            state.relatedDocuments = [];
+            state.relatedStatus = 'idle';
+            state.relatedPage = 0;
+            state.relatedTotalPages = 0;
         },
         setUploadFiles: (state, action: PayloadAction<FileUploadItem[]>) => {
             state.upload.files = [...state.upload.files, ...action.payload];
@@ -251,6 +359,50 @@ const documentSlice = createSlice({
             })
             .addCase(fetchCommentsByDocId.rejected, (state) => {
                 state.commentsStatus = 'failed';
+            });
+
+        builder
+            .addCase(fetchRelatedDocuments.pending, (state, action) => {
+                if (action.meta.arg.page === 0) {
+                    state.relatedStatus = 'loading';
+                }
+            })
+            .addCase(fetchRelatedDocuments.fulfilled, (state, action) => {
+                state.relatedStatus = 'succeeded';
+                if (action.payload.page === 0) {
+                    state.relatedDocuments = action.payload.items;
+                } else {
+                    state.relatedDocuments = [...state.relatedDocuments, ...action.payload.items];
+                }
+                state.relatedPage = action.payload.page;
+                state.relatedTotalPages = action.payload.totalPages;
+            })
+            .addCase(fetchRelatedDocuments.rejected, (state) => {
+                state.relatedStatus = 'failed';
+            });
+
+        builder
+            .addCase(searchUniversities.pending, (state) => {
+                state.universitiesStatus = 'loading';
+            })
+            .addCase(searchUniversities.fulfilled, (state, action: PayloadAction<University[]>) => {
+                state.universitiesStatus = 'succeeded';
+                state.universities = action.payload;
+            })
+            .addCase(searchUniversities.rejected, (state) => {
+                state.universitiesStatus = 'failed';
+            });
+
+        builder
+            .addCase(searchCourses.pending, (state) => {
+                state.coursesStatus = 'loading';
+            })
+            .addCase(searchCourses.fulfilled, (state, action: PayloadAction<Course[]>) => {
+                state.coursesStatus = 'succeeded';
+                state.courses = action.payload;
+            })
+            .addCase(searchCourses.rejected, (state) => {
+                state.coursesStatus = 'failed';
             });
 
         builder.addCase(saveFilesMetadata.pending, (state) => {

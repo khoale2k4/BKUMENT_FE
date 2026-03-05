@@ -8,4 +8,5 @@ export interface CardProp {
     content: string,
     tags: string[],
     onClick: (id: string) => void,
+    token: string
 }

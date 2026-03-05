@@ -51,7 +51,7 @@ const FileUpload = () => {
             university: '',
             course: '',
             description: ''
-        }));
+        } as FileUploadItem));
 
         const newFilesForRedux = newFilesFull.map(({ file, ...rest }) => rest);
 
@@ -85,7 +85,7 @@ const FileUpload = () => {
     const isNextDisabled = () => {
         if (activeStep === 1) {
             if (files.length === 0) return true;
-            return files.some(f => f.status !== 'uploaded' && f.status !== 'success');
+            return files.some(f => f.status !== 'uploaded' && f.status !== 'success' && f.status !== 'analyzing');
         }
         if (activeStep === 2) {
             return uploadStatus === 'saving';

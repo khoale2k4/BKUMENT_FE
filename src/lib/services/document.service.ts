@@ -6,6 +6,8 @@ export interface DocumentDetail {
     title: string;
     description: string;
     downloadUrl: string;
+    viewUrl: string;
+    previewImageUrl: string;
     downloadCount: number;
     documentType?: string;
     downloadable: boolean;
@@ -16,9 +18,13 @@ export interface DocumentDetail {
 
 interface FileUploadMetadata {
     assetId: string;
+    id: string | undefined;
     title: string;
     university: string;
+    universityId?: string;
     course: string;
+    courseId?: string;
+    topicId?: string;
     description: string;
     resourceType: string;
     visibility: string;
@@ -26,25 +32,24 @@ interface FileUploadMetadata {
     documentType: string;
 }
 
+interface AnalyseDocumentBody {
+    assetId: string;
+    fileName: string | undefined;
+}
+
+interface AnalyseDocumentResponse {
+    keywords: string[],
+    docId: string;
+    summary: string | undefined;
+}
+
 /**
  * Lấy chi tiết document theo ID
  */
 export const getDocumentById = async (id: string): Promise<DocumentDetail> => {
-    const response = await fetch(API_ENDPOINTS.DOCUMENTS.GET_DETAIL(id));
-    const data = (await response.json()).result.content[0];
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.GET_DETAIL(id));
 
-    return {
-        id,
-        title: data.title || 'Untitled Document',
-        description: data.description || 'No description available.',
-        downloadUrl: data.downloadUrl || '',
-        createdAt: data.createdAt,
-        documentType: data.documentType,
-        downloadable: data.downloadable,
-        downloadCount: data.downloadCount,
-        course: data.course,
-        university: data.university,
-    };
+    return response.data.result.content[0];
 };
 
 /**
@@ -59,27 +64,38 @@ export const getPresignedUrl = async (fileName: string): Promise<{ url: string; 
 };
 
 /**
- * Upload file lên storage với presigned URL
- */
-export const uploadToStorage = async (
-    url: string,
-    file: File,
-    onProgress?: (progress: number) => void
-): Promise<void> => {
-    await httpClient.put(url, file, {
-        headers: { 'Content-Type': file.type },
-        onUploadProgress: (progressEvent) => {
-            if (progressEvent.total && onProgress) {
-                const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                onProgress(percent);
-            }
-        },
-    });
-};
-
-/**
  * Lưu metadata của document
  */
 export const saveDocumentMetadata = async (metadata: FileUploadMetadata): Promise<void> => {
+    console.log(metadata);
     await httpClient.post(API_ENDPOINTS.DOCUMENTS.UPDATE_METADATA, metadata);
+};
+
+export const analyseDocument = async (body: AnalyseDocumentBody): Promise<AnalyseDocumentResponse> => {
+    const res = await httpClient.get(API_ENDPOINTS.DOCUMENTS.ANALYSE_DOCUMENT(body.assetId, body.fileName), {
+        timeout: 600000
+    });
+
+    return res.data.result;
+};
+
+export const getRelatedDocuments = async (id: string, page: number, size: number): Promise<any> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.RELATED_DOCUMENTS(id, page, size));
+    return response.data.result;
+};
+
+/**
+ * Search universities by query
+ */
+export const searchUniversities = async (query: string): Promise<{ id: number; name: string; abbreviation: string; logoUrl: string | null }[]> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.UNIVERSITIES(query));
+    return response.data.result;
+};
+
+/**
+ * Search courses by query
+ */
+export const searchCourses = async (query: string): Promise<{ id: string; name: string; topics: { id: string; name: string }[] }[]> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.COURSES(query));
+    return response.data.result;
 };

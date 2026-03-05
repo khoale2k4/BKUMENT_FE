@@ -26,14 +26,14 @@ export default function Sidebar() {
         { icon: FileText, label: 'My Blog', href: AppRoute.blogs.my, count: 0 },
         { icon: File, label: 'My Documents', href: AppRoute.documents.my, count: 0 },
         { icon: Send, label: 'Messages', href: AppRoute.messages, count: 2 },
-        { icon: UserSearch, label: 'Find Tutors', href: AppRoute.tutors, count: 0 },
+        // { icon: UserSearch, label: 'Find Tutors', href: AppRoute.tutors, count: 0 },
         { icon: Bell, label: 'Notifications', href: AppRoute.notifications, count: 2 },
     ];
 
     const secondaryMenuItems = [
-        { icon: PenSquare, label: 'Write Blog', href: '/write-blog', count: 0 },
+        { icon: PenSquare, label: 'Write Blog', href: AppRoute.blogs.write, count: 0 },
         { icon: Users, label: 'Following', href: '/following', count: 2 },
-        { icon: Users, label: 'My Groups', href: '/groups', count: 0 },
+        // { icon: Users, label: 'My Groups', href: '/groups', count: 0 },
     ];
 
     const renderMenuItem = (item: any, idx: number) => {

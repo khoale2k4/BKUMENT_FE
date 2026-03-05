@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import { IconPlus, IconX } from '@tabler/icons-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { setCoverImage, uploadImage } from '@/lib/redux/features/blogSlice';
+import { AuthenticatedImage } from '../../../components/ui/AuthenticatedImage';
 
 export default function PostCoverImage() {
     const dispatch = useAppDispatch();
@@ -46,7 +47,7 @@ export default function PostCoverImage() {
             {coverImage && (
                 <div className="relative w-full group animate-in fade-in">
                     <div className="aspect-[21/9] w-full overflow-hidden rounded-lg border border-gray-100">
-                        <img src={coverImage} alt="Cover" className="w-full h-full object-cover" />
+                        <AuthenticatedImage src={coverImage} className="w-full h-full object-cover" />
                     </div>
                     <button
                         onClick={() => dispatch(setCoverImage(null))}

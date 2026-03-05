@@ -3,6 +3,7 @@ import authReducer from './features/authSlice';
 import articleReducer from './features/articleSlice';
 import layoutReducer from './features/layoutSlide';
 import blogReducer from './features/blogSlice';
+import chatReducer from './features/chatSlice';
 import notificationReducer from './features/modalSlice';
 import documentReducer from './features/documentSlice';
 import toastReducer from './features/toastSlice';
@@ -14,6 +15,7 @@ export const makeStore = () => {
             auth: authReducer,
             articles: articleReducer,
             blogs: blogReducer,
+            chat: chatReducer,
             documents: documentReducer,
             ui: layoutReducer,
             notification: notificationReducer,

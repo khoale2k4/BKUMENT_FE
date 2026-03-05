@@ -12,6 +12,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 const IDENTITY_URL = 'http://localhost:8080/identity';
 
 const LMS_URL = 'http://localhost:8082/lms';
+const SOCKET_URL = 'http://localhost:8099';
 //local
 const DEBUG_URL = ''
 
@@ -24,12 +25,12 @@ export const API_ENDPOINTS = {
     },
     ACCOUNT: {
         PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
-        GET_USER_INFO: `${DEBUG_URL}/api/user/info`,
-        TUTOR_GETS:`${DEBUG_URL}/api/user/tutors`
+        GET_USER_INFO: `${API_BASE_URL}/profile/my-profile`,
+        TUTOR_GETS: `${DEBUG_URL}/api/user/tutors`
     },
     ARTICLES: {
         GET_ALL: `${DEBUG_URL}/api/articles`,
-        
+
         GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
         CREATE: `${DEBUG_URL}/api/articles`,
         UPDATE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
@@ -38,10 +39,15 @@ export const API_ENDPOINTS = {
     DOCUMENTS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
         SEARCH: (page: number, size: number) => `${API_BASE_URL}/document/search?page=${page}&size=${size}`,
-        UPDATE_METADATA: `${API_BASE_URL}/document/create`,
-        ANALYSE_DOCUMENT: (id: string) => `${DEBUG_URL}/api/documents/analyse?id=${id}`,
+        UPDATE_METADATA: `${API_BASE_URL}/document/updateMetadata`,
+        ANALYSE_DOCUMENT: (asset_id: string, file_name: string | undefined) => `${API_BASE_URL}/document/analyze/${asset_id}?${file_name != undefined ? "fileName=" + file_name : ""}`,
         TOPICS: `${DEBUG_URL}/api/documents/topics`,
         GET_DETAIL: (id: string | number) => `${API_BASE_URL}/document/search?q=${id}`,
+        RELATED_DOCUMENTS: (id: string, page: number, size: number) => `${API_BASE_URL}/document/related/${id}?page=${page}&size=${size}`,
+        RECOMMENDED_DOCUMENTS: (page: number, size: number) => `${API_BASE_URL}/document/recommendations?page=${page}&size=${size}`,
+        UNIVERSITIES: (query: string) => `${API_BASE_URL}/document/search-universities?q=${encodeURIComponent(query)}`,
+        COURSES: (query: string) => `${API_BASE_URL}/lms/subjects/search?q=${query}`,
+        TOPICS_BY_COURSE: (courseId: string, query: string) => `${DEBUG_URL}/api/documents/topics-by-course?courseId=${courseId}&query=${encodeURIComponent(query)}`,
     },
     BLOGS: {
         GET_ALL: `${DEBUG_URL}/api/resource`,
@@ -54,15 +60,28 @@ export const API_ENDPOINTS = {
         UPDATE_METADATA: `${API_BASE_URL}/resource/metadata`,
         LINK_IMAGE_FILEID: (fileId: string) => `${API_BASE_URL}/resource/download/asset/${fileId}`,
     },
+    CHAT:{
+        GET_CONVERSATIONS: (page: number, size: number) => `${API_BASE_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
+        START_CONVERSATIONS: `${API_BASE_URL}/communication/conversations/create`,
+        UPDATE_CONVERSATION: (con_id: string) => `${API_BASE_URL}/communication/conversations/${con_id}/metadata`,
+        GET_MESSAGES: (conversationId: string) => `${API_BASE_URL}/communication/messages?conversationId=${conversationId}`,
+        SEND_MESSAGE: `${API_BASE_URL}/communication/messages/create`,
+    },
     COMMENTS: {
         GET_BY_DOC: (id: string | number) => `${DEBUG_URL}/api/documents/${id}/comments`,
     },
     USERS: {
         LIST: `${DEBUG_URL}/api/users`,
     },
+    HOME: {
+        SEARCH: (query: string, page: number, size: number) => `${API_BASE_URL}/ai/search?query=${query}&page=${page + 1}&size=${size}`,
+    },
     LMS: {
         GET_TUTOR_CLASSES: `${LMS_URL}/classes`,
-        
+
     },
+    SOCKET: {
+        CONNECT_URL: `${SOCKET_URL}`
+    }
 };
 

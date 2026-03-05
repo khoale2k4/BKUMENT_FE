@@ -108,12 +108,13 @@ export const blogSlice = createSlice({
 
         builder
             .addCase(fetchPost.fulfilled, (state, action) => {
-                state.contentHTML = action.payload.content;
-                state.coverImage = action.payload.coverImage;
-                state.title = action.payload.name;
-                state.authorId = action.payload.authorId;
-                state.createdAt = action.payload.createdAt;
-                state.status = 'succeeded';
+                // TODO: fix this
+                // state.contentHTML = action.payload.content;
+                // state.coverImage = action.payload.coverImage;
+                // state.title = action.payload.name;
+                // state.authorId = action.payload.authorId;
+                // state.createdAt = action.payload.createdAt;
+                // state.status = 'succeeded';
             })
             .addCase(fetchPost.pending, (state) => {
                 state.status = 'getting';
