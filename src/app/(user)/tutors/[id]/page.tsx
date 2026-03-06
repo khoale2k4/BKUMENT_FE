@@ -1,7 +1,7 @@
 import CourseOverview from '@/screens/courses/page';
 import HomePage from '@/screens/home/page';
 import ProfilePage from '@/screens/profile/page';
-import TutorDetailPage from '@/screens/tutors/tutorDetal.tsx/page';
+import TutorDetailPage from '@/screens/tutors/tutorDetail.tsx/page';
 import { Metadata } from 'next';
 
 

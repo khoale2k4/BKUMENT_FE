@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 // Adjust the import path for RootState to match your project structure
 import { RootState } from "@/lib/redux/store";
-
+import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 // --- Interfaces ---
 
 interface Schedule {
@@ -96,16 +96,13 @@ export const getAllClasses = createAsyncThunk(
         return rejectWithValue("Unauthenticated: Missing access token");
       }
 
-      const response = await fetch(
-        "http://localhost:8082/lms/classes/my-classes",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(API_ENDPOINTS.LMS.GET_TUTOR_CLASSES, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await response.json();
       if (data.code !== 1000)
@@ -129,16 +126,13 @@ export const getMySubjects = createAsyncThunk(
         return rejectWithValue("Unauthenticated: Missing access token");
       }
 
-      const response = await fetch(
-        "http://localhost:8082/lms/tutors/my-subjects",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(API_ENDPOINTS.LMS.GET_TUTOR_SUBJECTS, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await response.json();
       if (data.code !== 1000)
@@ -162,7 +156,7 @@ export const createClass = createAsyncThunk(
         return rejectWithValue("Unauthenticated: Missing access token");
       }
 
-      const response = await fetch("http://localhost:8082/lms/classes", {
+      const response = await fetch(API_ENDPOINTS.LMS.ADD_NEW_CLASS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -199,7 +193,7 @@ export const updateClass = createAsyncThunk(
       }
 
       const response = await fetch(
-        `http://localhost:8082/lms/classes/${classId}`,
+        API_ENDPOINTS.LMS.UPDATE_CLASS(classId),
         {
           method: "PUT",
           headers: {
@@ -219,7 +213,7 @@ export const updateClass = createAsyncThunk(
   },
 );
 
-// 5. Cancel/Delete a class
+// 4. Cancel/Delete a class
 export const cancelClass = createAsyncThunk(
   "tutorCourse/cancelClass",
   async (classId: string, { getState, rejectWithValue }) => {
@@ -231,17 +225,13 @@ export const cancelClass = createAsyncThunk(
         return rejectWithValue("Unauthenticated: Missing access token");
       }
 
-      // Gọi API Delete theo format: http://localhost:8082/lms/classes/{classId}
-      const response = await fetch(
-        `http://localhost:8082/lms/classes/${classId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(API_ENDPOINTS.LMS.CANCEL_CLASS(classId), {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await response.json();
 
@@ -257,6 +247,7 @@ export const cancelClass = createAsyncThunk(
   },
 );
 
+// 5. Get members in a course
 export const getMemberInCourse = createAsyncThunk(
   "tutorCourse/getMemberInCourse",
   async (courseId: string, { getState, rejectWithValue }) => {
@@ -269,7 +260,7 @@ export const getMemberInCourse = createAsyncThunk(
       }
 
       const response = await fetch(
-        `http://localhost:8082/lms/classes/${courseId}/members`,
+        API_ENDPOINTS.LMS.GET_CLASS_MEMBERS(courseId),
         {
           method: "GET",
           headers: {
@@ -289,7 +280,7 @@ export const getMemberInCourse = createAsyncThunk(
     }
   },
 );
-
+// 6. Get pending members in a course (chờ gia sư duyệt)
 export const getMemberPendingInCourse = createAsyncThunk(
   "tutorCourse/getMemberPendingInCourse",
   async (courseId: string, { getState, rejectWithValue }) => {
@@ -302,7 +293,7 @@ export const getMemberPendingInCourse = createAsyncThunk(
       }
 
       const response = await fetch(
-        `http://localhost:8082/lms/classes/${courseId}/enrollments/pending`,
+        API_ENDPOINTS.LMS.GET_MEMBER_PENDING(courseId),
         {
           method: "GET",
           headers: {
@@ -323,6 +314,7 @@ export const getMemberPendingInCourse = createAsyncThunk(
   },
 );
 
+// 7. Approve or Reject member enrollment
 export const getClassesByTutorId = createAsyncThunk(
   "tutorClasses/getClassesByTutorId",
   async (tutorId: string, { getState, rejectWithValue }) => {
@@ -332,7 +324,7 @@ export const getClassesByTutorId = createAsyncThunk(
       const token = state.auth?.token;
 
       const response = await fetch(
-        `http://localhost:8082/lms/classes/class/${tutorId}`,
+        API_ENDPOINTS.LMS.GET_CLASSES_BY_TUTORID(tutorId),
         {
           method: "GET",
           headers: {
@@ -359,8 +351,7 @@ export const getClassesByTutorId = createAsyncThunk(
   },
 );
 
-// Trong file tutorCourseSlice.ts
-
+// 8. Approve or Reject member enrollment
 export const approveMember = createAsyncThunk(
   "tutorCourse/approveMember",
   async (
@@ -377,7 +368,7 @@ export const approveMember = createAsyncThunk(
 
       // Đưa isApproved trực tiếp vào URL
       const response = await fetch(
-        `http://localhost:8082/lms/enrollments/${enrollmentId}/approval?approved=${isApproved}`,
+        API_ENDPOINTS.LMS.APPROVE_ENROLLMENT(enrollmentId, isApproved),
         {
           method: "PUT",
           headers: {

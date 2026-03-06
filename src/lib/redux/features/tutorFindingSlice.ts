@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 // Thay đổi đường dẫn import RootState cho phù hợp với dự án của bạn
 import { RootState } from "@/lib/redux/store";
+import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 // Interface cho các tham số tìm kiếm đầu vào
 export interface SearchFilters {
   keyword?: string; // Từ khóa tìm kiếm chung (có thể dùng để tìm theo tên gia sư, tên lớp, mô tả, v.v.)
@@ -95,7 +96,7 @@ export const getSearchSubjects = createAsyncThunk(
     try {
       const state = getState() as RootState;
       const token = state.auth?.token;
-      const response = await fetch("http://localhost:8082/lms/subjects", {
+      const response = await fetch(API_ENDPOINTS.LMS.GET_SUBJECTS, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -134,8 +135,7 @@ export const searchTutors = createAsyncThunk(
       if (filters.format) queryParams.append("format", filters.format);
       if (filters.keyword) queryParams.append("keyword", filters.keyword);
       const queryString = queryParams.toString();
-      const url = `http://localhost:8082/lms/classes/search${queryString ? `?${queryString}` : ""}`;
-
+      const url = `${API_ENDPOINTS.LMS.SEARCH_CLASSES}${queryString ? `?${queryString}` : ""}`;
       // 2. Gửi Request
       const response = await fetch(url, {
         method: "GET",
