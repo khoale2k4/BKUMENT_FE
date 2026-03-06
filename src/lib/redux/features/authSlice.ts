@@ -2,10 +2,11 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { API_ENDPOINTS } from '@/lib/apiEndPoints'; 
 import * as authService from '@/lib/services/auth.service';
 
-// --- Helper to get token from LocalStorage (Safe for Next.js SSR) ---
+// --- Helper to get token from sessionStorage (Safe for Next.js SSR) ---
 const getStoredToken = () => {
     if (typeof window !== 'undefined') {
-        return localStorage.getItem('accessToken');
+        // return sessionStorage.getItem('accessToken');
+        return sessionStorage.getItem('accessToken');
     }
     return null;
 };
@@ -99,13 +100,13 @@ export const authSlice = createSlice({
             state.status = 'idle';
             state.error = null;
             
-            // Sync with LocalStorage
-            localStorage.setItem('accessToken', action.payload.token);
+            // Sync with sessionStorage
+            sessionStorage.setItem('accessToken', action.payload.token);
         },
         initializeAuth: (state) => {
             if (typeof window !== 'undefined') {
-                const token = localStorage.getItem('accessToken');
-                const savedUser = localStorage.getItem('user');
+                const token = sessionStorage.getItem('accessToken');
+                const savedUser = sessionStorage.getItem('user');
 
                 if (token) {
                     state.isAuthenticated = true;
@@ -125,8 +126,8 @@ export const authSlice = createSlice({
             state.token = null;
             state.status = 'idle';
             
-            // Sync with LocalStorage
-            localStorage.removeItem('accessToken');
+            // Sync with sessionStorage
+            sessionStorage.removeItem('accessToken');
         },
     },
     extraReducers: (builder) => {
@@ -143,7 +144,7 @@ export const authSlice = createSlice({
                 state.user = action.payload.user;
                 
                 // SAVE TO STORAGE
-                localStorage.setItem('accessToken', action.payload.token);
+                sessionStorage.setItem('accessToken', action.payload.token);
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.status = 'failed';
@@ -178,7 +179,7 @@ export const authSlice = createSlice({
                 state.token = null;
                 
                 // REMOVE FROM STORAGE
-                localStorage.removeItem('accessToken');
+                sessionStorage.removeItem('accessToken');
             })
             .addCase(logoutUser.rejected, (state, action) => {
                 state.status = 'failed';
@@ -188,7 +189,7 @@ export const authSlice = createSlice({
                 state.isAuthenticated = false;
                 state.user = null;
                 state.token = null;
-                localStorage.removeItem('accessToken');
+                sessionStorage.removeItem('accessToken');
             });
     }
 });

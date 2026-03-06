@@ -1,25 +1,25 @@
 const TOKEN_KEY = 'accessToken';
 
 /**
- * Lấy accessToken từ localStorage
+ * Lấy accessToken từ sessionStorage
  */
 export const getAccessToken = (): string | null => {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY);
 };
 
 /**
- * Lưu accessToken vào localStorage
+ * Lưu accessToken vào sessionStorage
  */
 export const setAccessToken = (token: string): void => {
     if (typeof window === 'undefined') return;
-    localStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(TOKEN_KEY, token);
 };
 
 /**
- * Xóa accessToken khỏi localStorage
+ * Xóa accessToken khỏi sessionStorage
  */
 export const removeAccessToken = (): void => {
     if (typeof window === 'undefined') return;
-    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
 };

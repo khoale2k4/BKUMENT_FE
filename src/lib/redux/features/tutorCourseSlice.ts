@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 // Adjust the import path for RootState to match your project structure
 import { RootState } from "@/lib/redux/store";
-
+import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 // --- Interfaces ---
 
 interface Schedule {
@@ -57,6 +57,8 @@ interface TutorCourseState {
   members: any[]; // Có thể định nghĩa interface riêng cho member nếu cần
   pendingMembers: any[]; // Danh sách thành viên chờ duyệt
   loadingMembers: boolean;
+  viewedTutorClasses: CourseItem[];
+  loadingViewedClasses: boolean;
 }
 
 const initialState: TutorCourseState = {
@@ -76,6 +78,8 @@ const initialState: TutorCourseState = {
   members: [],
   pendingMembers: [],
   loadingMembers: false,
+  viewedTutorClasses: [],
+  loadingViewedClasses: false,
 };
 
 // --- Async Thunks ---
@@ -92,16 +96,13 @@ export const getAllClasses = createAsyncThunk(
         return rejectWithValue("Unauthenticated: Missing access token");
       }
 
-      const response = await fetch(
-        "http://localhost:8082/lms/classes/my-classes",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(API_ENDPOINTS.LMS.GET_TUTOR_CLASSES, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await response.json();
       if (data.code !== 1000)
@@ -125,16 +126,13 @@ export const getMySubjects = createAsyncThunk(
         return rejectWithValue("Unauthenticated: Missing access token");
       }
 
-      const response = await fetch(
-        "http://localhost:8082/lms/tutors/my-subjects",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(API_ENDPOINTS.LMS.GET_TUTOR_SUBJECTS, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await response.json();
       if (data.code !== 1000)
@@ -158,7 +156,7 @@ export const createClass = createAsyncThunk(
         return rejectWithValue("Unauthenticated: Missing access token");
       }
 
-      const response = await fetch("http://localhost:8082/lms/classes", {
+      const response = await fetch(API_ENDPOINTS.LMS.ADD_NEW_CLASS, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -195,7 +193,7 @@ export const updateClass = createAsyncThunk(
       }
 
       const response = await fetch(
-        `http://localhost:8082/lms/classes/${classId}`,
+        API_ENDPOINTS.LMS.UPDATE_CLASS(classId),
         {
           method: "PUT",
           headers: {
@@ -215,7 +213,7 @@ export const updateClass = createAsyncThunk(
   },
 );
 
-// 5. Cancel/Delete a class
+// 4. Cancel/Delete a class
 export const cancelClass = createAsyncThunk(
   "tutorCourse/cancelClass",
   async (classId: string, { getState, rejectWithValue }) => {
@@ -227,17 +225,13 @@ export const cancelClass = createAsyncThunk(
         return rejectWithValue("Unauthenticated: Missing access token");
       }
 
-      // Gọi API Delete theo format: http://localhost:8082/lms/classes/{classId}
-      const response = await fetch(
-        `http://localhost:8082/lms/classes/${classId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await fetch(API_ENDPOINTS.LMS.CANCEL_CLASS(classId), {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
 
       const data = await response.json();
 
@@ -253,6 +247,7 @@ export const cancelClass = createAsyncThunk(
   },
 );
 
+// 5. Get members in a course
 export const getMemberInCourse = createAsyncThunk(
   "tutorCourse/getMemberInCourse",
   async (courseId: string, { getState, rejectWithValue }) => {
@@ -265,7 +260,7 @@ export const getMemberInCourse = createAsyncThunk(
       }
 
       const response = await fetch(
-        `http://localhost:8082/lms/classes/${courseId}/members`,
+        API_ENDPOINTS.LMS.GET_CLASS_MEMBERS(courseId),
         {
           method: "GET",
           headers: {
@@ -285,7 +280,7 @@ export const getMemberInCourse = createAsyncThunk(
     }
   },
 );
-
+// 6. Get pending members in a course (chờ gia sư duyệt)
 export const getMemberPendingInCourse = createAsyncThunk(
   "tutorCourse/getMemberPendingInCourse",
   async (courseId: string, { getState, rejectWithValue }) => {
@@ -298,7 +293,7 @@ export const getMemberPendingInCourse = createAsyncThunk(
       }
 
       const response = await fetch(
-        `http://localhost:8082/lms/classes/${courseId}/enrollments/pending`,
+        API_ENDPOINTS.LMS.GET_MEMBER_PENDING(courseId),
         {
           method: "GET",
           headers: {
@@ -319,8 +314,44 @@ export const getMemberPendingInCourse = createAsyncThunk(
   },
 );
 
-// Trong file tutorCourseSlice.ts
+// 7. Approve or Reject member enrollment
+export const getClassesByTutorId = createAsyncThunk(
+  "tutorClasses/getClassesByTutorId",
+  async (tutorId: string, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      // Nếu API này yêu cầu đăng nhập thì gửi kèm token, nếu là public thì hệ thống tự bỏ qua
+      const token = state.auth?.token;
 
+      const response = await fetch(
+        API_ENDPOINTS.LMS.GET_CLASSES_BY_TUTORID(tutorId),
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        },
+      );
+
+      const data = await response.json();
+      console.log("API Response for getClassesByTutorId:", data); // Debug log
+
+      // Xử lý dữ liệu trả về (Giả định backend trả về code 1000 là thành công)
+      if (data.code !== 1000) {
+        throw new Error(
+          data.message || "Không thể tải danh sách khóa học của gia sư",
+        );
+      }
+
+      return data.result as CourseItem[];
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+// 8. Approve or Reject member enrollment
 export const approveMember = createAsyncThunk(
   "tutorCourse/approveMember",
   async (
@@ -337,7 +368,7 @@ export const approveMember = createAsyncThunk(
 
       // Đưa isApproved trực tiếp vào URL
       const response = await fetch(
-        `http://localhost:8082/lms/enrollments/${enrollmentId}/approval?approved=${isApproved}`,
+        API_ENDPOINTS.LMS.APPROVE_ENROLLMENT(enrollmentId, isApproved),
         {
           method: "PUT",
           headers: {
@@ -496,6 +527,20 @@ const tutorCourseSlice = createSlice({
       .addCase(approveMember.rejected, (state, action) => {
         // Có thể xử lý thông báo lỗi toàn cục ở đây nếu cần
         console.error("Lỗi duyệt:", action.payload);
+      });
+
+    builder
+      .addCase(getClassesByTutorId.pending, (state) => {
+        state.loadingViewedClasses = true;
+        state.error = null;
+      })
+      .addCase(getClassesByTutorId.fulfilled, (state, action) => {
+        state.loadingViewedClasses = false;
+        state.viewedTutorClasses = action.payload; // Gán vào biến này để không đè lên 'classes'
+      })
+      .addCase(getClassesByTutorId.rejected, (state, action) => {
+        state.loadingViewedClasses = false;
+        state.error = action.payload as string;
       });
   },
 });

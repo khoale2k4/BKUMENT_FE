@@ -1,4 +1,6 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+import { GET } from "@/app/api/documents/courses/route";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8083";
 // https://bkment-identity-service-latest.onrender.com/identity/auth/login
 // const ARTICLE_URL = process.env.NEXT_PUBLIC_ARTICLE_API_URL || '';
 // const USER_URL = process.env.NEXT_PUBLIC_USER_API_URL || '';
@@ -9,79 +11,120 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 //local
 // const IDENTITY_URL = 'http://localhost:8888/api/v1/identity'
 // local của tui là 8080
-const IDENTITY_URL = 'http://localhost:8080/identity';
+const IDENTITY_URL = "http://localhost:8080/identity";
+const PROFILE_URL = "http://localhost:8888/api/v1";
+const CHAT_URL = "http://localhost:8888/api/v1";
 
-const LMS_URL = 'http://localhost:8082/lms';
-const SOCKET_URL = 'http://localhost:8099';
+const LMS_URL = "http://localhost:8888/api/v1/lms";
+const SOCKET_URL = "http://localhost:8099";
 //local
-const DEBUG_URL = ''
+const DEBUG_URL = "";
 
 export const API_ENDPOINTS = {
-    AUTH: {
-        LOGIN: `${IDENTITY_URL}/auth/login`,
-        SIGNUP: `${IDENTITY_URL}/accounts`,
-        LOGOUT: `${IDENTITY_URL}/auth/logout`,
-        PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
-    },
-    ACCOUNT: {
-        PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
-        GET_USER_INFO: `${API_BASE_URL}/profile/my-profile`,
-        TUTOR_GETS: `${DEBUG_URL}/api/user/tutors`
-    },
-    ARTICLES: {
-        GET_ALL: `${DEBUG_URL}/api/articles`,
+  AUTH: {
+    LOGIN: `${IDENTITY_URL}/auth/login`,
+    SIGNUP: `${IDENTITY_URL}/accounts`,
+    LOGOUT: `${IDENTITY_URL}/auth/logout`,
+    PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
+  },
+  ACCOUNT: {
+    PROFILE: `${PROFILE_URL}/identity/api/auth/me`,
+    GET_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
+    TUTOR_GETS: `${PROFILE_URL}/api/user/tutors`,
+  },
+  ARTICLES: {
+    GET_ALL: `${DEBUG_URL}/api/articles`,
 
-        GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
-        CREATE: `${DEBUG_URL}/api/articles`,
-        UPDATE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
-        DELETE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
-    },
-    DOCUMENTS: {
-        GET_ALL: `${DEBUG_URL}/api/resource`,
-        SEARCH: (page: number, size: number) => `${API_BASE_URL}/document/search?page=${page}&size=${size}`,
-        UPDATE_METADATA: `${API_BASE_URL}/document/updateMetadata`,
-        ANALYSE_DOCUMENT: (asset_id: string, file_name: string | undefined) => `${API_BASE_URL}/document/analyze/${asset_id}?${file_name != undefined ? "fileName=" + file_name : ""}`,
-        TOPICS: `${DEBUG_URL}/api/documents/topics`,
-        GET_DETAIL: (id: string | number) => `${API_BASE_URL}/document/search?q=${id}`,
-        RELATED_DOCUMENTS: (id: string, page: number, size: number) => `${API_BASE_URL}/document/related/${id}?page=${page}&size=${size}`,
-        RECOMMENDED_DOCUMENTS: (page: number, size: number) => `${API_BASE_URL}/document/recommendations?page=${page}&size=${size}`,
-        UNIVERSITIES: (query: string) => `${API_BASE_URL}/document/search-universities?q=${encodeURIComponent(query)}`,
-        COURSES: (query: string) => `${API_BASE_URL}/lms/subjects/search?q=${query}`,
-        TOPICS_BY_COURSE: (courseId: string, query: string) => `${DEBUG_URL}/api/documents/topics-by-course?courseId=${courseId}&query=${encodeURIComponent(query)}`,
-    },
-    BLOGS: {
-        GET_ALL: `${DEBUG_URL}/api/resource`,
-        SEARCH: (page: number, size: number) => `${API_BASE_URL}/blog/search?page=${page}&size=${size}`,
-        GET_DETAIL: (id: string | number) => `${API_BASE_URL}/blog/search?q=${id}`,
-        UPLOAD_NEW_BLOG: `${API_BASE_URL}/blog/`
-    },
-    RESOURCE: {
-        GET_PRESIGNED_URL: (fileName: string) => `${API_BASE_URL}/resource/presign?fileName=${fileName}`,
-        UPDATE_METADATA: `${API_BASE_URL}/resource/metadata`,
-        LINK_IMAGE_FILEID: (fileId: string) => `${API_BASE_URL}/resource/download/asset/${fileId}`,
-    },
-    CHAT:{
-        GET_CONVERSATIONS: (page: number, size: number) => `${API_BASE_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
-        START_CONVERSATIONS: `${API_BASE_URL}/communication/conversations/create`,
-        UPDATE_CONVERSATION: (con_id: string) => `${API_BASE_URL}/communication/conversations/${con_id}/metadata`,
-        GET_MESSAGES: (conversationId: string) => `${API_BASE_URL}/communication/messages?conversationId=${conversationId}`,
-        SEND_MESSAGE: `${API_BASE_URL}/communication/messages/create`,
-    },
-    COMMENTS: {
-        GET_BY_DOC: (id: string | number) => `${DEBUG_URL}/api/documents/${id}/comments`,
-    },
-    USERS: {
-        LIST: `${DEBUG_URL}/api/users`,
-    },
-    HOME: {
-        SEARCH: (query: string, page: number, size: number) => `${API_BASE_URL}/ai/search?query=${query}&page=${page + 1}&size=${size}`,
-    },
-    LMS: {
-        GET_TUTOR_CLASSES: `${LMS_URL}/classes`,
+    GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
+    CREATE: `${DEBUG_URL}/api/articles`,
+    UPDATE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
+    DELETE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
+  },
+  DOCUMENTS: {
+    GET_ALL: `${DEBUG_URL}/api/resource`,
+    SEARCH: (page: number, size: number) =>
+      `${API_BASE_URL}/document/search?page=${page}&size=${size}`,
+    UPDATE_METADATA: `${API_BASE_URL}/document/updateMetadata`,
+    ANALYSE_DOCUMENT: (asset_id: string, file_name: string | undefined) =>
+      `${API_BASE_URL}/document/analyze/${asset_id}?${file_name != undefined ? "fileName=" + file_name : ""}`,
+    TOPICS: `${DEBUG_URL}/api/documents/topics`,
+    GET_DETAIL: (id: string | number) =>
+      `${API_BASE_URL}/document/search?q=${id}`,
+    RELATED_DOCUMENTS: (id: string, page: number, size: number) =>
+      `${API_BASE_URL}/document/related/${id}?page=${page}&size=${size}`,
+    RECOMMENDED_DOCUMENTS: (page: number, size: number) =>
+      `${API_BASE_URL}/document/recommendations?page=${page}&size=${size}`,
+    UNIVERSITIES: (query: string) =>
+      `${API_BASE_URL}/document/search-universities?q=${encodeURIComponent(query)}`,
+    COURSES: (query: string) =>
+      `${API_BASE_URL}/lms/subjects/search?q=${query}`,
+    TOPICS_BY_COURSE: (courseId: string, query: string) =>
+      `${DEBUG_URL}/api/documents/topics-by-course?courseId=${courseId}&query=${encodeURIComponent(query)}`,
+  },
+  BLOGS: {
+    GET_ALL: `${DEBUG_URL}/api/resource`,
+    SEARCH: (page: number, size: number) =>
+      `${API_BASE_URL}/blog/search?page=${page}&size=${size}`,
+    GET_DETAIL: (id: string | number) => `${API_BASE_URL}/blog/search?q=${id}`,
+    UPLOAD_NEW_BLOG: `${API_BASE_URL}/blog/`,
+  },
+  RESOURCE: {
+    GET_PRESIGNED_URL: (fileName: string) =>
+      `${API_BASE_URL}/resource/presign?fileName=${fileName}`,
+    UPDATE_METADATA: `${API_BASE_URL}/resource/metadata`,
+    LINK_IMAGE_FILEID: (fileId: string) =>
+      `${API_BASE_URL}/resource/download/asset/${fileId}`,
+  },
+  CHAT: {
+    GET_CONVERSATIONS: (page: number, size: number) =>
+      `${CHAT_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
+    START_CONVERSATIONS: `${CHAT_URL}/communication/conversations/create`,
+    UPDATE_CONVERSATION: (con_id: string) =>
+      `${CHAT_URL}/communication/conversations/${con_id}/metadata`,
+    GET_MESSAGES: (conversationId: string) =>
+      `${CHAT_URL}/communication/messages?conversationId=${conversationId}`,
+    SEND_MESSAGE: `${CHAT_URL}/communication/messages/create`,
+  },
+  COMMENTS: {
+    GET_BY_DOC: (id: string | number) =>
+      `${DEBUG_URL}/api/documents/${id}/comments`,
+  },
+  USERS: {
+    LIST: `${DEBUG_URL}/api/users`,
+  },
+  HOME: {
+    SEARCH: (query: string, page: number, size: number) =>
+      `${API_BASE_URL}/ai/search?query=${query}&page=${page + 1}&size=${size}`,
+  },
+  LMS: {
+    GET_TUTOR_CLASSES: `${LMS_URL}/classes/my-classes`,
+    GET_TUTOR_SUBJECTS: `${LMS_URL}/tutors/my-subjects`, //"http://localhost:8082/lms/tutors/my-subjects",
+    // http://localhost:8082/lms/classes
+    ADD_NEW_CLASS: `${LMS_URL}/classes`,
+    //     `http://localhost:8082/lms/classes/${classId}`,
+    UPDATE_CLASS: (classId: string) => `${LMS_URL}/classes/${classId}`,
+    // `http://localhost:8082/lms/classes/${classId}`,
+    CANCEL_CLASS: (classId: string) => `${LMS_URL}/classes/${classId}`,
+    // `http://localhost:8082/lms/classes/${courseId}/members`,
+    GET_CLASS_MEMBERS: (courseId: string) =>
+      `${LMS_URL}/classes/${courseId}/members`,
+    //  `http://localhost:8082/lms/classes/${courseId}/enrollments/pending`,
+    GET_MEMBER_PENDING: (courseId: string) =>
+      `${LMS_URL}/classes/${courseId}/enrollments/pending`,
+    //   `http://localhost:8082/lms/classes/class/${tutorId}`,
+    GET_CLASSES_BY_TUTORID: (tutorId: string) =>
+      `${LMS_URL}/classes/class/${tutorId}`,
+    //  `http://localhost:8082/lms/enrollments/${enrollmentId}/approval?approved=${isApproved}`,
+    APPROVE_ENROLLMENT: (enrollmentId: string, isApproved: boolean) =>
+      `${LMS_URL}/enrollments/${enrollmentId}/approval?approved=${isApproved}`,
 
-    },
-    SOCKET: {
-        CONNECT_URL: `${SOCKET_URL}`
-    }
+    // API FOR USER
+    //  const response = await fetch("http://localhost:8082/lms/subjects",
+    GET_SUBJECTS: `${LMS_URL}/subjects`,
+    //   const url = `http://localhost:8082/lms/classes/search${queryString ? `?${queryString}` : ""}`;
+    SEARCH_CLASSES: `${LMS_URL}/classes/search`,
+  },
+  SOCKET: {
+    CONNECT_URL: `${SOCKET_URL}`,
+  },
 };
-
