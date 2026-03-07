@@ -26,11 +26,15 @@ export const API_ENDPOINTS = {
     SIGNUP: `${IDENTITY_URL}/accounts`,
     LOGOUT: `${IDENTITY_URL}/auth/logout`,
     PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
+       REFRESH_TOKEN: `${IDENTITY_URL}/auth/refresh`,
   },
   ACCOUNT: {
     PROFILE: `${PROFILE_URL}/identity/api/auth/me`,
     GET_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
     TUTOR_GETS: `${PROFILE_URL}/api/user/tutors`,
+    //    const response = await httpClient.patch('http://localhost:8081/profile/update', updateData);
+    UPDATE_USER_INFO: `${PROFILE_URL}/profile/update`,
+    UPDATE_TUTOR_INFO: `${PROFILE_URL}/lms/tutors/update/me`,
   },
   ARTICLES: {
     GET_ALL: `${DEBUG_URL}/api/articles`,

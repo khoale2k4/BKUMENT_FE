@@ -7,7 +7,7 @@ import { useAppSelector } from '@/lib/redux/hooks';
 import ProfileHeader, { TabType } from "./tabs/ProfileHeader"
 import HomeTab from './tabs/Home/HomeTab';
 import MyClassTab from './tabs/MyClass/MyClassTab';
-import AboutTab from './tabs/About/AboutTab';
+import AboutTab from './tabs/About';
 
 const ProfilePage = () => {
   // State quản lý tab đang active
@@ -17,6 +17,10 @@ const ProfilePage = () => {
   // Lưu ý: Có thể lấy từ authSlice.user.name nếu tutorCourse chưa load xong
   const { classes } = useAppSelector((state) => state.tutorCourse);
   const { user } = useAppSelector((state) => state.auth);
+
+  const { roles } = useAppSelector(state => state.auth);
+  const isTutor = roles.includes('USER');
+  console.log('User Roles:', isTutor);
   
   // Ưu tiên lấy tên từ Auth Slice nếu có, hoặc fallback
   const displayName = user?.name || (classes.length > 0 ? classes[0].tutorName : 'Tutor Profile');
