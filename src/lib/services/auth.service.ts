@@ -97,3 +97,24 @@ export const logout = async (token: string): Promise<any> => {
 
     return data;
 };
+
+export const refreshToken = async () => {
+  // Lấy token cũ (nếu API của bạn yêu cầu gửi token cũ lên)
+  const oldToken = sessionStorage.getItem("accessToken");
+
+  const response = await fetch(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {
+    method: "POST", // Hoặc GET tùy backend
+    headers: {
+      "Content-Type": "application/json",
+      ...(oldToken && { Authorization: `Bearer ${oldToken}` }),
+    },
+    // body: ... (Nếu backend cần body)
+  });
+
+  const data = await response.json();
+  if (data.code !== 1000) {
+    throw new Error(data.message);
+  }
+
+  return data.result; // Trả về { token: "..." }
+};

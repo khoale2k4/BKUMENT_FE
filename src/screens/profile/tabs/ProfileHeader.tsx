@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
+import { useAppSelector } from '@/lib/redux/hooks';
 
 // Định nghĩa kiểu dữ liệu cho các Tab
 export type TabType = 'home' | 'my-class' | 'about';
@@ -19,11 +20,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ tutorName, activeTab, onT
     { id: 'about', label: 'About' },
   ];
 
+    const { roles, currentRole } = useAppSelector(state => state.auth);
+    const isTutor = roles.includes('USER');
+    console.log('User Roles:', isTutor);
+
   return (
     <header className="flex justify-between items-start mb-8">
       <div>
         {/* Tên Gia sư */}
-        <h1 className="text-4xl font-bold text-slate-900 mb-8">{tutorName}</h1>
+        <h1 className="text-4xl font-bold text-slate-900 mb-8">{tutorName} - {currentRole}</h1>
         
         {/* Navigation Tabs */}
         <nav className="flex gap-8 text-sm font-medium text-slate-600 border-b border-gray-100 pb-0">

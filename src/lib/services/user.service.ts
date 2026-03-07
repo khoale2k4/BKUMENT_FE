@@ -9,6 +9,6 @@ export const getUserInfo = async (): Promise<UserProfile> => {
 };
 
 export const updateUserInfo = async (updateData: UpdateProfileRequest): Promise<UserProfile> => {
-    const response = await httpClient.patch('http://localhost:8081/profile/update', updateData);
+    const response = await httpClient.patch(API_ENDPOINTS.ACCOUNT.UPDATE_USER_INFO, updateData);
     return response.data.result;
 };
