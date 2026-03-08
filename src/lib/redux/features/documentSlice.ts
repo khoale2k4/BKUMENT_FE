@@ -54,7 +54,6 @@ interface DocumentState {
     relatedTotalPages: number;
 
     currentAuthor: UserInfo | null;
-    authorStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
     comments: Comment[];
     commentsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -81,7 +80,6 @@ const initialState: DocumentState = {
     relatedTotalPages: 0,
 
     currentAuthor: null,
-    authorStatus: 'idle',
 
     comments: [],
     commentsStatus: 'idle',
@@ -108,19 +106,6 @@ export const fetchDocumentById = createAsyncThunk(
         const response = await documentService.getDocumentById(id);
         console.log(response);
         return response;
-    }
-);
-
-export const fetchAuthorById = createAsyncThunk(
-    'documents/fetchAuthor',
-    async (id: string) => {
-        const data = await userService.getUserInfo();
-
-        return {
-            id: id,
-            user: data.fullName,
-            avatar: data.avatarUrl
-        } as UserInfo;
     }
 );
 
@@ -290,7 +275,6 @@ const documentSlice = createSlice({
             state.currentAuthor = null;
             state.comments = [];
             state.detailStatus = 'idle';
-            state.authorStatus = 'idle';
             state.relatedDocuments = [];
             state.relatedStatus = 'idle';
             state.relatedPage = 0;
@@ -335,18 +319,6 @@ const documentSlice = createSlice({
             })
             .addCase(fetchDocumentById.rejected, (state) => {
                 state.detailStatus = 'failed';
-            });
-
-        builder
-            .addCase(fetchAuthorById.pending, (state) => {
-                state.authorStatus = 'loading';
-            })
-            .addCase(fetchAuthorById.fulfilled, (state, action: PayloadAction<UserInfo>) => {
-                state.authorStatus = 'succeeded';
-                state.currentAuthor = action.payload;
-            })
-            .addCase(fetchAuthorById.rejected, (state) => {
-                state.authorStatus = 'failed';
             });
 
         builder

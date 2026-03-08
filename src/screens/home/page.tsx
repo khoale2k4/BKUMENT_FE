@@ -23,6 +23,11 @@ export default function HomePage() {
 
     const tabs = ['Following', 'Documents'];
 
+    const tabToText = (tab: string) => {
+        if(tab == tabs[0]) return "Bài viết";
+        return "Tài liệu";
+    }
+
     const urlSearchQuery = searchParams.get('search');
 
     useEffect(() => {
@@ -53,7 +58,6 @@ export default function HomePage() {
                 promise.abort();
             };
         } else {
-            // Normal feed fetch
             const promise = dispatch(fetchFeed({
                 category: activeTab,
                 page: currentPage
@@ -145,7 +149,6 @@ export default function HomePage() {
     return (
         <div className="flex w-full items-start justify-center gap-8">
             <main className="w-full max-w-3xl py-8 transition-all duration-300">
-                {/* Show search indicator */}
                 {isSearching && (
                     <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                         <div className="flex items-center justify-between">
@@ -170,7 +173,6 @@ export default function HomePage() {
                     </div>
                 )}
 
-                {/* Only show tabs when not searching */}
                 {!isSearching && (
                     <div className="flex items-center gap-8 mb-8 border-b border-gray-100 overflow-x-auto no-scrollbar">
                         {tabs.map((tab) => (
@@ -184,7 +186,7 @@ export default function HomePage() {
                                         : "border-transparent text-gray-500 hover:text-black"
                                 )}
                             >
-                                {tab}
+                                {tabToText(tab)}
                             </button>
                         ))}
                     </div>

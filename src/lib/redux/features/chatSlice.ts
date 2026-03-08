@@ -33,6 +33,9 @@ interface ChatState {
     activeConversationId: string | null;
     currentMessages: ChatMessage[];
     messagesStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+    
+    messagesPage: number;
+    hasMoreMessages: boolean;
 }
 
 const initialState: ChatState = {
@@ -44,35 +47,42 @@ const initialState: ChatState = {
     activeConversationId: null,
     currentMessages: [],
     messagesStatus: 'idle',
+
+    messagesPage: 0,
+    hasMoreMessages: true,
 };
 
 export const fetchConversations = createAsyncThunk(
     'chat/fetchConversations',
     async ({ page, size }: { page: number; size: number }) => {
-        const response = await chatService.getConversations(page, size);
-        console.log(response)
+        const response: any = await chatService.getConversations(page, size);
+
         return {
-            items: response as unknown as Conversation[],
-            page: 0,
-            totalPages: 1
+            items: response.content as Conversation[],
+            page: response.number,
+            totalPages: response.totalPages
         };
     }
 );
 
 export const fetchMessagesByConversationId = createAsyncThunk(
     'chat/fetchMessages',
-    async (conversationId: string) => {
-        const response = await chatService.getMessages(conversationId);
-        
-        const sortedMessages = [...response].sort((a, b) => {
+    async ({ conversationId, page, size }: { conversationId: string, page: number, size: number }) => {
+        const response: any = await chatService.getMessages(conversationId, page, size);
+
+        const dataArray = response.content || response; 
+
+        const sortedMessages = [...dataArray].sort((a, b) => {
             const timeA = new Date(a.createdDate).getTime();
             const timeB = new Date(b.createdDate).getTime();
-            return timeA - timeB;
+            return timeA - timeB; 
         });
 
         return {
             conversationId,
-            messages: sortedMessages
+            messages: sortedMessages,
+            page,
+            size
         };
     }
 );
@@ -154,7 +164,7 @@ export const receiveSocketMessageThunk = createAsyncThunk(
     'chat/receiveSocketMessage',
     async (incomingMessage: ChatMessage, { dispatch, getState }) => {
         const state = getState() as RootState;
-        
+
         const isConversationExist = state.chat.conversations.some(
             (c) => c.id === incomingMessage.conversationId
         );
@@ -175,6 +185,8 @@ const chatSlice = createSlice({
             state.activeConversationId = action.payload;
             state.currentMessages = [];
             state.messagesStatus = 'idle';
+            state.messagesPage = 0;
+            state.hasMoreMessages = true;
         },
         clearChatState: () => {
             return initialState;
@@ -207,27 +219,35 @@ const chatSlice = createSlice({
                 }
             })
             .addCase(fetchConversations.fulfilled, (state, action) => {
-                state.conversationsStatus = 'succeeded';
+
                 if (action.payload.page === 0) {
                     state.conversations = action.payload.items;
                 } else {
                     state.conversations = [...state.conversations, ...action.payload.items];
                 }
-                state.conversationsPage = action.payload.page;
-                state.conversationsTotalPages = action.payload.totalPages;
+
+                state.conversationsStatus = 'succeeded';
             })
             .addCase(fetchConversations.rejected, (state) => {
                 state.conversationsStatus = 'failed';
             });
 
         builder
-            .addCase(fetchMessagesByConversationId.pending, (state) => {
-                state.messagesStatus = 'loading';
+            .addCase(fetchMessagesByConversationId.pending, (state, action) => {
+                if (action.meta.arg.page === 0) {
+                    state.messagesStatus = 'loading';
+                }
             })
             .addCase(fetchMessagesByConversationId.fulfilled, (state, action) => {
                 state.messagesStatus = 'succeeded';
                 if (state.activeConversationId === action.payload.conversationId) {
-                    state.currentMessages = action.payload.messages;
+                    if (action.payload.page === 0) {
+                        state.currentMessages = action.payload.messages;
+                    } else {
+                        state.currentMessages = [...action.payload.messages, ...state.currentMessages];
+                    }
+                    state.messagesPage = action.payload.page;
+                    state.hasMoreMessages = action.payload.messages.length === action.payload.size;
                 }
             })
             .addCase(fetchMessagesByConversationId.rejected, (state) => {

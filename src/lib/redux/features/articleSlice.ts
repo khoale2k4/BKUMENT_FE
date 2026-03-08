@@ -46,7 +46,7 @@ export const fetchFeed = createAsyncThunk(
 
         const mappedItems = items.map((dta: any) => ({
             id: dta.id || Math.random(),
-            author: userData,
+            author: dta.author,
             title: dta.name || dta.title,
             time: dta.createdAt,
 
@@ -61,6 +61,8 @@ export const fetchFeed = createAsyncThunk(
 
             tags: dta.tags || (category === 'Documents' ? ['PDF', 'Doc'] : ['Hot', '24h'])
         }));
+
+        console.log(mappedItems);
 
         return {
             items: mappedItems,

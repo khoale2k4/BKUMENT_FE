@@ -41,8 +41,8 @@ export const getConversations = async (page: number, size: number): Promise<Conv
     return response.data.result;
 };
 
-export const getMessages = async (conversationId: string): Promise<ChatMessage[]> => {
-    const response = await httpClient.get(API_ENDPOINTS.CHAT.GET_MESSAGES(conversationId));
+export const getMessages = async (conversationId: string, page: number, size: number): Promise<ChatMessage[]> => {
+    const response = await httpClient.get(API_ENDPOINTS.CHAT.GET_MESSAGES(conversationId, page, size));
     
     return response.data.result;
 };

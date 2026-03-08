@@ -30,7 +30,7 @@ export const API_ENDPOINTS = {
   },
   ACCOUNT: {
     PROFILE: `${PROFILE_URL}/identity/api/auth/me`,
-    GET_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
+    GET_USER_INFO: `${API_BASE_URL}/profile/my-profile`,
     TUTOR_GETS: `${PROFILE_URL}/api/user/tutors`,
     //    const response = await httpClient.patch('http://localhost:8081/profile/update', updateData);
     UPDATE_USER_INFO: `${PROFILE_URL}/profile/update`,
@@ -81,13 +81,13 @@ export const API_ENDPOINTS = {
   },
   CHAT: {
     GET_CONVERSATIONS: (page: number, size: number) =>
-      `${CHAT_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
-    START_CONVERSATIONS: `${CHAT_URL}/communication/conversations/create`,
+      `${API_BASE_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
+    START_CONVERSATIONS: `${API_BASE_URL}/communication/conversations/create`,
     UPDATE_CONVERSATION: (con_id: string) =>
-      `${CHAT_URL}/communication/conversations/${con_id}/metadata`,
-    GET_MESSAGES: (conversationId: string) =>
-      `${CHAT_URL}/communication/messages?conversationId=${conversationId}`,
-    SEND_MESSAGE: `${CHAT_URL}/communication/messages/create`,
+      `${API_BASE_URL}/communication/conversations/${con_id}/metadata`,
+    GET_MESSAGES: (conversationId: string, page: number, size: number) =>
+      `${API_BASE_URL}/communication/messages?conversationId=${conversationId}&page=${page}&size=${size}`,
+    SEND_MESSAGE: `${API_BASE_URL}/communication/messages/create`,
   },
   COMMENTS: {
     GET_BY_DOC: (id: string | number) =>

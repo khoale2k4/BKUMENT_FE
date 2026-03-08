@@ -3,7 +3,7 @@ import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp } from 'lucide-
 import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { useEffect, useState } from 'react';
-import { clearCurrentDocument, fetchAuthorById, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments } from '@/lib/redux/features/documentSlice';
+import { clearCurrentDocument, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments } from '@/lib/redux/features/documentSlice';
 import CommentSection from './commentSection/page';
 import { getAccessToken } from '@/lib/utils/token';
 import Pagination from '@/components/ui/Pagination';
@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import RelatedDocumentCard from './RelatedDocumentCard';
 import { DescriptionWithShowMore } from './DescriptionWithShowMore/page';
 import httpClient from '@/lib/services/http';
+import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 
 const PDFViewer = dynamic(() => import('./pdfViewer/page'), { ssr: false, });
 const WordViewer = dynamic(() => import('./wordViewer/page'), { ssr: false });
@@ -24,7 +25,7 @@ const Skeleton = ({ className }: { className: string }) => (
 
 export default function DocumentDetailPage({ params }: { params: { id: string } }) {
     const dispatch = useAppDispatch();
-    const { currentDocument, currentAuthor, detailStatus, authorStatus, relatedDocuments, relatedStatus, relatedPage, relatedTotalPages } = useAppSelector((state) => state.documents);
+    const { currentDocument, currentAuthor, detailStatus, relatedDocuments, relatedStatus, relatedPage, relatedTotalPages } = useAppSelector((state) => state.documents);
     const [token, setToken] = useState<string | null>(() => getAccessToken());
     const router = useRouter();
 
@@ -59,7 +60,6 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
         if (params.id) {
             if (params.id) {
                 dispatch(fetchDocumentById(params.id));
-                dispatch(fetchAuthorById(params.id));
                 dispatch(fetchCommentsByDocId(params.id));
                 dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
             }
@@ -110,7 +110,8 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     }
 
     const isDocLoading = detailStatus === 'loading' || !currentDocument;
-    const isAuthorLoading = authorStatus === 'loading' || !currentAuthor;
+
+    console.log(currentDocument)
 
     return (
         <main className="min-h-screen bg-white pb-20">
@@ -137,7 +138,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-gray-100 pb-8">
                     <div className="flex items-center gap-3 justify-center sm:justify-start">
-                        {isAuthorLoading ? (
+                        {currentDocument?.author === null ? (
                             <>
                                 <Skeleton className="w-12 h-12 rounded-full" />
                                 <div className="space-y-2">
@@ -148,10 +149,11 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                         ) : (
                             <>
                                 <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-100 shrink-0">
-                                    <img src={currentAuthor?.avatar} alt={currentAuthor?.user} className="w-full h-full object-cover" />
+                                    {!currentDocument?.author && <img src={currentDocument?.author?.avatarUrl} alt={currentAuthor?.user} className="w-full h-full object-cover" />}
+                                    {currentDocument?.author && <AuthenticatedImage src={currentDocument?.author?.avatarUrl} alt={currentAuthor?.user} className="w-full h-full object-cover" />}
                                 </div>
                                 <div>
-                                    <div className="font-semibold text-gray-900">{currentAuthor?.user}</div>
+                                    <div className="font-semibold text-gray-900">{currentDocument?.author.name}</div>
                                     <div className="text-xs text-gray-500">
                                         {currentDocument?.course
                                             ? `Học ${currentDocument.course} tại ${currentDocument.university}`
