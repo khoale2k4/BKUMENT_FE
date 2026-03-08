@@ -18,7 +18,7 @@ interface ArticleState {
 
 const initialState: ArticleState = {
     items: [],
-    status: 'idle',
+    status: 'loading',
     error: null,
     currentPage: 0,
     totalPages: 0,
@@ -26,7 +26,7 @@ const initialState: ArticleState = {
 
     searchQuery: null,
     searchResults: [],
-    searchStatus: 'idle',
+    searchStatus: 'loading',
 };
 
 export const fetchFeed = createAsyncThunk(
@@ -127,8 +127,12 @@ const articleSlice = createSlice({
                 state.totalPages = action.payload.totalPages;
             })
             .addCase(fetchFeed.rejected, (state, action) => {
+                if (action.meta.aborted || action.error.name === 'AbortError') {
+                    return;
+                }
+
                 state.status = 'failed';
-                state.error = action.error.message || 'Failed to fetch articles';
+                state.error = action.error.message || 'Something went wrong';
             });
 
         builder
@@ -143,8 +147,12 @@ const articleSlice = createSlice({
                 state.totalPages = action.payload.totalPages;
             })
             .addCase(searchKeyword.rejected, (state, action) => {
+                if (action.meta.aborted || action.error.name === 'AbortError') {
+                    return;
+                }
+
                 state.searchStatus = 'failed';
-                state.error = action.error.message || 'Search failed';
+                state.error = action.error.message || 'Something went wrong';
             });
     },
 });
