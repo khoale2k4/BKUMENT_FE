@@ -1,15 +1,21 @@
-import { memo } from "react";
-import { Clapperboard, HandHeart, MessageCircle, MoreHorizontal } from "lucide-react";
+import { memo, useState } from "react";
+import { MessageCircle } from "lucide-react";
 import { CommentInput } from "./CommentInput";
 import { formatDate } from "@/lib/utils/formatDate";
+import { Comment } from "@/lib/services/comment.service";
+import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
+import { useAppDispatch } from "@/lib/redux/hooks";
+import { fetchRepliesByCommentId } from "@/lib/redux/features/documentSlice"; // Import thêm
 
 interface CommentItemProps {
-    comment: AppComment;
+    comment: Comment;
     currentUser: User;
     isReplying: boolean;
     onReplyClick: (id: string | number, username: string) => void;
     onCancelReply: () => void;
+    numberOfChildComment: number;
     onSubmitReply: (parentId: string | number, text: string) => void;
+    isChild?: boolean; 
 }
 
 export const CommentItem = memo(function CommentItem({
@@ -18,42 +24,64 @@ export const CommentItem = memo(function CommentItem({
     isReplying,
     onReplyClick,
     onCancelReply,
-    onSubmitReply
+    numberOfChildComment,
+    onSubmitReply,
+    isChild = false
 }: CommentItemProps) {
+    const dispatch = useAppDispatch();
+    
+    const [showReplies, setShowReplies] = useState(false);
+
+    const replies = comment.replies || [];
+    const repliesPage = comment.repliesPage || 0;
+    const repliesTotalPages = comment.repliesTotalPages || 0;
+    const isLoadingReplies = comment.isLoadingReplies || false;
+
+    const handleToggleReplies = () => {
+        if (!showReplies && replies.length === 0) {
+            dispatch(fetchRepliesByCommentId({ parentId: comment.id.toString(), page: 0, size: 5 }));
+        }
+        setShowReplies(!showReplies);
+    };
+    
+    const handleLoadMoreReplies = () => {
+        dispatch(fetchRepliesByCommentId({ parentId: comment.id.toString(), page: repliesPage + 1, size: 5 }));
+    }
+
     return (
-        <div className="border-b border-gray-100 pb-6 last:border-none">
+        <div className={`pb-6 ${!isChild ? 'border-b border-gray-100 last:border-none' : 'mt-4'}`}>
             <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                    <img src={comment.avatar} alt={comment.user} className="w-10 h-10 rounded-full" />
+                    {comment.avatar && <AuthenticatedImage src={comment.avatar} alt={comment.user} className="w-10 h-10 rounded-full object-cover" />}
+                    {!comment.avatar && <img src={comment.avatar} alt={comment.user} className="w-10 h-10 rounded-full object-cover" />}
                     <div>
                         <div className="font-bold text-gray-900">{comment.user}</div>
                         <div className="text-sm text-gray-500">{formatDate(comment.time)}</div>
                     </div>
                 </div>
-                <button className="text-gray-400 hover:text-gray-600">
-                    <MoreHorizontal size={20} />
-                </button>
             </div>
 
             <p className="text-gray-800 text-base leading-relaxed mb-4">{comment.content}</p>
 
             <div className="flex items-center gap-6 text-gray-500">
-                <button className="flex items-center gap-2 hover:text-gray-900 transition">
-                    <HandHeart size={20} />
-                    <span className="text-sm font-medium">
-                        {comment.likes > 0 ? `${comment.likes} claps` : 'Clap'}
-                    </span>
-                </button>
-                <button className="flex items-center gap-2 hover:text-gray-900 transition">
-                    <MessageCircle size={20} />
-                    <span className="text-sm font-medium">6 replies</span>
-                </button>
-                <button
+                {!isChild && (
+                    <button 
+                        onClick={handleToggleReplies}
+                        className="flex items-center gap-2 hover:text-gray-900 transition"
+                    >
+                        <MessageCircle size={20} />
+                        <span className="text-sm font-medium">
+                            {showReplies ? 'Ẩn phản hồi' : `Xem ${numberOfChildComment} phản hồi`}
+                        </span>
+                    </button>
+                )}
+                
+                {!isChild && <button
                     onClick={() => onReplyClick(comment.id, comment.user)}
                     className="text-sm font-medium hover:text-gray-900 transition"
                 >
                     Reply
-                </button>
+                </button>}
             </div>
 
             {isReplying && (
@@ -66,6 +94,45 @@ export const CommentItem = memo(function CommentItem({
                         onCancel={onCancelReply}
                         onSubmit={(text) => onSubmitReply(comment.id, text)}
                     />
+                </div>
+            )}
+
+            {!isChild && showReplies && (
+                <div className="mt-4 ml-4 md:ml-12 pl-4 border-l-2 border-gray-100 space-y-2">
+                    {isLoadingReplies && repliesPage === 0 ? (
+                        <div className="flex items-center gap-2 text-sm text-gray-500 py-2">
+                            <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                            Đang tải...
+                        </div>
+                    ) : replies.length > 0 ? (
+                        <>
+                            {replies.map((reply) => (
+                                <CommentItem
+                                    key={reply.id}
+                                    comment={reply}
+                                    currentUser={currentUser}
+                                    isReplying={false}
+                                    onReplyClick={onReplyClick} 
+                                    numberOfChildComment={reply.numberOfChildComment || 0} // Hoặc 0
+                                    onCancelReply={onCancelReply}
+                                    onSubmitReply={onSubmitReply}
+                                    isChild={true} 
+                                />
+                            ))}
+                            
+                            {repliesPage < repliesTotalPages - 1 && (
+                                <button
+                                    onClick={handleLoadMoreReplies}
+                                    disabled={isLoadingReplies}
+                                    className="text-sm text-blue-600 font-medium hover:underline disabled:opacity-50 mt-2"
+                                >
+                                    {isLoadingReplies ? "Đang tải..." : "Xem thêm phản hồi"}
+                                </button>
+                            )}
+                        </>
+                    ) : (
+                        <div className="text-sm text-gray-500 py-2">Chưa có phản hồi nào.</div>
+                    )}
                 </div>
             )}
         </div>

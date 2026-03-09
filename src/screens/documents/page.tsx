@@ -60,7 +60,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
         if (params.id) {
             if (params.id) {
                 dispatch(fetchDocumentById(params.id));
-                dispatch(fetchCommentsByDocId(params.id));
+                dispatch(fetchCommentsByDocId({ documentId: params.id, page: 0, size: 5 }));
                 dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
             }
             return () => {

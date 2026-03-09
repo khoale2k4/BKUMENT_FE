@@ -26,7 +26,7 @@ export const API_ENDPOINTS = {
     SIGNUP: `${IDENTITY_URL}/accounts`,
     LOGOUT: `${IDENTITY_URL}/auth/logout`,
     PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
-       REFRESH_TOKEN: `${IDENTITY_URL}/auth/refresh`,
+    REFRESH_TOKEN: `${IDENTITY_URL}/auth/refresh`,
   },
   ACCOUNT: {
     PROFILE: `${PROFILE_URL}/identity/api/auth/me`,
@@ -90,8 +90,10 @@ export const API_ENDPOINTS = {
     SEND_MESSAGE: `${API_BASE_URL}/communication/messages/create`,
   },
   COMMENTS: {
-    GET_BY_DOC: (id: string | number) =>
-      `${DEBUG_URL}/api/documents/${id}/comments`,
+    GET_BY_DOC: (id: string, page: number, size: number) =>
+      `${API_BASE_URL}/social/comments/resource/${id}?page=${page}&size=${size}`,
+    GET_BY_PARENT_COMMENT: (id: string, page: number, size: number) => `${API_BASE_URL}/social/comments/reply/${id}?page=${page}&size=${size}`,
+    CREATE: `${API_BASE_URL}/social/comments`,
   },
   USERS: {
     LIST: `${DEBUG_URL}/api/users`,
