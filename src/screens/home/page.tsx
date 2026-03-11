@@ -14,7 +14,7 @@ import { getAccessToken } from '@/lib/utils/token';
 
 export default function HomePage() {
     const dispatch = useAppDispatch();
-    const { items, status, error, currentPage, totalPages, searchQuery, searchResults, searchStatus } = useAppSelector((state) => state.articles);
+    const { items, status, error, currentPage, totalPages, searchQuery, searchResults, searchStatus, totalItems } = useAppSelector((state) => state.articles);
     const router = useRouter();
     const searchParams = useSearchParams();
     const [token, setToken] = useState<string | null>(() => getAccessToken());
@@ -150,26 +150,24 @@ export default function HomePage() {
         <div className="flex w-full items-start justify-center gap-8">
             <main className="w-full max-w-3xl py-8 transition-all duration-300">
                 {isSearching && (
-                    <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-blue-900">
-                                    Kết quả tìm kiếm cho: <span className="font-bold">"{urlSearchQuery}"</span>
-                                </p>
-                                <p className="text-xs text-blue-700 mt-1">
-                                    {searchResults.length} kết quả được tìm thấy
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    router.push('/home');
-                                    dispatch(clearSearch());
-                                }}
-                                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                            >
-                                Xóa tìm kiếm
-                            </button>
+                    <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-900">
+                                Kết quả cho "{urlSearchQuery}"
+                            </h2>
+                            <p className="text-sm text-gray-500 mt-1">
+                                Tìm thấy {totalItems} kết quả
+                            </p>
                         </div>
+                        <button
+                            onClick={() => {
+                                router.push('/home');
+                                dispatch(clearSearch());
+                            }}
+                            className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-full border border-gray-200 cursor-pointer"
+                        >
+                            Xóa tìm kiếm
+                        </button>
                     </div>
                 )}
 

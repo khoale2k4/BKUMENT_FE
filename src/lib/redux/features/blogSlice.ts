@@ -1,10 +1,16 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import * as blogService from '@/lib/services/blog.service';
 
+interface Author {
+    id: string,
+    name: string,
+    avatarUrl: string
+}
+
 interface BlogState {
     id?: string;
     title: string;
-    authorId: string;
+    author?: Author;
     contentHTML: string;
     coverImage: string | null;
     visibility: 'PUBLIC' | 'PRIVATE';
@@ -18,7 +24,6 @@ const initialState: BlogState = {
     title: '',
     contentHTML: '',
     coverImage: null,
-    authorId: '',
     visibility: 'PUBLIC',
     status: 'idle',
     error: null,
@@ -109,12 +114,12 @@ export const blogSlice = createSlice({
         builder
             .addCase(fetchPost.fulfilled, (state, action) => {
                 // TODO: fix this
-                // state.contentHTML = action.payload.content;
-                // state.coverImage = action.payload.coverImage;
-                // state.title = action.payload.name;
-                // state.authorId = action.payload.authorId;
-                // state.createdAt = action.payload.createdAt;
-                // state.status = 'succeeded';
+                state.contentHTML = action.payload.content;
+                state.coverImage = action.payload.coverImage;
+                state.title = action.payload.name;
+                state.author = action.payload.author;
+                state.createdAt = action.payload.createdAt;
+                state.status = 'succeeded';
             })
             .addCase(fetchPost.pending, (state) => {
                 state.status = 'getting';

@@ -7,6 +7,9 @@ import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { useEffect } from 'react';
 import { fetchPost } from '@/lib/redux/features/blogSlice';
+import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
+
+import parse, { HTMLReactParserOptions, Element } from 'html-react-parser';
 
 interface PageProps {
     params: {
@@ -20,25 +23,43 @@ export default function BlogDetailPage(params: PageProps) {
     const router = useRouter();
     const dispatch = useAppDispatch();
 
-    const { title, contentHTML, coverImage, visibility, authorId, createdAt, status } = useAppSelector(
+    const { title, contentHTML, coverImage, visibility, author, createdAt, status } = useAppSelector(
         (state) => state.blogs
     );
+
+    const parseOptions: HTMLReactParserOptions = {
+        replace(domNode) {
+            if (domNode instanceof Element && domNode.name === 'img') {
+                const { src, alt, className } = domNode.attribs;
+                
+                return (
+                    <AuthenticatedImage 
+                        src={src} 
+                        alt={alt || 'Nội dung bài viết'} 
+                        className={className} 
+                        onError={(e: any) => {
+                            e.currentTarget.src = "https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg";
+                        }}
+                    />
+                );
+            }
+        }
+    };
 
     useEffect(() => {
         dispatch(fetchPost(params.params.id));
     }, [dispatch]);
 
-    if (status === 'getting' || status === 'idle') {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
-                <div className="flex flex-col items-center gap-3 text-gray-500">
-                    <div className="w-8 h-8 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
-                    <span className="text-sm font-medium">Đang tải bài viết...</span>
-                </div>
-            </div>
-        );
-    }
-
+    // if (status === 'getting' || status === 'idle') {
+    //     return (
+    //         <div className="min-h-screen flex items-center justify-center bg-white">
+    //             <div className="flex flex-col items-center gap-3 text-gray-500">
+    //                 <div className="w-8 h-8 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
+    //                 <span className="text-sm font-medium">Đang tải bài viết...</span>
+    //             </div>
+    //         </div>
+    //     );
+    // }
 
     return (
         <div className="min-h-screen bg-white font-sans pb-20">
@@ -113,19 +134,14 @@ export default function BlogDetailPage(params: PageProps) {
 
                 {coverImage && (
                     <div className="w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden mb-10 shadow-sm border border-gray-100">
-                        <img
-                            src={coverImage}
-                            onError={(e) => {
+                        <AuthenticatedImage src={coverImage} onError={(e) => {
                                 e.currentTarget.src =
-                                    "https://images2.thanhnien.vn/528068263637045248/2025/12/16/u23-vietnam-2-17658561303842145453005.jpg";
-                            }}
-                            alt="Cover"
-                            className="w-full h-full object-cover"
-                        />
+                                    "https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg";
+                            }} className="w-full h-full object-cover" />
                     </div>
                 )}
 
-                <div
+<div
                     className={clsx(
                         "prose prose-lg prose-slate max-w-none",
                         "prose-headings:font-bold prose-headings:text-gray-900",
@@ -135,8 +151,9 @@ export default function BlogDetailPage(params: PageProps) {
                         "prose-blockquote:border-l-4 prose-blockquote:border-black prose-blockquote:pl-4 prose-blockquote:italic",
                         "first-letter:text-5xl first-letter:font-bold first-letter:mr-3 first-letter:float-left first-letter:text-gray-900"
                     )}
-                    dangerouslySetInnerHTML={{ __html: contentHTML }}
-                />
+                >
+                    {contentHTML ? parse(contentHTML, parseOptions) : null}
+                </div>
 
                 <div className="mt-12 pt-8 border-t border-gray-100">
                     <h4 className="text-sm font-bold text-gray-900 uppercase mb-4">

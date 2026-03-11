@@ -49,16 +49,14 @@ export const uploadImage = async (file: File): Promise<string> => {
  * Submit blog post mới
  */
 export const submitPost = async (post: BlogPost): Promise<any> => {
-    const response = await httpClient.post(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, JSON.stringify(post), {
-        headers: { 'Content-Type': 'application/json' },
-    });
+    const response = await httpClient.post(API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG, JSON.stringify(post));
 
     // if (!response.ok) {
     //     throw new Error('Upload failed');
     // }
 
     // const data = await response.json();
-    // return data.result;
+    return response.data.result;
 };
 
 /**
@@ -72,5 +70,5 @@ export const fetchPostById = async (blogId: string) => {
     // }
 
     // const data = await response.json();
-    // return data.result.content[0];
+    return response.data.result.content[0];
 };

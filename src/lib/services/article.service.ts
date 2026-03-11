@@ -33,11 +33,8 @@ export const searchBlogs = async (page: number, size: number): Promise<SearchRes
 /**
  * Search content by keyword với pagination
  */
-export const searchContent = async (query: string, page: number, size: number): Promise<SearchResponse> => {
+export const searchContent = async (query: string, page: number, size: number) => {
     const response = await httpClient.get(API_ENDPOINTS.HOME.SEARCH(query, page, size));
 
-    return {
-        content: response.data.results || [],
-        totalPages: Math.ceil((response.data.results?.length || 0) / size) || 1,
-    };
+    return response.data.result; 
 };
