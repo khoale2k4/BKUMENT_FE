@@ -6,7 +6,7 @@ interface LoginCredentials {
     password: string;
 }
 
-interface RegisterPayload {
+export interface RegisterPayload {
     account: {
         username: string;
         password: string;
@@ -15,8 +15,13 @@ interface RegisterPayload {
     firstName: string;
     lastName: string;
     dob: string;
-    university: string;
+    universityId: number;  // <-- Sửa thành Id dạng number theo code mới của bạn
+    email: string;     
+    phone: string;     
+    address: string;   
+    bio: string;       
 }
+
 
 interface LoginResponse {
     token: string;

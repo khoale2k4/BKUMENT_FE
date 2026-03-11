@@ -140,6 +140,7 @@ export const getMyTutorProfile = createAsyncThunk(
             });
 
             const data = await response.json();
+            console.log("Dữ liệu tutor profile nhận được:", data);
             if (data.code !== 1000) throw new Error(data.message || 'Failed to fetch tutor profile');
             
             return data.result as TutorProfile;

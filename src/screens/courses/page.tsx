@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState, useEffect } from 'react'; // Nhớ import useEffect
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks'; // Import Redux hooks
-import { getAllClasses } from '@/lib/redux/features/tutorCourseSlice'; // Import action
+import { Loader2 } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
+
+import { getClassDetailsById, clearClassDetail } from '@/lib/redux/features/tutorFindingSlice';
 
 import CourseHeader from './components/CourseHeader';
 import OverviewTab from './tabs/OverviewTab';
 import MembersTab from './tabs/MemberTabs/MembersTabs';
 import ResourcesTab from './tabs/ResoursesTabs';
-import NotificationsTab from './tabs/NotificationTabs';
+import NotificationsTab from './tabs/NotificationTabs/NotificationTabs';
 
 const CoursePage = () => {
   const params = useParams();
@@ -17,36 +19,62 @@ const CoursePage = () => {
   
   const dispatch = useAppDispatch();
   
-  // Lấy danh sách classes và trạng thái loading từ Redux
-  const { classes, loading } = useAppSelector((state) => state.tutorCourse);
+  const { currentClassDetail, loadingClassDetail, errorClassDetail } = useAppSelector((state) => state.tutorFinding);
 
   const [activeTab, setActiveTab] = useState('Overview');
   const tabs = ['Overview', 'Members', 'Resources', 'Notification'];
 
-  // --- THÊM LOGIC NÀY ĐỂ FIX LỖI F5 ---
   useEffect(() => {
-    // Nếu mảng classes trống (do người dùng F5 hoặc truy cập trực tiếp bằng link)
-    // thì gọi API để lấy lại dữ liệu
-    if (classes.length === 0) {
-      dispatch(getAllClasses());
+    if (courseId) {
+      dispatch(getClassDetailsById(courseId));
     }
-  }, [dispatch, classes.length]);
-  // ------------------------------------
+    else{
+      console.error("Course ID is missing in URL parameters.");
+    }
 
-  // (Tuỳ chọn) Hiển thị trạng thái đang tải dữ liệu để giao diện mượt hơn
-  if (loading && classes.length === 0) {
+    // Bật lại cleanup để khi back ra ngoài nó xóa data đi, 
+    // tránh lỗi nháy hình của lớp cũ khi vào lớp mới
+    return () => {
+      dispatch(clearClassDetail());
+    };
+  }, [dispatch, courseId]);
+
+  // 1. CHỈ KIỂM TRA LOADING Ở ĐÂY
+  if (loadingClassDetail) {
     return (
-      <div className="max-w-6xl mx-auto px-6 py-20 flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      <div className="flex flex-col justify-center items-center min-h-screen">
+        <Loader2 className="animate-spin text-orange-500 mb-4" size={48} />
+        <p className="text-gray-500 font-medium animate-pulse">Đang tải dữ liệu lớp học...</p>
       </div>
     );
   }
 
+  // 2. KIỂM TRA LỖI SAU KHI ĐÃ LOAD XONG
+  if (errorClassDetail) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="bg-red-50 text-red-500 p-8 rounded-2xl border border-red-100 max-w-lg text-center font-medium shadow-sm">
+          <p>Không thể tải lớp học này.</p>
+          <p className="text-sm mt-2 opacity-80">Chi tiết lỗi: {errorClassDetail}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. CUỐI CÙNG MỚI KIỂM TRA NULL (Nếu ko load, ko lỗi, mà vẫn ko có data)
+  if (!currentClassDetail) {
+    return (
+       <div className="flex justify-center items-center min-h-screen">
+         <p className="text-gray-500">Không tìm thấy thông tin lớp học.</p>
+       </div>
+    );
+  }
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10 bg-white min-h-screen">
+    <div className="max-w-6xl mx-auto px-6 py-10 bg-white min-h-screen animate-in fade-in duration-500">
+      
       <CourseHeader courseId={courseId} />
 
-      {/* Tabs Navigation */}
       <div className="flex border border-gray-200 rounded-xl overflow-hidden mb-8 shadow-sm">
         {tabs.map((tab) => (
           <button
@@ -62,13 +90,13 @@ const CoursePage = () => {
         ))}
       </div>
 
-      {/* Tab Content Rendering */}
       <div className="min-h-[300px]">
-        {activeTab === 'Overview' && <OverviewTab courseId={courseId} />}
+        {activeTab === 'Overview' && <OverviewTab courseId={courseId}/>}
         {activeTab === 'Members' && <MembersTab courseId={courseId} />}
         {activeTab === 'Resources' && <ResourcesTab />}
-        {activeTab === 'Notification' && <NotificationsTab />}
+        {activeTab === 'Notification' && NotificationsTab && <NotificationsTab courseId={courseId} />}
       </div>
+      
     </div>
   );
 };

@@ -23,7 +23,7 @@ const DEBUG_URL = "";
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: `${IDENTITY_URL}/auth/login`,
-    SIGNUP: `${IDENTITY_URL}/accounts`,
+    SIGNUP: `${IDENTITY_URL}/accounts/registration`,
     LOGOUT: `${IDENTITY_URL}/auth/logout`,
     PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
        REFRESH_TOKEN: `${IDENTITY_URL}/auth/refresh`,
@@ -101,8 +101,9 @@ export const API_ENDPOINTS = {
       `${API_BASE_URL}/ai/search?query=${query}&page=${page + 1}&size=${size}`,
   },
   LMS: {
-    GET_TUTOR_CLASSES: `${LMS_URL}/classes/my-classes`,
-    GET_TUTOR_SUBJECTS: `${LMS_URL}/tutors/my-subjects`, //"http://localhost:8082/lms/tutors/my-subjects",
+    //http://localhost:8888/api/v1/lms/classes/teaching?page=1&size=10
+    //GET_TUTOR_CLASSES: `${LMS_URL}/lms/classes/teaching?page=${page}&size=${size}`, // `${LMS_URL}/lms/classes/teaching`,
+    GET_TUTOR_SUBJECTS: `${LMS_URL}/tutors/me/subjects`, //"http://localhost:8082/lms/tutors/my-subjects",
     // http://localhost:8082/lms/classes
     ADD_NEW_CLASS: `${LMS_URL}/classes`,
     //     `http://localhost:8082/lms/classes/${classId}`,
@@ -117,7 +118,7 @@ export const API_ENDPOINTS = {
       `${LMS_URL}/classes/${courseId}/enrollments/pending`,
     //   `http://localhost:8082/lms/classes/class/${tutorId}`,
     GET_CLASSES_BY_TUTORID: (tutorId: string) =>
-      `${LMS_URL}/classes/class/${tutorId}`,
+      `${LMS_URL}/classes/tutors/${tutorId}`,
     //  `http://localhost:8082/lms/enrollments/${enrollmentId}/approval?approved=${isApproved}`,
     APPROVE_ENROLLMENT: (enrollmentId: string, isApproved: boolean) =>
       `${LMS_URL}/enrollments/${enrollmentId}/approval?approved=${isApproved}`,

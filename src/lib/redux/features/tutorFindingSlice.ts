@@ -41,6 +41,7 @@ interface Course {
   tutorAvatar: string;
   topicName: string;
   subjectName: string;
+  userStatus:string;
 }
 
 interface TutorInfo {
@@ -69,6 +70,20 @@ interface TutorFindingState {
   subjects: Subject[]; // Danh sách môn học và chủ đề
   loadingSubjects: boolean; // Trạng thái chờ load danh sách môn
   errorSubjects: string | null;
+
+  studyingClasses: Course[];
+  studyingCurrentPage: number;
+  studyingTotalPages: number;
+  loadingStudying: boolean;
+  errorStudying: string | null;
+  // THÊM STATE CHO CLASS DETAILS
+  currentClassDetail: Course | null; 
+  loadingClassDetail: boolean;
+  errorClassDetail: string | null;
+
+  isEnrolling: boolean;
+  enrollError: string | null;
+  enrollSuccess: boolean;
 }
 
 const initialState: TutorFindingState = {
@@ -85,6 +100,18 @@ const initialState: TutorFindingState = {
   subjects: [],
   loadingSubjects: false,
   errorSubjects: null,
+  studyingClasses: [],
+  studyingCurrentPage: 1,
+  studyingTotalPages: 1,
+  loadingStudying: false,
+  errorStudying: null,
+  currentClassDetail: null,
+  loadingClassDetail: false,
+  errorClassDetail: null,
+
+  isEnrolling: false,
+  enrollError: null,
+  enrollSuccess: false,
 };
 
 // --- Async Thunks ---
@@ -92,7 +119,7 @@ const initialState: TutorFindingState = {
 // 1. Hàm Get Danh sách Môn học & Chủ đề (API Mới)
 export const getSearchSubjects = createAsyncThunk(
   "tutorFinding/getSearchSubjects",
-  async (_, { getState,rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
       const state = getState() as RootState;
       const token = state.auth?.token;
@@ -105,7 +132,7 @@ export const getSearchSubjects = createAsyncThunk(
       });
 
       const data = await response.json();
-    //   console.log("Subjects API response:", data); // Debug log để xem cấu trúc dữ liệu trả về
+      //   console.log("Subjects API response:", data); // Debug log để xem cấu trúc dữ liệu trả về
 
       if (data.code !== 1000) {
         throw new Error(data.message || "Failed to fetch subjects");
@@ -158,6 +185,115 @@ export const searchTutors = createAsyncThunk(
   },
 );
 
+// Lấy các lớp học của mình
+export const getAllStudyingClasses = createAsyncThunk(
+  "tutorCourse/getAllStudyingClasses",
+  async (
+    { page, size }: { page: number; size: number },
+    { getState, rejectWithValue },
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token || sessionStorage.getItem("accessToken");
+
+      // Chèn page và size vào URL
+      const response = await fetch(
+        `http://localhost:8888/api/v1/lms/classes/my-class?page=${page}&size=${size}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        },
+      );
+
+      const data = await response.json();
+      console.log("API Response for getAllStudyingClasses:", data); // Debug log
+      if (data.code !== 1000) throw new Error(data.message);
+
+      // Trả về toàn bộ cục result (chứa cả data và totalPages)
+      return data.result;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+// Lấy chi tiết lớp học bằng classID
+export const getClassDetailsById = createAsyncThunk(
+  "tutorFinding/getClassDetailsById",
+  async (classId: string, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token || sessionStorage.getItem("accessToken");
+
+      const response = await fetch(
+        `http://localhost:8888/api/v1/lms/classes/${classId}`, // Sử dụng classId được truyền vào
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        },
+      );
+
+      const data = await response.json();
+      console.log("API Response for getClassDetailsById:", data); 
+
+      if (data.code !== 1000) throw new Error(data.message || "Failed to fetch class details");
+
+      // Trả về object Course chi tiết
+      return data.result as Course;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+// tham gia vào lớp học mới
+ // Học viên đăng ký tham gia lớp học
+export const enrollInClass = createAsyncThunk(
+  "tutorFinding/enrollInClass",
+  async (classId: string, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token || sessionStorage.getItem("accessToken");
+
+      if (!token) {
+        return rejectWithValue("Vui lòng đăng nhập để đăng ký lớp học.");
+      }
+
+      const response = await fetch(
+        `http://localhost:8888/api/v1/lms/classes/${classId}/enroll`,
+        {
+          method: "POST", // Thường Enroll là POST
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          // body: JSON.stringify({}), // Thêm body nếu Backend yêu cầu (ví dụ gửi ghi chú cho gia sư)
+        }
+      );
+
+      const data = await response.json();
+      console.log("API Response for enrollInClass:", data);
+
+      if (data.code !== 1000) {
+        throw new Error(data.message || "Đăng ký tham gia lớp học thất bại.");
+      }
+
+      // Trả về kết quả thành công
+      return data.result; 
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+
 // --- Slice ---
 
 const tutorFindingSlice = createSlice({
@@ -172,6 +308,16 @@ const tutorFindingSlice = createSlice({
     clearFilters: (state) => {
       state.filters = initialState.filters;
     },
+    clearClassDetail: (state) => {
+        state.currentClassDetail = null;
+        state.errorClassDetail = null;
+    },
+    // THÊM: Reset trạng thái enroll (Dùng khi user đóng popup thành công hoặc chuyển trang)
+    resetEnrollStatus: (state) => {
+        state.isEnrolling = false;
+        state.enrollError = null;
+        state.enrollSuccess = false;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -181,7 +327,7 @@ const tutorFindingSlice = createSlice({
       })
       .addCase(searchTutors.fulfilled, (state, action) => {
         state.loading = false;
-        state.tutors = action.payload; // Gán data.result trả về vào list tutors
+        state.tutors = action.payload?.data || action.payload || []; // Gán data.result trả về vào list tutors
       })
       .addCase(searchTutors.rejected, (state, action) => {
         state.loading = false;
@@ -196,15 +342,64 @@ const tutorFindingSlice = createSlice({
       })
       .addCase(getSearchSubjects.fulfilled, (state, action) => {
         state.loadingSubjects = false;
-        state.subjects = action.payload; // Lưu mảng Subject lấy được
+        state.subjects = action.payload?.data || action.payload || []; // Lưu mảng Subject lấy được
       })
       .addCase(getSearchSubjects.rejected, (state, action) => {
         state.loadingSubjects = false;
         state.errorSubjects = action.payload as string;
       });
+    // Xử lý getAllStudyingClasses
+    builder
+      .addCase(getAllStudyingClasses.pending, (state) => {
+        state.loadingStudying = true;
+        state.errorStudying = null;
+      })
+      .addCase(getAllStudyingClasses.fulfilled, (state, action) => {
+        state.loadingStudying = false;
+        // Bóc tách đúng mảng data và các thông số phân trang
+        state.studyingClasses = action.payload.data || [];
+        state.studyingCurrentPage = action.payload.currentPage || 1;
+        state.studyingTotalPages = action.payload.totalPages || 1;
+      })
+      .addCase(getAllStudyingClasses.rejected, (state, action) => {
+        state.loadingStudying = false;
+        state.errorStudying = action.payload as string;
+      });
+
+      builder
+      .addCase(getClassDetailsById.pending, (state) => {
+        state.loadingClassDetail = true;
+        state.errorClassDetail = null;
+      })
+      .addCase(getClassDetailsById.fulfilled, (state, action) => {
+        state.loadingClassDetail = false;
+        state.currentClassDetail = action.payload; // Lưu chi tiết lớp học vào state
+      })
+      .addCase(getClassDetailsById.rejected, (state, action) => {
+        state.loadingClassDetail = false;
+        state.errorClassDetail = action.payload as string;
+      });
+
+      // Xử lý enrollInClass
+    builder
+      .addCase(enrollInClass.pending, (state) => {
+        state.isEnrolling = true;
+        state.enrollError = null;
+        state.enrollSuccess = false;
+      })
+      .addCase(enrollInClass.fulfilled, (state) => {
+        state.isEnrolling = false;
+        state.enrollSuccess = true;
+        // Tùy chọn: Nếu muốn cập nhật trực tiếp UI số lượng học viên, bạn có thể chỉnh sửa `state.currentClassDetail` ở đây
+      })
+      .addCase(enrollInClass.rejected, (state, action) => {
+        state.isEnrolling = false;
+        state.enrollError = action.payload as string;
+        state.enrollSuccess = false;
+      });
   },
 });
 
-export const { setFilters, clearFilters } = tutorFindingSlice.actions;
+export const { setFilters, clearFilters, clearClassDetail, resetEnrollStatus } = tutorFindingSlice.actions;
 
 export default tutorFindingSlice.reducer;

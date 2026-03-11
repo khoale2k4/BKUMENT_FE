@@ -12,51 +12,58 @@ interface CourseHeaderProps {
 const CourseHeader: React.FC<CourseHeaderProps> = ({ courseId }) => {
   const router = useRouter();
   
-  // Lấy danh sách khóa học từ Redux
-  const { classes } = useAppSelector((state) => state.tutorCourse);
+  // SỬA Ở ĐÂY: Lấy trực tiếp currentClassDetail từ tutorFinding slice
+  // Đổi tên biến (alias) thành currentCourse để tái sử dụng code cũ bên dưới cho lẹ
+  const { currentClassDetail: currentCourse } = useAppSelector((state) => state.tutorFinding);
 
-  // Tìm khóa học theo ID
-  const currentCourse = classes.find((c) => c.id === courseId);
-
-  // Nếu không tìm thấy khóa học
+  // Nếu không có khóa học (chưa load xong hoặc lỗi) thì hiện khung xương (Skeleton)
   if (!currentCourse) {
-    return <div className="mb-8 animate-pulse bg-gray-100 h-24 rounded-lg"></div>;
+    return <div className="mb-8 animate-pulse bg-gray-100 h-32 rounded-2xl"></div>;
   }
 
   const stats = [
-    { icon: <Clock size={18} className="text-orange-500" />, label: `${currentCourse.startDate} - ${currentCourse.endDate}` },
-    { icon: <Users size={18} className="text-orange-500" />, label: currentCourse.status },
-    { icon: <BarChart3 size={18} className="text-orange-500" />, label: `${currentCourse.schedules.length} Sessions/Week` },
-    { icon: <BookOpen size={18} className="text-orange-500" />, label: currentCourse.subjectName },
-    { icon: <HelpCircle size={18} className="text-orange-500" />, label: currentCourse.topicName },
+    { icon: <Clock size={16} className="text-orange-500" />, label: `${currentCourse.startDate} - ${currentCourse.endDate}` },
+    { icon: <Users size={16} className="text-orange-500" />, label: currentCourse.status },
+    // Dùng optional chaining (?.) để chống sập nếu schedules bị null
+    { icon: <BarChart3 size={16} className="text-orange-500" />, label: `${currentCourse.schedules?.length || 0} Sessions/Week` },
+    { icon: <BookOpen size={16} className="text-orange-500" />, label: currentCourse.subjectName },
+    { icon: <HelpCircle size={16} className="text-orange-500" />, label: currentCourse.topicName },
   ];
 
   return (
-    <div className="mb-8">
-      {/* Đường dẫn điều hướng */}
-      <nav className="text-sm text-gray-500 mb-4">
-        {currentCourse.tutorName} / Course / <span className="text-gray-400">{currentCourse.id}</span>
+    <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      {/* Đường dẫn điều hướng (Breadcrumb) */}
+      <nav className="text-sm text-gray-500 mb-4 font-medium flex items-center gap-2">
+        <span className="text-orange-600 font-bold">{currentCourse.tutorName}</span> 
+        <span>/</span> 
+        <span>Course</span> 
+        <span>/</span> 
+        <span className="text-gray-400 truncate max-w-[150px]">{currentCourse.id}</span>
       </nav>
       
       {/* Tên khóa học và nút chỉnh sửa */}
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-4xl font-bold text-slate-900 leading-tight">
+      <div className="flex items-start md:items-center justify-between mb-6 gap-4">
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight font-serif tracking-tight">
           {currentCourse.name}
         </h1>
-        {/* SỬA ĐƯỜNG DẪN Ở ĐÂY */}
+        
+        {/* Nút Cài đặt (Settings) */}
         <button 
           onClick={() => router.push(`/courses/${courseId}/edit`)}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700 hover:text-orange-500"
+          className="p-3 rounded-full hover:bg-orange-50 transition-all text-gray-400 hover:text-orange-600 shrink-0 shadow-sm border border-transparent hover:border-orange-100"
           title="Chỉnh sửa khóa học"
         >
-          <Settings size={24} />
+          <Settings size={22} />
         </button>
       </div>
       
-      {/* Thống kê khóa học */}
-      <div className="flex flex-wrap gap-6 items-center">
+      {/* Thống kê khóa học (Pills) */}
+      <div className="flex flex-wrap gap-3 items-center">
         {stats.map((stat, i) => (
-          <div key={i} className="flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-50 px-3 py-1.5 rounded-md border border-gray-100">
+          <div 
+            key={i} 
+            className="flex items-center gap-2 text-xs md:text-sm font-semibold text-gray-700 bg-white px-4 py-2.5 rounded-full border border-gray-200 shadow-sm hover:border-orange-200 hover:bg-orange-50 transition-colors cursor-default"
+          >
             {stat.icon}
             {stat.label}
           </div>

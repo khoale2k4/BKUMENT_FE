@@ -5,7 +5,7 @@ import { MoreHorizontal } from 'lucide-react';
 import { useAppSelector } from '@/lib/redux/hooks';
 
 // Định nghĩa kiểu dữ liệu cho các Tab
-export type TabType = 'home' | 'my-class' | 'about';
+export type TabType = 'home' | 'my-teaching-class' | 'about' | 'my-studying-class';
 
 interface ProfileHeaderProps {
   tutorName: string;
@@ -16,7 +16,8 @@ interface ProfileHeaderProps {
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ tutorName, activeTab, onTabChange }) => {
   const tabs: { id: TabType; label: string }[] = [
     { id: 'home', label: 'Home' },
-    { id: 'my-class', label: 'My Class' },
+    { id: 'my-teaching-class', label: 'My Teaching Classes' },
+    { id: 'my-studying-class', label: 'My Studying Classes' },
     { id: 'about', label: 'About' },
   ];
 
