@@ -130,6 +130,9 @@ export const API_ENDPOINTS = {
     //   const url = `http://localhost:8082/lms/classes/search${queryString ? `?${queryString}` : ""}`;
     SEARCH_CLASSES: `${LMS_URL}/classes/search`,
   },
+  REPORT: {
+    CREATE: `${API_BASE_URL}/social/reports`,
+  },
   SOCKET: {
     CONNECT_URL: `${SOCKET_URL}`,
   },

@@ -6,7 +6,7 @@ import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export default function ModalNotification() {
-    const { isOpen, type, title, message } = useAppSelector((state) => state.notification);
+    const { isOpen, type, title, message } = useAppSelector((state) => state.modal.notification);
     const dispatch = useAppDispatch();
 
     useEffect(() => {

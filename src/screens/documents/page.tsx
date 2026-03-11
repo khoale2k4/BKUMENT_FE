@@ -1,9 +1,10 @@
 'use client';
-import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp } from 'lucide-react';
+import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp, Flag } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { useEffect, useState } from 'react';
 import { clearCurrentDocument, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments } from '@/lib/redux/features/documentSlice';
+import { openReportModal } from '@/lib/redux/features/modalSlice';
 import CommentSection from './commentSection/page';
 import { getAccessToken } from '@/lib/utils/token';
 import Pagination from '@/components/ui/Pagination';
@@ -55,6 +56,11 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
         }
     };
 
+    const handleReport = () => {
+        if (currentDocument?.id) {
+            dispatch(openReportModal({ targetId: currentDocument.id, type: 'DOCUMENT' }));
+        }
+    };
 
     useEffect(() => {
         if (params.id) {
@@ -110,8 +116,6 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     }
 
     const isDocLoading = detailStatus === 'loading' || !currentDocument;
-
-    console.log(currentDocument)
 
     return (
         <main className="min-h-screen bg-white pb-20">
@@ -182,11 +186,16 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                             <Download size={18} />
                             <span>Download</span>
                         </button>
-                        <button className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition">
-                            <Bookmark size={20} />
-                        </button>
-                        <button className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition">
+                        <button className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer" title="Chia sẻ">
                             <Share2 size={20} />
+                        </button>
+
+                        <button
+                            onClick={() => handleReport()}
+                            className="p-2 text-gray-400 hover:text-[#8B2C1F] hover:bg-red-50 rounded-full transition cursor-pointer"
+                            title="Báo cáo vi phạm"
+                        >
+                            <Flag size={20} />
                         </button>
                     </div>
                 </div>
@@ -258,7 +267,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                             ))}
                             <div
                                 className="min-w-[100px] flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-50 rounded-xl border border-dashed border-gray-300 transition"
-                                onClick={() => onRelatedPageChange(relatedPage + 2)} 
+                                onClick={() => onRelatedPageChange(relatedPage + 2)}
                             >
                                 <span className="text-sm font-medium text-gray-500">Xem thêm</span>
                             </div>

@@ -3,6 +3,7 @@ import "./globals.css";
 import StoreProvider from "./providers/StoreProvider";
 import GlobalToast from "@/components/ui/ToastNotification";
 import { MantineProvider } from "@mantine/core";
+import ReportModal from "@/components/ui/ReportModal";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -12,6 +13,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <MantineProvider>{children}</MantineProvider>
           <ModalNotification />
           <GlobalToast />
+          <ReportModal />
         </StoreProvider>
       </body>
     </html>

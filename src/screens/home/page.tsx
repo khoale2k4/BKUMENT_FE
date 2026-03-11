@@ -180,7 +180,7 @@ export default function HomePage() {
                                 key={tab}
                                 onClick={() => onTabChange(tab)}
                                 className={clsx(
-                                    "pb-4 text-sm font-medium whitespace-nowrap transition-all border-b-2",
+                                    "pb-4 text-sm font-medium whitespace-nowrap transition-all border-b-2 cursor-pointer",
                                     activeTab === tab
                                         ? "border-black text-black"
                                         : "border-transparent text-gray-500 hover:text-black"
