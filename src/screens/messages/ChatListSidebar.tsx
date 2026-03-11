@@ -23,6 +23,10 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
 
     const [searchValue, setSearchValue] = useState("");
     const [isCreating, setIsCreating] = useState(false); 
+    
+    const [currentPage, setCurrentPage] = useState(0);
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
 
     const handleSearchKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchValue.trim() !== '') {
@@ -35,15 +39,38 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
                     userIds: [searchValue.trim()]
                 })).unwrap(); 
 
-                await dispatch(fetchConversations({ page: 0, size: 20 })).unwrap();
-
+                await dispatch(fetchConversations({ page: 0, size: 10 })).unwrap();
+                setCurrentPage(0);
+                setHasMore(true);
                 setSearchValue("");
-
             } catch (error) {
                 console.error("Lỗi khi tạo cuộc trò chuyện:", error);
                 alert("Không thể tạo cuộc trò chuyện với ID này. Có thể ID không tồn tại.");
             } finally {
                 setIsCreating(false);
+            }
+        }
+    };
+
+    const handleScroll = async (e: React.UIEvent<HTMLDivElement>) => {
+        const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+
+        if (scrollHeight - scrollTop <= clientHeight + 20) {
+            if (!isFetchingMore && hasMore) {
+                setIsFetchingMore(true);
+                try {
+                    const nextPage = currentPage + 1;
+                    const actionResult = await dispatch(fetchConversations({ page: nextPage, size: 10 })).unwrap();
+                    
+                    if (actionResult.items.length < 10) {
+                        setHasMore(false);
+                    }
+                    setCurrentPage(nextPage);
+                } catch (error) {
+                    console.error("Lỗi khi tải thêm cuộc trò chuyện:", error);
+                } finally {
+                    setIsFetchingMore(false);
+                }
             }
         }
     };
@@ -57,7 +84,6 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
                         <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
-                        {/* TODO: Cái này tạm cho test tạo cuộc trò chuyện, sau sẽ thêm cách khác */}
                         <input
                             type="text"
                             placeholder="Tìm cuộc trò chuyện ..."
@@ -70,29 +96,37 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto" onScroll={handleScroll}>
                     {conversations && conversations.length > 0 ? (
-                        conversations.map((chat: any) => {
-                            const { name, avatar } = getChatDisplayInfo(chat, currentUserId);
-                            const isActive = chat.id === activeConversationId;
+                        <>
+                            {conversations.map((chat: any) => {
+                                const { name, avatar } = getChatDisplayInfo(chat, currentUserId);
+                                const isActive = chat.id === activeConversationId;
 
-                            return (
-                                <div
-                                    key={chat.id}
-                                    onClick={() => dispatch(setActiveConversation(chat.id))}
-                                    className={`flex items-center gap-3 p-3 mx-2 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors ${isActive ? "bg-blue-50" : ""}`}
-                                >
-                                    <AuthenticatedImage src={avatar} alt={name} className="w-12 h-12 rounded-full object-cover shrink-0" />
-                                    <div className="flex-1 overflow-hidden">
-                                        <h3 className="font-semibold text-gray-900 truncate">{name}</h3>
-                                        <p className="text-sm text-gray-500 truncate">
-                                            {chat.lastMessage && chat.lastMessage.includes('http') && chat.lastMessage.includes('asset') ? "Hình ảnh" : chat.lastMessage || "Chưa có tin nhắn"}
-                                            {chat.lastMessageTime && ` · ${formatTimestamp(chat.lastMessageTime).split(' ')[0]}`}
-                                        </p>
+                                return (
+                                    <div
+                                        key={chat.id}
+                                        onClick={() => dispatch(setActiveConversation(chat.id))}
+                                        className={`flex items-center gap-3 p-3 mx-2 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors ${isActive ? "bg-blue-50" : ""}`}
+                                    >
+                                        <AuthenticatedImage src={avatar} alt={name} className="w-12 h-12 rounded-full object-cover shrink-0" />
+                                        <div className="flex-1 overflow-hidden">
+                                            <h3 className="font-semibold text-gray-900 truncate">{name}</h3>
+                                            <p className="text-sm text-gray-500 truncate">
+                                                {chat.lastMessage && chat.lastMessage.includes('http') && chat.lastMessage.includes('asset') ? "Hình ảnh" : chat.lastMessage || "Chưa có tin nhắn"}
+                                                {chat.lastMessageTime && ` · ${formatTimestamp(chat.lastMessageTime).split(' ')[0]}`}
+                                            </p>
+                                        </div>
                                     </div>
+                                );
+                            })}
+                            
+                            {isFetchingMore && (
+                                <div className="flex justify-center p-4">
+                                    <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                                 </div>
-                            );
-                        })
+                            )}
+                        </>
                     ) : (
                         <div className="flex flex-col items-center justify-center h-[70%] text-center px-6">
                             <div className="bg-gray-50 p-4 rounded-full mb-4">

@@ -32,8 +32,8 @@ export default function LoginPage() {
       dispatch(
         showToast({
           type: "success",
-          title: "Success!",
-          message: "Successfully logged in!",
+          title: "Thành công!",
+          message: "Bạn đã đăng nhập thành công!",
         })
       );
 
@@ -44,8 +44,8 @@ export default function LoginPage() {
       dispatch(
         showToast({
           type: "error",
-          title: "Login Failed",
-          message: (errorMsg as string) || "Invalid credentials",
+          title: "Đăng nhập thất bại",
+          message: (errorMsg as string) || "Tài khoản hoặc mật khẩu không hợp lệ!",
         })
       );
     }

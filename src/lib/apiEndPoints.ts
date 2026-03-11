@@ -26,11 +26,11 @@ export const API_ENDPOINTS = {
     SIGNUP: `${IDENTITY_URL}/accounts/registration`,
     LOGOUT: `${IDENTITY_URL}/auth/logout`,
     PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
-       REFRESH_TOKEN: `${IDENTITY_URL}/auth/refresh`,
+    REFRESH_TOKEN: `${IDENTITY_URL}/auth/refresh`,
   },
   ACCOUNT: {
     PROFILE: `${PROFILE_URL}/identity/api/auth/me`,
-    GET_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
+    GET_USER_INFO: `${API_BASE_URL}/profile/my-profile`,
     TUTOR_GETS: `${PROFILE_URL}/api/user/tutors`,
     //    const response = await httpClient.patch('http://localhost:8081/profile/update', updateData);
     UPDATE_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
@@ -81,17 +81,19 @@ export const API_ENDPOINTS = {
   },
   CHAT: {
     GET_CONVERSATIONS: (page: number, size: number) =>
-      `${CHAT_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
-    START_CONVERSATIONS: `${CHAT_URL}/communication/conversations/create`,
+      `${API_BASE_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
+    START_CONVERSATIONS: `${API_BASE_URL}/communication/conversations/create`,
     UPDATE_CONVERSATION: (con_id: string) =>
-      `${CHAT_URL}/communication/conversations/${con_id}/metadata`,
-    GET_MESSAGES: (conversationId: string) =>
-      `${CHAT_URL}/communication/messages?conversationId=${conversationId}`,
-    SEND_MESSAGE: `${CHAT_URL}/communication/messages/create`,
+      `${API_BASE_URL}/communication/conversations/${con_id}/metadata`,
+    GET_MESSAGES: (conversationId: string, page: number, size: number) =>
+      `${API_BASE_URL}/communication/messages?conversationId=${conversationId}&page=${page}&size=${size}`,
+    SEND_MESSAGE: `${API_BASE_URL}/communication/messages/create`,
   },
   COMMENTS: {
-    GET_BY_DOC: (id: string | number) =>
-      `${DEBUG_URL}/api/documents/${id}/comments`,
+    GET_BY_DOC: (id: string, page: number, size: number) =>
+      `${API_BASE_URL}/social/comments/resource/${id}?page=${page}&size=${size}`,
+    GET_BY_PARENT_COMMENT: (id: string, page: number, size: number) => `${API_BASE_URL}/social/comments/reply/${id}?page=${page}&size=${size}`,
+    CREATE: `${API_BASE_URL}/social/comments`,
   },
   USERS: {
     LIST: `${DEBUG_URL}/api/users`,
@@ -128,6 +130,9 @@ export const API_ENDPOINTS = {
     GET_SUBJECTS: `${LMS_URL}/subjects?page=1&size=300`,
     //   const url = `http://localhost:8082/lms/classes/search${queryString ? `?${queryString}` : ""}`;
     SEARCH_CLASSES: `${LMS_URL}/classes/search`,
+  },
+  REPORT: {
+    CREATE: `${API_BASE_URL}/social/reports`,
   },
   SOCKET: {
     CONNECT_URL: `${SOCKET_URL}`,

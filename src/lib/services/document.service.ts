@@ -4,6 +4,7 @@ import httpClient from './http';
 export interface DocumentDetail {
     id: string;
     title: string;
+    author: Author;
     description: string;
     downloadUrl: string;
     viewUrl: string;
@@ -14,6 +15,12 @@ export interface DocumentDetail {
     university?: string;
     course?: string;
     createdAt: Date;
+}
+
+interface Author {
+    id: string,
+    name: string,
+    avatarUrl: string
 }
 
 interface FileUploadMetadata {

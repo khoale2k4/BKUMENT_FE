@@ -32,11 +32,16 @@ const MessagesPage = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [isFetchingOlder, setIsFetchingOlder] = useState(false);
+
     const {
         conversations,
         activeConversationId,
         currentMessages,
-        messagesStatus
+        messagesStatus,
+        messagesPage,
+        hasMoreMessages
     } = useSelector((state: RootState) => state.chat);
 
     const {
@@ -44,12 +49,16 @@ const MessagesPage = () => {
     } = useSelector((state: RootState) => state.profile);
 
     useEffect(() => {
-        dispatch(fetchConversations({ page: 0, size: 20 }));
+        dispatch(fetchConversations({ page: 0, size: 10 }));
     }, [dispatch]);
 
     useEffect(() => {
         if (activeConversationId) {
-            dispatch(fetchMessagesByConversationId(activeConversationId));
+            dispatch(fetchMessagesByConversationId({
+                conversationId: activeConversationId,
+                page: 0,
+                size: 20
+            }));
         }
     }, [dispatch, activeConversationId]);
 
@@ -107,13 +116,44 @@ const MessagesPage = () => {
         }
     }, [groupedMessages]);
 
-    // if (!user) {
-    //     return (
-    //         <div className="flex h-[calc(100vh-70px)] w-full items-center justify-center bg-white/50">
-    //             <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-    //         </div>
-    //     );
-    // }
+    useEffect(() => {
+        if (groupedMessages.length > 0 && !isFetchingOlder && messagesPage === 0) {
+            scrollToBottom();
+        }
+    }, [groupedMessages, messagesPage, isFetchingOlder]);
+
+    const handleScroll = async () => {
+        const container = scrollContainerRef.current;
+        if (!container) return;
+
+        if (container.scrollTop <= 10 && hasMoreMessages && !isFetchingOlder && messagesStatus !== 'loading') {
+            setIsFetchingOlder(true);
+            
+            const previousScrollHeight = container.scrollHeight;
+
+            await dispatch(fetchMessagesByConversationId({
+                conversationId: activeConversationId!,
+                page: messagesPage + 1,
+                size: 20
+            }));
+
+            setTimeout(() => {
+                if (scrollContainerRef.current) {
+                    const newScrollHeight = scrollContainerRef.current.scrollHeight;
+                    scrollContainerRef.current.scrollTop = newScrollHeight - previousScrollHeight;
+                }
+                setIsFetchingOlder(false);
+            }, 50); 
+        }
+    };
+
+    if (!user) {
+        return (
+            <div className="flex h-[calc(100vh-70px)] w-full items-center justify-center bg-white/50">
+                <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
 
     return (
@@ -138,7 +178,17 @@ const MessagesPage = () => {
                             />
                         )}
 
-                        <div className="flex-1 overflow-y-auto p-4 flex flex-col">
+                        <div 
+                            ref={scrollContainerRef}
+                            onScroll={handleScroll}
+                            className="flex-1 overflow-y-auto p-4 flex flex-col"
+                        >
+                            {isFetchingOlder && (
+                                <div className="flex justify-center py-2">
+                                    <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                </div>
+                            )}
+
                             {messagesStatus === 'loading' ? (
                                 <div className="flex-1 flex justify-center items-center">
                                     <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -184,6 +234,7 @@ const MessagesPage = () => {
                                     );
                                 })
                             )}
+                            <div ref={messagesEndRef} />
                         </div>
 
                         <ChatInput />

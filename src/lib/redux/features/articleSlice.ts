@@ -8,9 +8,9 @@ interface ArticleState {
     error: string | null;
     currentPage: number;
     totalPages: number;
+    totalItems: number;
     pageSize: number;
 
-    // Search state
     searchQuery: string | null;
     searchResults: any[];
     searchStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -18,15 +18,16 @@ interface ArticleState {
 
 const initialState: ArticleState = {
     items: [],
-    status: 'idle',
+    status: 'loading',
     error: null,
     currentPage: 0,
     totalPages: 0,
+    totalItems: 0,
     pageSize: 10,
 
     searchQuery: null,
     searchResults: [],
-    searchStatus: 'idle',
+    searchStatus: 'loading',
 };
 
 export const fetchFeed = createAsyncThunk(
@@ -41,12 +42,11 @@ export const fetchFeed = createAsyncThunk(
             data = await articleService.searchBlogs(page, state.pageSize);
         }
 
-        const userData = await userService.getUserInfo();
         const items = data.content;
 
         const mappedItems = items.map((dta: any) => ({
             id: dta.id || Math.random(),
-            author: userData,
+            author: dta.author,
             title: dta.name || dta.title,
             time: dta.createdAt,
 
@@ -65,7 +65,7 @@ export const fetchFeed = createAsyncThunk(
         return {
             items: mappedItems,
             page: page,
-            totalPages: data.totalPages
+            totalPages: data.totalPages,
         };
     }
 );
@@ -74,25 +74,30 @@ export const searchKeyword = createAsyncThunk(
     'articles/search',
     async ({ query, page, size }: { query: string; page: number; size: number }) => {
         const data = await articleService.searchContent(query, page, size);
-        const userData = await userService.getUserInfo();
-
+        
         const mappedItems = data.content.map((result: any) => ({
             id: result.id,
-            author: userData,
+            author: result.author || null, 
             title: result.title,
-            time: result.created_at || new Date().toISOString(),
-            content: result.description || "Kết quả tìm kiếm",
-            coverImage: result.preview_image_url || result.coverImage,
-            type: 'DOC',
-            tags: result.tags || ['Search Result'],
+            time: result.createdAt || new Date().toISOString(),
+            
+            content: result.description || "Tài liệu đính kèm",
+            totalItems: result.totalElements,
+            
+            coverImage: result.preview_image_url || result.coverImage || result.previewImageUrl,
+            
+            type: result.type || 'DOC', 
+            
+            tags: result.tags || ['Kết quả tìm kiếm'],
             score: result.score
         }));
 
         return {
             items: mappedItems,
             query: query,
-            page: page,
-            totalPages: data.totalPages
+            page: page, 
+            totalPages: data.totalPages,
+            totalItems: data.totalElements
         };
     }
 );
@@ -125,8 +130,12 @@ const articleSlice = createSlice({
                 state.totalPages = action.payload.totalPages;
             })
             .addCase(fetchFeed.rejected, (state, action) => {
+                if (action.meta.aborted || action.error.name === 'AbortError') {
+                    return;
+                }
+
                 state.status = 'failed';
-                state.error = action.error.message || 'Failed to fetch articles';
+                state.error = action.error.message || 'Something went wrong';
             });
 
         builder
@@ -139,10 +148,15 @@ const articleSlice = createSlice({
                 state.searchQuery = action.payload.query;
                 state.currentPage = action.payload.page;
                 state.totalPages = action.payload.totalPages;
+                state.totalItems = action.payload.totalItems;
             })
             .addCase(searchKeyword.rejected, (state, action) => {
+                if (action.meta.aborted || action.error.name === 'AbortError') {
+                    return;
+                }
+
                 state.searchStatus = 'failed';
-                state.error = action.error.message || 'Search failed';
+                state.error = action.error.message || 'Something went wrong';
             });
     },
 });

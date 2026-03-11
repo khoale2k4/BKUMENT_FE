@@ -4,25 +4,41 @@ import { IconWorld, IconLock } from '@tabler/icons-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { setVisibility, submitPost } from '@/lib/redux/features/blogSlice';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { AppRoute } from '@/lib/appRoutes';
+import { showToast } from '@/lib/redux/features/toastSlice';
 
 export default function CreatePostHeader() {
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { visibility, status, id } = useAppSelector(state => state.blogs);
-    const isSubmitting = status === 'submitting';
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(status === 'submitting');
 
     const handlePublish = async () => {
         try {
             await dispatch(submitPost()).unwrap();
 
+            dispatch(
+                showToast({
+                    type: "success",
+                    title: "Thành công!",
+                    message: "Đăng bài viết thành công!",
+                })
+            );
+
             // chỗ này nối API vô thì ko cần nữa
             // router.push('/blogs/9f30a3ce-a937-42ca-a3e5-faff19931f09'); 
 
         } catch (error) {
-            console.log(error);
-            alert(error); 
+            dispatch(
+                showToast({
+                    type: "error",
+                    title: "Thất bại!",
+                    message: "Đăng bài viết không thành công!",
+                })
+            );
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -63,7 +79,7 @@ export default function CreatePostHeader() {
                         color="dark"
                         className="px-6 font-medium bg-black hover:bg-gray-800"
                         loading={isSubmitting}
-                        onClick={handlePublish} 
+                        onClick={handlePublish}
                     >
                         Xuất bản
                     </Button>

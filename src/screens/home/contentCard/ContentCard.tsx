@@ -16,14 +16,15 @@ export default function ContentCard({ data }: { data: CardProp }) {
         <div className="py-6 border-b border-gray-100 last:border-none w-full max-w-3xl cursor-pointer" onClick={() => data?.onClick?.(data.id)}>
             <div className="flex items-center gap-2 mb-3">
                 <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
-                    <img
-                        src={avatarUrl}
+                    {data.author.avatarUrl && <AuthenticatedImage src={data.author.avatarUrl} className="w-full h-full object-cover" />}
+                    {!data.author.avatarUrl && <img
+                        src={data.author.avatarUrl}
                         alt="avatar"
                         className="w-full h-full object-cover"
-                    />
+                    />}
                 </div>
                 <div className="flex items-center text-[13px] leading-none">
-                    <span className="font-medium text-gray-900">{authorName}</span>
+                    <span className="font-medium text-gray-900">{data.author.name}</span>
                     <span className="mx-1 text-gray-400">·</span>
                     <span className="text-gray-500">{data?.time ? formatTimeAgo(data.time) : ''}</span>
                 </div>
@@ -54,11 +55,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                         </span>
                     )}
 
-                    <span className="text-[13px] text-gray-500">{timeRead} min read</span>
-
-                    <span className="text-[10px] text-gray-400 mx-[-2px]">•</span>
-
-                    <span className="text-[13px] text-gray-500 hidden sm:block">Selected for you</span>
+                    <span className="text-[13px] text-gray-500">Khoảng {timeRead} phút đọc</span>
                 </div>
 
                 <div className="flex items-center gap-4 text-gray-500">

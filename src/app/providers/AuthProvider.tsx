@@ -17,9 +17,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         setIsAuthRestored(true);
     }, [dispatch]);
 
-    // if (!isAuthRestored) {
-    //     return <AppLoading/>;
-    // }
+    if (!isAuthRestored) {
+        return <AppLoading/>;
+    }
 
     return <>{children}</>;
 }
