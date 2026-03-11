@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Trash2, Loader2, UserPlus } from 'lucide-react';
+import { Trash2, Loader2, UserPlus, Clock, CheckCircle } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { cancelClass } from '@/lib/redux/features/tutorCourseSlice';
 import { enrollInClass } from '@/lib/redux/features/tutorFindingSlice'; // <-- IMPORT ACTION MỚI
@@ -112,13 +112,21 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
     
   }
 
-  { currentCourse.userStatus == 'APPROVED'  && (<> <p> Bạn đã đăng ký lớp học này </p> </>)
-    
-  }  
+  {/* --- THIẾT KẾ MỚI CHO TRẠNG THÁI APPROVED --- */}
+        { currentCourse.userStatus == 'APPROVED'  && (
+          <div className="flex items-center gap-2.5 px-6 py-2.5 bg-green-50 border border-green-200 text-green-700 rounded-full font-semibold text-sm shadow-sm cursor-default">
+            <CheckCircle size={18} className="text-green-600" />
+            <span>Bạn đã là học viên của lớp này</span>
+          </div>
+        )}  
 
-    { currentCourse.userStatus == 'PENDING'  && (<> <p> Yêu cầu đăng ký của bạn đang chờ được phê duyệt. </p> </>)
-    
-  }  
+        {/* --- THIẾT KẾ MỚI CHO TRẠNG THÁI PENDING --- */}
+        { currentCourse.userStatus == 'PENDING'  && (
+          <div className="flex items-center gap-2.5 px-6 py-2.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-full font-semibold text-sm shadow-sm cursor-wait">
+            <Clock size={18} className="text-amber-600 animate-pulse" />
+            <span>Đang chờ Gia sư phê duyệt...</span>
+          </div>
+        )}
 
           
       

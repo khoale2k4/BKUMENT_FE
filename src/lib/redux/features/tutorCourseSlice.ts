@@ -173,6 +173,7 @@ export const getMySubjects = createAsyncThunk(
       });
 
       const data = await response.json();
+      console.log("API Response for getMySubjects:", data); // Debug log
       if (data.code !== 1000)
         throw new Error(data.message || "Failed to fetch subjects");
       return data.result as Subject[];
@@ -231,7 +232,7 @@ export const updateClass = createAsyncThunk(
       }
 
       const response = await fetch(API_ENDPOINTS.LMS.UPDATE_CLASS(classId), {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
