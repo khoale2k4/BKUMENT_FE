@@ -12,8 +12,7 @@ import MyStudyingClassTab from './tabs/MyClass/MyStudyingClassTab';
 
 const ProfilePage = () => {
   // State quản lý tab đang active
-  const [activeTab, setActiveTab] = useState<TabType>('my-teaching-class');
-  
+  const [activeTab, setActiveTab] = useState<TabType>('about');  
   // Lấy thông tin user (để hiển thị tên) từ Redux
   // Lưu ý: Có thể lấy từ authSlice.user.name nếu tutorCourse chưa load xong
   const { classes } = useAppSelector((state) => state.tutorCourse);

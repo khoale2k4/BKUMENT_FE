@@ -61,6 +61,14 @@ export interface UpdateTutorRequest {
   subjectIds: string[]
 }
 
+export interface PaginatedUsers {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalElements: number;
+  data: UserProfile[];
+}
+
 // PROFILE STATE CHUNG
 interface ProfileState {
     // State cho User
@@ -75,6 +83,18 @@ interface ProfileState {
     isTutorUpdating: boolean;
     isTutorRegistering: boolean;
     tutorError: string | null;
+
+    followersData: PaginatedUsers | null;
+    isFollowersLoading: boolean;
+    followersError: string | null;
+
+    followingData: PaginatedUsers | null;
+    isFollowingLoading: boolean;
+    followingError: string | null;
+
+    viewedProfile: UserProfile | null;
+    isViewedProfileLoading: boolean;
+    viewedProfileError: string | null;
 }
 
 const initialState: ProfileState = {
@@ -88,6 +108,18 @@ const initialState: ProfileState = {
     isTutorUpdating: false,
     isTutorRegistering: false,
     tutorError: null,
+
+    followersData: null,
+    isFollowersLoading: false,
+    followersError: null,
+
+    followingData: null,
+    isFollowingLoading: false,
+    followingError: null,
+
+    viewedProfile: null,
+    isViewedProfileLoading: false,
+    viewedProfileError: null,
 };
 
 
@@ -117,6 +149,83 @@ export const updateMyProfile = createAsyncThunk(
             return data ? data : updateData;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || error.message || 'Failed to update user profile');
+        }
+    }
+);
+
+export const getFollowingByProfileId = createAsyncThunk(
+    'profile/getFollowingByProfileId',
+    async ({ profileId, page = 1, size = 10 }: { profileId: string, page?: number, size?: number }, { getState, rejectWithValue }) => {
+        try {
+            const state = getState() as RootState;
+            const token = state.auth.token || sessionStorage.getItem('accessToken');
+
+            const response = await fetch(`http://localhost:8888/api/v1/profile/${profileId}/following?page=${page}&size=${size}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { Authorization: `Bearer ${token}` }),
+                },
+            });
+
+            const data = await response.json();
+            if (data.code !== 1000) throw new Error(data.message || 'Failed to fetch following list');
+            
+            return data.result as PaginatedUsers;
+        } catch (error: any) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+// === THÊM MỚI: Thunk Lấy danh sách Followers ===
+export const getFollowersByProfileId = createAsyncThunk(
+    'profile/getFollowersByProfileId',
+    async ({ profileId, page = 1, size = 10 }: { profileId: string, page?: number, size?: number }, { getState, rejectWithValue }) => {
+        try {
+            const state = getState() as RootState;
+            const token = state.auth.token || sessionStorage.getItem('accessToken');
+
+            const response = await fetch(`http://localhost:8888/api/v1/profile/${profileId}/followers?page=${page}&size=${size}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { Authorization: `Bearer ${token}` }),
+                },
+            });
+
+            const data = await response.json();
+            if (data.code !== 1000) throw new Error(data.message || 'Failed to fetch followers list');
+            
+            return data.result as PaginatedUsers;
+        } catch (error: any) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
+// === THÊM MỚI: Lấy thông tin Profile của một người dùng bất kỳ theo ID ===
+export const getProfileById = createAsyncThunk(
+    'profile/getProfileById',
+    async (profileId: string, { getState, rejectWithValue }) => {
+        try {
+            const state = getState() as RootState;
+            const token = state.auth?.token || sessionStorage.getItem('accessToken');
+
+            const response = await fetch(`http://localhost:8888/api/v1/profile/${profileId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(token && { Authorization: `Bearer ${token}` }),
+                },
+            });
+
+            const data = await response.json();
+            if (data.code !== 1000) throw new Error(data.message || 'Failed to fetch profile by ID');
+            
+            return data.result as UserProfile;
+        } catch (error: any) {
+            return rejectWithValue(error.message);
         }
     }
 );
@@ -206,6 +315,8 @@ export const updateTutorProfile = createAsyncThunk(
     }
 );
 
+// 
+
 // --- 3. Slice ---
 
 const profileSlice = createSlice({
@@ -259,6 +370,49 @@ const profileSlice = createSlice({
             .addCase(updateMyProfile.rejected, (state, action) => {
                 state.isUpdating = false;
                 state.error = action.payload as string;
+            });
+
+            builder
+            .addCase(getFollowingByProfileId.pending, (state) => {
+                state.isFollowingLoading = true;
+                state.followingError = null;
+            })
+            .addCase(getFollowingByProfileId.fulfilled, (state, action) => {
+                state.isFollowingLoading = false;
+                state.followingData = action.payload; 
+            })
+            .addCase(getFollowingByProfileId.rejected, (state, action) => {
+                state.isFollowingLoading = false;
+                state.followingError = action.payload as string;
+            });
+
+        // === THÊM MỚI: Handle Get Followers ===
+        builder
+            .addCase(getFollowersByProfileId.pending, (state) => {
+                state.isFollowersLoading = true;
+                state.followersError = null;
+            })
+            .addCase(getFollowersByProfileId.fulfilled, (state, action) => {
+                state.isFollowersLoading = false;
+                state.followersData = action.payload; 
+            })
+            .addCase(getFollowersByProfileId.rejected, (state, action) => {
+                state.isFollowersLoading = false;
+                state.followersError = action.payload as string;
+            });
+
+            builder
+            .addCase(getProfileById.pending, (state) => {
+                state.isViewedProfileLoading = true;
+                state.viewedProfileError = null;
+            })
+            .addCase(getProfileById.fulfilled, (state, action) => {
+                state.isViewedProfileLoading = false;
+                state.viewedProfile = action.payload; 
+            })
+            .addCase(getProfileById.rejected, (state, action) => {
+                state.isViewedProfileLoading = false;
+                state.viewedProfileError = action.payload as string;
             });
 
         // --- Get Tutor Profile ---
