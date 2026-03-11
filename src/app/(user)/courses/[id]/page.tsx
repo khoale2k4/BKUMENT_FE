@@ -1,5 +1,4 @@
-import CourseOverview from '@/screens/courses/page';
-import HomePage from '@/screens/home/page';
+import CoursePage from '@/screens/courses/page';
 import { Metadata } from 'next';
 
 
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
 export default function HomeApp() {
   return (
     <div>
-        <CourseOverview/>
+      <CoursePage/>
     </div>
   );
 }

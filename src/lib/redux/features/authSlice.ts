@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as authService from "@/lib/services/auth.service";
-
+import { RegisterPayload } from "@/lib/services/auth.service";
 // --- Helper to get token from sessionStorage (Safe for Next.js SSR) ---
 const getStoredToken = () => {
   if (typeof window !== "undefined") {
@@ -50,6 +50,11 @@ interface AuthState {
   currentRole: string | null; // <-- LƯU ROLE HIỆN TẠI ĐANG SỬ DỤNG
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+
+  // --- THÊM MỚI: State lưu danh sách trường Đại học ---
+  universities: University[];
+  isUniversitiesLoading: boolean;
+  universitiesError: string | null;
 }
 const initialToken = getStoredToken();
 
@@ -61,6 +66,11 @@ const initialState: AuthState = {
   currentRole: getStoredCurrentRole() || "USER",
   status: "idle",
   error: null,
+
+  // --- THÊM MỚI: State lưu danh sách trường Đại học ---
+  universities: [],
+  isUniversitiesLoading: false,
+  universitiesError: null,
 };
 
 interface LoginPayload {
@@ -68,16 +78,10 @@ interface LoginPayload {
   password: string;
 }
 
-export interface RegisterPayload {
-  account: {
-    username: string;
-    password: string;
-    role: string;
-  };
-  firstName: string;
-  lastName: string;
-  dob: string;
-  university: string;
+export interface University {
+  id: number;
+  name: string;
+  // Thêm các trường khác nếu API của bạn trả về thêm (ví dụ: code, address...)
 }
 
 // --- Async Thunks ---
@@ -99,6 +103,10 @@ export const registerUser = createAsyncThunk(
   async (payload: RegisterPayload, { rejectWithValue }) => {
     try {
       const result = await authService.register(payload);
+      if(result.code !== 1000) {
+        alert("Đăng ký thất bại: " + result.message);
+        return rejectWithValue(result.message || "Registration failed");
+      }
       return result;
     } catch (error: any) {
       return rejectWithValue(error.message || "Network error");
@@ -132,6 +140,32 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
+export const getUniversities = createAsyncThunk(
+  "auth/getUniversities",
+  async (_, { rejectWithValue }) => {
+    try {
+      // Bạn có thể đưa URL này vào file API_ENDPOINTS.ts cho gọn nhé
+      const response = await fetch("http://localhost:8888/api/v1/profile/universities", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+
+      // Dựa theo format chung của dự án bạn (code 1000 là success)
+      if (data.code !== 1000) {
+        throw new Error(data.message || "Failed to fetch universities");
+      }
+      console.log("Danh sách trường Đại học nhận được:", data.result);
+
+      return data.result as University[];
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Lỗi kết nối khi tải danh sách trường");
+    }
+  }
+);
 // --- Slice ---
 
 export const authSlice = createSlice({
@@ -154,6 +188,7 @@ export const authSlice = createSlice({
       state.error = null;
 
       sessionStorage.setItem("accessToken", action.payload.token);
+      sessionStorage.setItem("user", JSON.stringify({ name: action.payload.name, email: action.payload.email }));
     },
     initializeAuth: (state) => {
       if (typeof window !== "undefined") {
@@ -290,6 +325,21 @@ export const authSlice = createSlice({
         
         sessionStorage.removeItem("accessToken");
         sessionStorage.removeItem("currentRole");
+      });
+
+      // --- THÊM MỚI: Get Universities ---
+    builder
+      .addCase(getUniversities.pending, (state) => {
+        state.isUniversitiesLoading = true;
+        state.universitiesError = null;
+      })
+      .addCase(getUniversities.fulfilled, (state, action) => {
+        state.isUniversitiesLoading = false;
+        state.universities = action.payload; // Gán data vào mảng
+      })
+      .addCase(getUniversities.rejected, (state, action) => {
+        state.isUniversitiesLoading = false;
+        state.universitiesError = action.payload as string;
       });
   },
 });

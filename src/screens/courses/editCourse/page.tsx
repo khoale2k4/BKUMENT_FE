@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ChevronLeft, Loader2 } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
-import { getAllClasses } from '@/lib/redux/features/tutorCourseSlice';
+import { getAllTeachingClasses } from '@/lib/redux/features/tutorCourseSlice';
 
 // Import Custom Hook và các Components con bạn đã tách ở phần trước
 import { useCourseForm } from '../createCourse/hooks/useCourseForm'; // Tùy chỉnh đường dẫn import cho đúng
@@ -26,7 +26,7 @@ const EditCoursePage = () => {
   // Nếu người dùng F5 trang này, mảng classes bị rỗng, cần gọi lại API
   useEffect(() => {
     if (classes.length === 0) {
-      dispatch(getAllClasses());
+      dispatch(getAllTeachingClasses({ page: 1, size: 10 }));
     }
   }, [dispatch, classes.length]);
 
@@ -48,6 +48,9 @@ const EditCoursePage = () => {
     classId: classId,
     initialData: currentCourse,
   });
+
+  console.log("Current Course Data, subjects:", currentCourse, subjects);
+
 
   // Hiển thị loading nếu chưa load xong khóa học
   if (loading || (!currentCourse && classes.length > 0)) {

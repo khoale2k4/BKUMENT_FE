@@ -6,12 +6,13 @@ import { useAppSelector } from '@/lib/redux/hooks';
 // Import các components con
 import ProfileHeader, { TabType } from "./tabs/ProfileHeader"
 import HomeTab from './tabs/Home/HomeTab';
-import MyClassTab from './tabs/MyClass/MyClassTab';
+import MyTeachingClassTab from './tabs/MyClass/MyTeachingClassTab';
 import AboutTab from './tabs/About';
+import MyStudyingClassTab from './tabs/MyClass/MyStudyingClassTab';
 
 const ProfilePage = () => {
   // State quản lý tab đang active
-  const [activeTab, setActiveTab] = useState<TabType>('my-class');
+  const [activeTab, setActiveTab] = useState<TabType>('my-teaching-class');
   
   // Lấy thông tin user (để hiển thị tên) từ Redux
   // Lưu ý: Có thể lấy từ authSlice.user.name nếu tutorCourse chưa load xong
@@ -37,7 +38,8 @@ const ProfilePage = () => {
       {/* 2. Content Area - Render nội dung dựa trên Active Tab */}
       <div className="mt-6">
         {activeTab === 'home' && <HomeTab />}
-        {activeTab === 'my-class' && <MyClassTab />}
+        {activeTab === 'my-teaching-class' && <MyTeachingClassTab />}
+        {activeTab === 'my-studying-class' && <MyStudyingClassTab />}
         {activeTab === 'about' && <AboutTab />}
       </div>
     </div>

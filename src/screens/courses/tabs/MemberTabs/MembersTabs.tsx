@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { Loader2, Users, Clock } from 'lucide-react';
+import { Loader2, Users, Clock, ShieldAlert } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { getMemberInCourse, getMemberPendingInCourse } from '@/lib/redux/features/tutorCourseSlice';
 
@@ -13,55 +13,77 @@ interface MembersTabProps {
   courseId: string;
 }
 
-// Định nghĩa các loại Sub-tab
 type SubTabType = 'approved' | 'pending';
 
 const MembersTab: React.FC<MembersTabProps> = ({ courseId }) => {
   const dispatch = useAppDispatch();
   const [searchQuery, setSearchQuery] = useState('');
-  
-  // State quản lý Tab đang active
   const [activeSubTab, setActiveSubTab] = useState<SubTabType>('approved');
   
   const { members, pendingMembers, loadingMembers, error } = useAppSelector((state) => state.tutorCourse);
+  const { currentClassDetail: currentCourse } = useAppSelector((state) => state.tutorFinding);
 
-  // Gọi API lấy dữ liệu
+  const userStatus = currentCourse?.userStatus || 'NONE';
+  const isOwner = userStatus === 'OWNER';
+  const isApprovedStudent = userStatus === 'APPROVED' || userStatus === 'STUDENT';
+
+  // 1. CHỈ GỌI API NẾU LÀ OWNER HOẶC APPROVED
   useEffect(() => {
-    if (courseId) {
+    if (courseId && (isOwner || isApprovedStudent)) {
       dispatch(getMemberInCourse(courseId));
-      dispatch(getMemberPendingInCourse(courseId)); 
+      
+      // Chỉ OWNER mới cần lấy danh sách chờ duyệt
+      if (isOwner) {
+        dispatch(getMemberPendingInCourse(courseId)); 
+      }
     }
-  }, [dispatch, courseId]);
+  }, [dispatch, courseId, isOwner, isApprovedStudent]);
 
-  // 1. Lọc danh sách thành viên CHÍNH THỨC
+  // 2. Lọc danh sách thành viên CHÍNH THỨC
   const filteredApprovedMembers = useMemo(() => {
     if (!members) return [];
-    const typedMembers = members as CourseMember[];
-    const activeMembers = typedMembers.filter(m => m.status === 'APPROVED');
+    const typedMembers = Array.isArray(members) ? members as CourseMember[] : (members as any)?.data || [];
+    const activeMembers = typedMembers.filter((m: CourseMember) => m.status === 'APPROVED');
 
     if (!searchQuery.trim()) return activeMembers;
     const lowerQuery = searchQuery.toLowerCase();
-    return activeMembers.filter(member => 
+    return activeMembers.filter((member: CourseMember) => 
       member.studentName.toLowerCase().includes(lowerQuery) || 
       member.studentEmail.toLowerCase().includes(lowerQuery)
     );
   }, [members, searchQuery]);
 
-  // 2. Lọc danh sách thành viên CHỜ DUYỆT
+  // 3. Lọc danh sách thành viên CHỜ DUYỆT
   const filteredPendingMembers = useMemo(() => {
     if (!pendingMembers) return [];
-    const typedMembers = pendingMembers as CourseMember[];
-    const pendingList = typedMembers.filter(m => m.status === 'PENDING');
+    const typedMembers = Array.isArray(pendingMembers) ? pendingMembers as CourseMember[] : (pendingMembers as any)?.data || [];
+    const pendingList = typedMembers.filter((m:CourseMember) => m.status === 'PENDING');
 
     if (!searchQuery.trim()) return pendingList;
     const lowerQuery = searchQuery.toLowerCase();
-    return pendingList.filter(member => 
+    return pendingList.filter((member: CourseMember)   => 
       member.studentName.toLowerCase().includes(lowerQuery) || 
       member.studentEmail.toLowerCase().includes(lowerQuery)
     );
   }, [pendingMembers, searchQuery]);
 
-  // Xử lý UI Loading & Error
+  // --- RENDERING BẢO MẬT (SECURITY RENDERING) ---
+  
+  // Nếu không có quyền truy cập
+  if (!isOwner && !isApprovedStudent) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
+        <ShieldAlert size={64} className="text-gray-300 mb-6" />
+        <h3 className="text-xl font-bold text-gray-800 mb-2">Truy cập bị từ chối</h3>
+        <p className="text-gray-500 text-center max-w-md">
+          Chỉ Gia sư và Học viên chính thức của lớp học mới có quyền xem danh sách thành viên.
+        </p>
+      </div>
+    );
+  }
+
+  // --- RENDERING BÌNH THƯỜNG DÀNH CHO OWNER VÀ APPROVED ---
+
   if (loadingMembers) {
     return (
       <div className="flex justify-center items-center min-h-[300px]">
@@ -80,15 +102,19 @@ const MembersTab: React.FC<MembersTabProps> = ({ courseId }) => {
 
   return (
     <div className="w-full bg-white font-serif text-[#1c1e21] animate-in fade-in duration-500 p-2">
-      {/* Header Info */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-1">Members Management</h2>
-        <p className="text-sm text-gray-500 font-sans">Quản lý và xét duyệt học viên trong lớp học của bạn.</p>
+        <p className="text-sm text-gray-500 font-sans">
+          {isOwner 
+            ? "Quản lý và xét duyệt học viên trong lớp học của bạn." 
+            : "Xem danh sách bạn học trong lớp."}
+        </p>
       </div>
 
       {/* --- SUB-TABS NAVIGATION --- */}
       <div className="flex gap-8 border-b border-gray-200 mb-8 font-sans">
-        {/* Tab Chính thức */}
+        
+        {/* Tab Chính thức (Ai cũng thấy) */}
         <button
           onClick={() => setActiveSubTab('approved')}
           className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all border-b-2 ${
@@ -106,32 +132,31 @@ const MembersTab: React.FC<MembersTabProps> = ({ courseId }) => {
           </span>
         </button>
         
-        {/* Tab Chờ duyệt */}
-        <button
-          onClick={() => setActiveSubTab('pending')}
-          className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all border-b-2 ${
-            activeSubTab === 'pending'
-              ? 'border-orange-500 text-orange-500'
-              : 'border-transparent text-gray-400 hover:text-gray-700'
-          }`}
-        >
-          <Clock size={16} />
-          Chờ duyệt
-          <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
-            activeSubTab === 'pending' ? 'bg-orange-100 text-orange-600' : 'bg-gray-50 text-gray-400'
-          }`}>
-            {filteredPendingMembers.length}
-          </span>
-        </button>
+        {/* Tab Chờ duyệt (CHỈ OWNER MỚI THẤY) */}
+        {isOwner && (
+          <button
+            onClick={() => setActiveSubTab('pending')}
+            className={`flex items-center gap-2 pb-3 text-sm font-bold transition-all border-b-2 ${
+              activeSubTab === 'pending'
+                ? 'border-orange-500 text-orange-500'
+                : 'border-transparent text-gray-400 hover:text-gray-700'
+            }`}
+          >
+            <Clock size={16} />
+            Chờ duyệt
+            <span className={`ml-1 px-2 py-0.5 rounded-full text-xs ${
+              activeSubTab === 'pending' ? 'bg-orange-100 text-orange-600' : 'bg-gray-50 text-gray-400'
+            }`}>
+              {filteredPendingMembers.length}
+            </span>
+          </button>
+        )}
       </div>
 
-      {/* Search Component (Hiển thị cố định cho cả 2 Tab) */}
       <MemberSearch searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-      {/* --- CONTENT AREA: RENDERING DỰA TRÊN TAB ĐANG CHỌN --- */}
       <div className="min-h-[300px] mt-6">
         
-        {/* Nội dung Tab Chính thức */}
         {activeSubTab === 'approved' && (
           <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {filteredApprovedMembers.length === 0 && !searchQuery ? (
@@ -139,36 +164,20 @@ const MembersTab: React.FC<MembersTabProps> = ({ courseId }) => {
                 Lớp học chưa có thành viên chính thức nào.
               </div>
             ) : (
-              <MemberList members={filteredApprovedMembers} />
-            )}
-            
-            {filteredApprovedMembers.length > 10 && (
-              <div className="flex justify-center mt-10">
-                <button className="px-8 py-2 border border-gray-300 rounded-full text-sm font-bold hover:bg-gray-50 transition-colors font-sans">
-                  Load More
-                </button>
-              </div>
+              // Bổ sung isOwner prop vào MemberList nếu bạn muốn chỉ OWNER mới thấy nút "Kick/Xóa" học viên
+              <MemberList members={filteredApprovedMembers} isOwner={isOwner} />
             )}
           </section>
         )}
 
-        {/* Nội dung Tab Chờ duyệt */}
-        {activeSubTab === 'pending' && (
+        {isOwner && activeSubTab === 'pending' && (
           <section className="animate-in fade-in slide-in-from-bottom-2 duration-300">
             {filteredPendingMembers.length === 0 && !searchQuery ? (
               <div className="text-center py-12 text-gray-400 font-sans italic bg-orange-50/30 rounded-xl border border-dashed border-orange-100">
                 Không có yêu cầu tham gia nào đang chờ duyệt.
               </div>
             ) : (
-              <MemberList members={filteredPendingMembers} />
-            )}
-            
-            {filteredPendingMembers.length > 10 && (
-              <div className="flex justify-center mt-10">
-                <button className="px-8 py-2 border border-gray-300 rounded-full text-sm font-bold hover:bg-gray-50 transition-colors font-sans">
-                  Load More
-                </button>
-              </div>
+              <MemberList members={filteredPendingMembers} isOwner={true} />
             )}
           </section>
         )}

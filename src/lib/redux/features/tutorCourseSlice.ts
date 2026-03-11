@@ -10,7 +10,7 @@ interface Schedule {
   endTime: string; // HH:MM:SS
 }
 
-interface CourseItem {
+export interface CourseItem {
   id: string;
   name: string;
   description: string;
@@ -53,12 +53,20 @@ interface TutorCourseState {
   submitting: boolean;
   error: string | null;
   // State for the new course form
+  currentPage: number;
+  totalPages: number;
   newCourse: CreateClassRequest;
   members: any[]; // Có thể định nghĩa interface riêng cho member nếu cần
   pendingMembers: any[]; // Danh sách thành viên chờ duyệt
   loadingMembers: boolean;
   viewedTutorClasses: CourseItem[];
   loadingViewedClasses: boolean;
+  notifications: ClassNotification[];
+  notificationsCurrentPage: number;
+  notificationsTotalPages: number;
+  loadingNotifications: boolean;
+  creatingNotification: boolean; // Dùng riêng cho nút "Gửi thông báo" để hiện loading xoay xoay
+  notificationError: string | null;
 }
 
 const initialState: TutorCourseState = {
@@ -67,6 +75,8 @@ const initialState: TutorCourseState = {
   loading: false,
   submitting: false,
   error: null,
+  currentPage: 1,
+  totalPages: 1,
   newCourse: {
     name: "",
     description: "",
@@ -80,33 +90,61 @@ const initialState: TutorCourseState = {
   loadingMembers: false,
   viewedTutorClasses: [],
   loadingViewedClasses: false,
+  notifications: [],
+  notificationsCurrentPage: 1,
+  notificationsTotalPages: 1,
+  loadingNotifications: false,
+  creatingNotification: false,
+  notificationError: null,
 };
+
+// --- Interfaces --- (Thêm vào phần đầu file)
+
+export interface ClassNotification {
+  id: string;
+  title: string;
+  message: string;
+  sentAt: string;
+  classId: string;
+  className: string;
+}
+
+export interface CreateNotificationRequest {
+  title: string;
+  message: string;
+}
 
 // --- Async Thunks ---
 
 // 1. Get all classes for the tutor
-export const getAllClasses = createAsyncThunk(
-  "tutorCourse/getAllClasses",
-  async (_, { getState, rejectWithValue }) => {
+// Thêm params vào Thunk
+export const getAllTeachingClasses = createAsyncThunk(
+  "tutorCourse/getAllTeachingClasses",
+  async (
+    { page, size }: { page: number; size: number },
+    { getState, rejectWithValue },
+  ) => {
     try {
       const state = getState() as RootState;
-      const token = state.auth.token;
+      const token = state.auth.token || sessionStorage.getItem("accessToken");
 
-      if (!token) {
-        return rejectWithValue("Unauthenticated: Missing access token");
-      }
-
-      const response = await fetch(API_ENDPOINTS.LMS.GET_TUTOR_CLASSES, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      // Chèn page và size vào URL
+      const response = await fetch(
+        `http://localhost:8888/api/v1/lms/classes/teaching?page=${page}&size=${size}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
         },
-      });
+      );
 
       const data = await response.json();
-      if (data.code !== 1000)
-        throw new Error(data.message || "Failed to fetch classes");
+      console.log("API Response for getAllTeachingClasses:", data); // Debug log
+      if (data.code !== 1000) throw new Error(data.message);
+
+      // Trả về toàn bộ cục result (chứa cả data và totalPages)
       return data.result;
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -135,6 +173,7 @@ export const getMySubjects = createAsyncThunk(
       });
 
       const data = await response.json();
+      console.log("API Response for getMySubjects:", data); // Debug log
       if (data.code !== 1000)
         throw new Error(data.message || "Failed to fetch subjects");
       return data.result as Subject[];
@@ -192,17 +231,14 @@ export const updateClass = createAsyncThunk(
         return rejectWithValue("Unauthenticated: Missing access token");
       }
 
-      const response = await fetch(
-        API_ENDPOINTS.LMS.UPDATE_CLASS(classId),
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(courseData),
+      const response = await fetch(API_ENDPOINTS.LMS.UPDATE_CLASS(classId), {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      );
+        body: JSON.stringify(courseData),
+      });
 
       const data = await response.json();
       if (data.code !== 1000) throw new Error(data.message);
@@ -280,6 +316,7 @@ export const getMemberInCourse = createAsyncThunk(
     }
   },
 );
+
 // 6. Get pending members in a course (chờ gia sư duyệt)
 export const getMemberPendingInCourse = createAsyncThunk(
   "tutorCourse/getMemberPendingInCourse",
@@ -314,7 +351,7 @@ export const getMemberPendingInCourse = createAsyncThunk(
   },
 );
 
-// 7. Approve or Reject member enrollment
+// 7. Get classes by tutorId
 export const getClassesByTutorId = createAsyncThunk(
   "tutorClasses/getClassesByTutorId",
   async (tutorId: string, { getState, rejectWithValue }) => {
@@ -370,7 +407,7 @@ export const approveMember = createAsyncThunk(
       const response = await fetch(
         API_ENDPOINTS.LMS.APPROVE_ENROLLMENT(enrollmentId, isApproved),
         {
-          method: "PUT",
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -389,7 +426,72 @@ export const approveMember = createAsyncThunk(
   },
 );
 
-// --- Slice ---
+// 9. Lấy danh sách thông báo của một lớp học (Có phân trang)
+export const getClassNotifications = createAsyncThunk(
+  "tutorCourse/getClassNotifications",
+  async (
+    { classId, page, size }: { classId: string; page: number; size: number },
+    { getState, rejectWithValue },
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token || sessionStorage.getItem("accessToken");
+
+      const response = await fetch(
+        `http://localhost:8888/api/v1/lms/notifications/class/${classId}?page=${page}&size=${size}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        },
+      );
+
+      const data = await response.json();
+      if (data.code !== 1000) throw new Error(data.message || "Failed to fetch notifications");
+
+      return data.result; // Trả về object chứa data, currentPage, totalPages...
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+// 10. Tạo thông báo mới cho lớp học
+export const createClassNotification = createAsyncThunk(
+  "tutorCourse/createClassNotification",
+  async (
+    { classId, payload }: { classId: string; payload: CreateNotificationRequest },
+    { getState, rejectWithValue },
+  ) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.token || sessionStorage.getItem("accessToken");
+
+      if (!token) return rejectWithValue("Unauthenticated");
+
+      const response = await fetch(
+        `http://localhost:8888/api/v1/lms/notifications/class/${classId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        },
+      );
+
+      const data = await response.json();
+      if (data.code !== 1000) throw new Error(data.message || "Failed to create notification");
+
+      return data.result as ClassNotification; // Trả về cục thông báo vừa tạo thành công
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
 
 const tutorCourseSlice = createSlice({
   name: "tutorCourse",
@@ -414,15 +516,17 @@ const tutorCourseSlice = createSlice({
   extraReducers: (builder) => {
     // --- Handle getAllClasses ---
     builder
-      .addCase(getAllClasses.pending, (state) => {
+      .addCase(getAllTeachingClasses.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getAllClasses.fulfilled, (state, action) => {
+      .addCase(getAllTeachingClasses.fulfilled, (state, action) => {
         state.loading = false;
-        state.classes = action.payload;
+        state.classes = action.payload.data || []; // Đảm bảo luôn có mảng
+        state.currentPage = action.payload.currentPage;
+        state.totalPages = action.payload.totalPages || 1;
       })
-      .addCase(getAllClasses.rejected, (state, action) => {
+      .addCase(getAllTeachingClasses.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
@@ -435,7 +539,7 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getMySubjects.fulfilled, (state, action) => {
         state.loading = false;
-        state.subjects = action.payload;
+        state.subjects = action.payload?.data || action.payload || []; // Đảm bảo luôn có mảng
       })
       .addCase(getMySubjects.rejected, (state, action) => {
         state.loading = false;
@@ -479,7 +583,7 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getMemberInCourse.fulfilled, (state, action) => {
         state.loadingMembers = false;
-        state.members = action.payload; // action.payload chính là data.result từ API
+        state.members = action.payload?.data || action.payload || []; // action.payload chính là data.result từ API
       })
       .addCase(getMemberInCourse.rejected, (state, action) => {
         state.loadingMembers = false;
@@ -493,7 +597,7 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getMemberPendingInCourse.fulfilled, (state, action) => {
         state.loadingMembers = false;
-        state.pendingMembers = action.payload; // action.payload chính là data.result từ API
+        state.pendingMembers = action.payload?.data || action.payload || []; // action.payload chính là data.result từ API
       })
       .addCase(getMemberPendingInCourse.rejected, (state, action) => {
         state.loadingMembers = false;
@@ -536,11 +640,45 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getClassesByTutorId.fulfilled, (state, action) => {
         state.loadingViewedClasses = false;
-        state.viewedTutorClasses = action.payload; // Gán vào biến này để không đè lên 'classes'
+        state.viewedTutorClasses = action.payload?.data || action.payload || []; // Gán vào biến này để không đè lên 'classes'
       })
       .addCase(getClassesByTutorId.rejected, (state, action) => {
         state.loadingViewedClasses = false;
         state.error = action.payload as string;
+      });
+      builder
+      .addCase(getClassNotifications.pending, (state) => {
+        state.loadingNotifications = true;
+        state.notificationError = null;
+      })
+      .addCase(getClassNotifications.fulfilled, (state, action) => {
+        state.loadingNotifications = false;
+        state.notifications = action.payload?.data || [];
+        state.notificationsCurrentPage = action.payload?.currentPage || 1;
+        state.notificationsTotalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getClassNotifications.rejected, (state, action) => {
+        state.loadingNotifications = false;
+        state.notificationError = action.payload as string;
+      });
+
+    // --- Handle createClassNotification ---
+    builder
+      .addCase(createClassNotification.pending, (state) => {
+        state.creatingNotification = true;
+        state.notificationError = null;
+      })
+      .addCase(createClassNotification.fulfilled, (state, action) => {
+        state.creatingNotification = false;
+        
+        // UX Cực tốt: Thay vì phải gọi lại API lấy list, 
+        // ta đẩy luôn thông báo mới vừa tạo lên ĐẦU danh sách hiện tại.
+        // Giúp UI cập nhật ngay lập tức mà không bị giật lag.
+        state.notifications.unshift(action.payload); 
+      })
+      .addCase(createClassNotification.rejected, (state, action) => {
+        state.creatingNotification = false;
+        state.notificationError = action.payload as string;
       });
   },
 });
