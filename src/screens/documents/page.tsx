@@ -32,6 +32,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
         if (!currentDocument) return;
 
         try {
+            console.log(currentDocument.downloadUrl);
             const response = await httpClient.get(currentDocument.downloadUrl, {
                 responseType: 'blob',
             });
