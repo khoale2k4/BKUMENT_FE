@@ -539,7 +539,8 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getMySubjects.fulfilled, (state, action) => {
         state.loading = false;
-        state.subjects = action.payload || action.payload || []; // Đảm bảo luôn có mảng
+        // Xử lý cả trường hợp trả về trực tiếp mảng hoặc object chứa thuộc tính data/content từ phân trang
+        state.subjects = (action.payload as any)?.data || (action.payload as any)?.content || (Array.isArray(action.payload) ? action.payload : []);
       })
       .addCase(getMySubjects.rejected, (state, action) => {
         state.loading = false;
@@ -646,7 +647,7 @@ const tutorCourseSlice = createSlice({
         state.loadingViewedClasses = false;
         state.error = action.payload as string;
       });
-      builder
+    builder
       .addCase(getClassNotifications.pending, (state) => {
         state.loadingNotifications = true;
         state.notificationError = null;
@@ -670,11 +671,11 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(createClassNotification.fulfilled, (state, action) => {
         state.creatingNotification = false;
-        
+
         // UX Cực tốt: Thay vì phải gọi lại API lấy list, 
         // ta đẩy luôn thông báo mới vừa tạo lên ĐẦU danh sách hiện tại.
         // Giúp UI cập nhật ngay lập tức mà không bị giật lag.
-        state.notifications.unshift(action.payload); 
+        state.notifications.unshift(action.payload);
       })
       .addCase(createClassNotification.rejected, (state, action) => {
         state.creatingNotification = false;

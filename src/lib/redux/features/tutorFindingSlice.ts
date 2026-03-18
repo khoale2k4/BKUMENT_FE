@@ -41,7 +41,7 @@ interface Course {
   tutorAvatar: string;
   topicName: string;
   subjectName: string;
-  userStatus:string;
+  userStatus: string;
 }
 
 interface TutorInfo {
@@ -77,7 +77,7 @@ interface TutorFindingState {
   loadingStudying: boolean;
   errorStudying: string | null;
   // THÊM STATE CHO CLASS DETAILS
-  currentClassDetail: Course | null; 
+  currentClassDetail: Course | null;
   loadingClassDetail: boolean;
   errorClassDetail: string | null;
 
@@ -240,7 +240,7 @@ export const getClassDetailsById = createAsyncThunk(
       );
 
       const data = await response.json();
-      console.log("API Response for getClassDetailsById:", data); 
+      console.log("API Response for getClassDetailsById:", data);
 
       if (data.code !== 1000) throw new Error(data.message || "Failed to fetch class details");
 
@@ -253,7 +253,7 @@ export const getClassDetailsById = createAsyncThunk(
 );
 
 // tham gia vào lớp học mới
- // Học viên đăng ký tham gia lớp học
+// Học viên đăng ký tham gia lớp học
 export const enrollInClass = createAsyncThunk(
   "tutorFinding/enrollInClass",
   async (classId: string, { getState, rejectWithValue }) => {
@@ -285,7 +285,7 @@ export const enrollInClass = createAsyncThunk(
       }
 
       // Trả về kết quả thành công
-      return data.result; 
+      return data.result;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -309,14 +309,14 @@ const tutorFindingSlice = createSlice({
       state.filters = initialState.filters;
     },
     clearClassDetail: (state) => {
-        state.currentClassDetail = null;
-        state.errorClassDetail = null;
+      state.currentClassDetail = null;
+      state.errorClassDetail = null;
     },
     // THÊM: Reset trạng thái enroll (Dùng khi user đóng popup thành công hoặc chuyển trang)
     resetEnrollStatus: (state) => {
-        state.isEnrolling = false;
-        state.enrollError = null;
-        state.enrollSuccess = false;
+      state.isEnrolling = false;
+      state.enrollError = null;
+      state.enrollSuccess = false;
     }
   },
   extraReducers: (builder) => {
@@ -342,7 +342,8 @@ const tutorFindingSlice = createSlice({
       })
       .addCase(getSearchSubjects.fulfilled, (state, action) => {
         state.loadingSubjects = false;
-        state.subjects = action.payload || action.payload || []; // Lưu mảng Subject lấy được
+        const payloadData = action.payload as any;
+        state.subjects = payloadData?.data || payloadData?.content || (Array.isArray(payloadData) ? payloadData : []);
       })
       .addCase(getSearchSubjects.rejected, (state, action) => {
         state.loadingSubjects = false;
@@ -366,7 +367,7 @@ const tutorFindingSlice = createSlice({
         state.errorStudying = action.payload as string;
       });
 
-      builder
+    builder
       .addCase(getClassDetailsById.pending, (state) => {
         state.loadingClassDetail = true;
         state.errorClassDetail = null;
@@ -380,7 +381,7 @@ const tutorFindingSlice = createSlice({
         state.errorClassDetail = action.payload as string;
       });
 
-      // Xử lý enrollInClass
+    // Xử lý enrollInClass
     builder
       .addCase(enrollInClass.pending, (state) => {
         state.isEnrolling = true;
