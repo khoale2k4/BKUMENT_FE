@@ -327,7 +327,7 @@ const tutorFindingSlice = createSlice({
       })
       .addCase(searchTutors.fulfilled, (state, action) => {
         state.loading = false;
-        state.tutors = action.payload?.data || action.payload || []; // Gán data.result trả về vào list tutors
+        state.tutors = action.payload || action.payload || []; // Gán data.result trả về vào list tutors
       })
       .addCase(searchTutors.rejected, (state, action) => {
         state.loading = false;
@@ -342,7 +342,7 @@ const tutorFindingSlice = createSlice({
       })
       .addCase(getSearchSubjects.fulfilled, (state, action) => {
         state.loadingSubjects = false;
-        state.subjects = action.payload?.data || action.payload || []; // Lưu mảng Subject lấy được
+        state.subjects = action.payload || action.payload || []; // Lưu mảng Subject lấy được
       })
       .addCase(getSearchSubjects.rejected, (state, action) => {
         state.loadingSubjects = false;

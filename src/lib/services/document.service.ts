@@ -104,5 +104,5 @@ export const searchUniversities = async (query: string): Promise<{ id: number; n
  */
 export const searchCourses = async (query: string): Promise<{ id: string; name: string; topics: { id: string; name: string }[] }[]> => {
     const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.COURSES(query));
-    return response.data.result;
+    return response.data.result.data;
 };

@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { useEffect, useState } from 'react';
 import { clearCurrentDocument, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments } from '@/lib/redux/features/documentSlice';
-import { openReportModal } from '@/lib/redux/features/modalSlice';
+import { openReportModal, showNotification } from '@/lib/redux/features/modalSlice';
 import CommentSection from './commentSection/page';
 import { getAccessToken } from '@/lib/utils/token';
 import Pagination from '@/components/ui/Pagination';
@@ -16,6 +16,7 @@ import RelatedDocumentCard from './RelatedDocumentCard';
 import { DescriptionWithShowMore } from './DescriptionWithShowMore/page';
 import httpClient from '@/lib/services/http';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
+import { showToast } from '@/lib/redux/features/toastSlice';
 
 const PDFViewer = dynamic(() => import('./pdfViewer/page'), { ssr: false, });
 const WordViewer = dynamic(() => import('./wordViewer/page'), { ssr: false });
@@ -59,6 +60,25 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     const handleReport = () => {
         if (currentDocument?.id) {
             dispatch(openReportModal({ targetId: currentDocument.id, type: 'DOCUMENT' }));
+        }
+    };
+
+    const handleShare = async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            
+            dispatch(showToast({
+                type: 'success', 
+                title: 'Thành công', 
+                message: 'Đã sao chép đường dẫn bài viết!' 
+            }));
+        } catch (error) {
+            console.error("Lỗi khi copy:", error);
+            dispatch(showToast({
+                type: 'error', 
+                title: 'Lỗi', 
+                message: 'Không thể sao chép đường dẫn lúc này.' 
+            }));
         }
     };
 
@@ -159,11 +179,11 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                                 <div>
                                     <div className="font-semibold text-gray-900">{currentDocument?.author.name}</div>
                                     <div className="text-xs text-gray-500">
-                                        {currentDocument?.course
+                                        {/* {currentDocument?.course
                                             ? `Học ${currentDocument.course} tại ${currentDocument.university}`
                                             : `Học tại ${currentDocument?.university}`
                                         }
-                                        {" - "}
+                                        {" - "} */}
                                         {currentDocument?.createdAt && new Date(currentDocument.createdAt).toLocaleDateString("vi-VN")}
                                     </div>
                                 </div>
@@ -186,7 +206,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                             <Download size={18} />
                             <span>Download</span>
                         </button>
-                        <button className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer" title="Chia sẻ">
+                        <button className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer" title="Chia sẻ" onClick={() => handleShare()}>
                             <Share2 size={20} />
                         </button>
 
@@ -239,7 +259,6 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                 </div>
             </div>
 
-            {/* Related Documents Section */}
             <div className="max-w-4xl mx-auto px-4 mb-16 border-t border-gray-100 pt-8">
                 <h3 className="text-xl font-bold text-gray-900 mb-6">Tài liệu liên quan</h3>
 

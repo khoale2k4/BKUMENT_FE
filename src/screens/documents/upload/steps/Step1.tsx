@@ -49,14 +49,14 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                 onDragOver={handleDragOver}
             >
                 <Upload className="text-4xl text-blue-600 mb-4" />
-                <p className="text-lg font-semibold text-gray-800">Drag & Drop files</p>
-                <p className="text-sm text-gray-500">Or click anywhere to browse</p>
+                <p className="text-lg font-semibold text-gray-800">Kéo & thả tệp</p>
+                <p className="text-sm text-gray-500">Hoặc nhấp vào bất kỳ đâu để chọn</p>
 
                 <button
                     type="button"
                     className="mt-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors pointer-events-none" // pointer-events-none để click xuyên qua div cha
                 >
-                    Browse my files
+                    Chọn tệp từ thiết bị
                 </button>
 
                 <input
@@ -70,14 +70,14 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                     onClick={(e) => e.stopPropagation()}
                 />
 
-                <p className="mt-4 text-xs text-gray-500">Supported files: PDF, DOC, DOCX</p>
+                <p className="mt-4 text-xs text-gray-500">Định dạng hỗ trợ: PDF, DOC, DOCX</p>
             </div>
 
             <div className="mt-8 flex-1 overflow-y-auto border border-gray-100 rounded-xl space-y-4 p-2 max-h-[400px] shadow-inner bg-gray-50/50">
                 {files.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                         <FileText className="w-12 h-12 mb-3 opacity-20" />
-                        <p>No files uploaded yet</p>
+                        <p>Chưa có tệp nào được tải lên</p>
                     </div>
                 ) : (
                     files.map((file) => (
@@ -102,7 +102,7 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                             <div className="flex items-center space-x-3">
                                 {file.status === 'error' ? (
                                     <div className="flex items-center text-red-500 bg-red-50 px-3 py-1 rounded-full border border-red-100">
-                                        <span className="text-xs font-semibold">Error</span>
+                                        <span className="text-xs font-semibold">Lỗi</span>
                                     </div>
                                 ) : file.status === 'analyzing' ? (
                                     <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
@@ -111,13 +111,13 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
                                         </div>
-                                        <span className="text-xs font-semibold text-blue-600">Analyzing...</span>
+                                        <span className="text-xs font-semibold text-blue-600">Đang phân tích...</span>
                                     </div>
                                 ) : (
                                     <div className="flex items-center space-x-2">
                                         {file.progress === 100 ? (
                                             <div className="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
-                                                <span className="text-xs font-semibold">Ready</span>
+                                                <span className="text-xs font-semibold">Sẵn sàng</span>
                                             </div>
                                         ) : (
                                             <div className="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">
@@ -134,6 +134,7 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                                             onDeleteFile && onDeleteFile(file.localId);
                                         }}
                                         className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Xóa tệp" 
                                     >
                                         <Trash className="w-4 h-4" />
                                     </button>

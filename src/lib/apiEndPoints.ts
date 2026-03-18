@@ -59,9 +59,9 @@ export const API_ENDPOINTS = {
     RECOMMENDED_DOCUMENTS: (page: number, size: number) =>
       `${API_BASE_URL}/document/recommendations?page=${page}&size=${size}`,
     UNIVERSITIES: (query: string) =>
-      `${API_BASE_URL}/document/search-universities?q=${encodeURIComponent(query)}`,
+      `${API_BASE_URL}/document/search-universities${query ? '?q=' + encodeURIComponent(query) : ''}`,
     COURSES: (query: string) =>
-      `${API_BASE_URL}/lms/subjects/search?q=${query}`,
+      `${API_BASE_URL}/lms/subjects?q=${query}`,
     TOPICS_BY_COURSE: (courseId: string, query: string) =>
       `${DEBUG_URL}/api/documents/topics-by-course?courseId=${courseId}&query=${encodeURIComponent(query)}`,
   },
@@ -126,7 +126,7 @@ export const API_ENDPOINTS = {
       `${LMS_URL}/enrollments/${enrollmentId}/approval?approved=${isApproved}`,
 
     // API FOR USER
-//http://localhost:8888/api/v1/lms/subjects?page=1&size=100
+    //http://localhost:8888/api/v1/lms/subjects?page=1&size=100
     GET_SUBJECTS: `${LMS_URL}/subjects?page=1&size=300`,
     //   const url = `http://localhost:8082/lms/classes/search${queryString ? `?${queryString}` : ""}`;
     SEARCH_CLASSES: `${LMS_URL}/classes/search`,

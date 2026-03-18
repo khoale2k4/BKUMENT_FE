@@ -539,7 +539,7 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getMySubjects.fulfilled, (state, action) => {
         state.loading = false;
-        state.subjects = action.payload?.data || action.payload || []; // Đảm bảo luôn có mảng
+        state.subjects = action.payload || action.payload || []; // Đảm bảo luôn có mảng
       })
       .addCase(getMySubjects.rejected, (state, action) => {
         state.loading = false;
@@ -640,7 +640,7 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getClassesByTutorId.fulfilled, (state, action) => {
         state.loadingViewedClasses = false;
-        state.viewedTutorClasses = action.payload?.data || action.payload || []; // Gán vào biến này để không đè lên 'classes'
+        state.viewedTutorClasses = action.payload || action.payload || []; // Gán vào biến này để không đè lên 'classes'
       })
       .addCase(getClassesByTutorId.rejected, (state, action) => {
         state.loadingViewedClasses = false;
