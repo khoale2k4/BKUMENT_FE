@@ -41,6 +41,15 @@ httpClient.interceptors.response.use(
         if (error.response?.status === 401) {
             // Handle unauthorized
             console.error('Unauthorized - Token may be invalid or expired');
+            if (typeof window !== 'undefined') {
+                const currentPath = window.location.pathname + window.location.search;
+                if (!currentPath.includes('/login')) {
+                    localStorage.setItem('redirectUrl', currentPath);
+                    sessionStorage.removeItem('accessToken');
+                    sessionStorage.removeItem('currentRole');
+                    window.location.href = '/login';
+                }
+            }
         }
 
         return Promise.reject(error);
