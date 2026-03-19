@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react';
+import { useParams } from 'next/navigation';
 import ActiveStep from './steps/ActiveStep';
 import FileUploader from './steps/Step1';
 import UploadSuccess from './steps/Step3';
@@ -19,6 +20,8 @@ import FileDescription from './steps/Step2/FileDescription';
 
 const FileUpload = () => {
     const dispatch = useAppDispatch();
+    const params = useParams();
+    const courseId = params?.course_id as string | undefined;
 
     const { files, activeStep, uploadStatus } = useAppSelector((state) => state.documents.upload);
 
@@ -68,7 +71,7 @@ const FileUpload = () => {
 
     const handleNextStep = () => {
         if (activeStep === 2) {
-            dispatch(saveFilesMetadata());
+            dispatch(saveFilesMetadata(courseId));
         } else {
             dispatch(setActiveStep(Math.min(3, activeStep + 1)));
         }

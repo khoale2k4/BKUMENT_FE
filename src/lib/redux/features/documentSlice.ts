@@ -164,7 +164,7 @@ export const searchUniversities = createAsyncThunk(
 export const searchCourses = createAsyncThunk(
     'documents/searchCourses',
     async (query: string) => {
-        const response =  await documentService.searchCourses(query);
+        const response = await documentService.searchCourses(query);
         console.log(response);
         return response;
     }
@@ -255,7 +255,7 @@ export const submitCommentAsync = createAsyncThunk(
 
 export const saveFilesMetadata = createAsyncThunk(
     'documents/saveFilesMetadata',
-    async (_, { getState, dispatch, rejectWithValue }) => {
+    async (courseIdFromUrl: string | undefined, { getState, dispatch, rejectWithValue }) => {
         const state = getState() as { documents: DocumentState };
         const filesToSave = state.documents.upload.files.filter(f => f.status === 'uploaded' || f.status === 'success');
 
@@ -274,7 +274,7 @@ export const saveFilesMetadata = createAsyncThunk(
                     university: file.university || '',
                     universityId: file.universityId,
                     course: file.course || '',
-                    courseId: file.courseId,
+                    courseId: courseIdFromUrl || file.courseId,
                     topicId: file.topicId,
                     description: file.description || '',
                     resourceType: 'DOCUMENT',

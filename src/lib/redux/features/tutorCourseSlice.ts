@@ -2,9 +2,10 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 // Adjust the import path for RootState to match your project structure
 import { RootState } from "@/lib/redux/store";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
+import * as courseService from '@/lib/services/course.service';
 // --- Interfaces ---
 
-interface Schedule {
+export interface Schedule {
   dayOfWeek: string;
   startTime: string; // HH:MM:SS
   endTime: string; // HH:MM:SS
@@ -37,7 +38,7 @@ export interface Subject {
   topics: Topic[];
 }
 
-interface CreateClassRequest {
+export interface CreateClassRequest {
   name: string;
   description: string;
   startDate: string;
@@ -67,6 +68,12 @@ interface TutorCourseState {
   loadingNotifications: boolean;
   creatingNotification: boolean; // Dùng riêng cho nút "Gửi thông báo" để hiện loading xoay xoay
   notificationError: string | null;
+
+  classDocuments: any[];
+  documentsCurrentPage: number;
+  documentsTotalPages: number;
+  loadingDocuments: boolean;
+  documentsError: string | null;
 }
 
 const initialState: TutorCourseState = {
@@ -96,6 +103,11 @@ const initialState: TutorCourseState = {
   loadingNotifications: false,
   creatingNotification: false,
   notificationError: null,
+  classDocuments: [],
+  documentsCurrentPage: 1,
+  documentsTotalPages: 1,
+  loadingDocuments: false,
+  documentsError: null,
 };
 
 // --- Interfaces --- (Thêm vào phần đầu file)
@@ -114,40 +126,16 @@ export interface CreateNotificationRequest {
   message: string;
 }
 
-// --- Async Thunks ---
-
 // 1. Get all classes for the tutor
-// Thêm params vào Thunk
 export const getAllTeachingClasses = createAsyncThunk(
   "tutorCourse/getAllTeachingClasses",
-  async (
-    { page, size }: { page: number; size: number },
-    { getState, rejectWithValue },
-  ) => {
+  async ({ page, size }: { page: number; size: number }, { rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      // Chèn page và size vào URL
-      const response = await fetch(
-        `http://localhost:8888/api/v1/lms/classes/teaching?page=${page}&size=${size}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        },
-      );
-
-      const data = await response.json();
-      console.log("API Response for getAllTeachingClasses:", data); // Debug log
+      const data = await courseService.getAllTeachingClasses(page, size);
       if (data.code !== 1000) throw new Error(data.message);
-
-      // Trả về toàn bộ cục result (chứa cả data và totalPages)
       return data.result;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -155,30 +143,11 @@ export const getAllTeachingClasses = createAsyncThunk(
 // 2. Get tutor's subjects and topics (New)
 export const getMySubjects = createAsyncThunk(
   "tutorCourse/getMySubjects",
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-
-      if (!token) {
-        return rejectWithValue("Unauthenticated: Missing access token");
-      }
-
-      const response = await fetch(API_ENDPOINTS.LMS.GET_TUTOR_SUBJECTS, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-      console.log("API Response for getMySubjects:", data); // Debug log
-      if (data.code !== 1000)
-        throw new Error(data.message || "Failed to fetch subjects");
-      return data.result as Subject[];
+      return await courseService.getMySubjects();
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -186,29 +155,11 @@ export const getMySubjects = createAsyncThunk(
 // 3. Create a new class
 export const createClass = createAsyncThunk(
   "tutorCourse/createClass",
-  async (courseData: CreateClassRequest, { getState, rejectWithValue }) => {
+  async (courseData: CreateClassRequest, { rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-
-      if (!token) {
-        return rejectWithValue("Unauthenticated: Missing access token");
-      }
-
-      const response = await fetch(API_ENDPOINTS.LMS.ADD_NEW_CLASS, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(courseData),
-      });
-
-      const data = await response.json();
-      if (data.code !== 1000) throw new Error(data.message);
-      return data.result;
+      return await courseService.createClass(courseData);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -217,34 +168,13 @@ export const createClass = createAsyncThunk(
 export const updateClass = createAsyncThunk(
   "tutorCourse/updateClass",
   async (
-    {
-      classId,
-      courseData,
-    }: { classId: string; courseData: CreateClassRequest },
-    { getState, rejectWithValue },
+    { classId, courseData }: { classId: string; courseData: CreateClassRequest },
+    { rejectWithValue },
   ) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-
-      if (!token) {
-        return rejectWithValue("Unauthenticated: Missing access token");
-      }
-
-      const response = await fetch(API_ENDPOINTS.LMS.UPDATE_CLASS(classId), {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(courseData),
-      });
-
-      const data = await response.json();
-      if (data.code !== 1000) throw new Error(data.message);
-      return data.result;
+      return await courseService.updateClass(classId, courseData);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -252,33 +182,13 @@ export const updateClass = createAsyncThunk(
 // 4. Cancel/Delete a class
 export const cancelClass = createAsyncThunk(
   "tutorCourse/cancelClass",
-  async (classId: string, { getState, rejectWithValue }) => {
+  async (classId: string, { rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-
-      if (!token) {
-        return rejectWithValue("Unauthenticated: Missing access token");
-      }
-
-      const response = await fetch(API_ENDPOINTS.LMS.CANCEL_CLASS(classId), {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (data.code !== 1000) {
-        throw new Error(data.message || "Failed to cancel class");
-      }
-
-      // Trả về classId để reducer biết cần xóa/cập nhật class nào trong state
+      const data = await courseService.cancelClass(classId);
+      if (data.code !== 1000) throw new Error(data.message || "Failed to cancel class");
       return classId;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -286,33 +196,11 @@ export const cancelClass = createAsyncThunk(
 // 5. Get members in a course
 export const getMemberInCourse = createAsyncThunk(
   "tutorCourse/getMemberInCourse",
-  async (courseId: string, { getState, rejectWithValue }) => {
+  async (courseId: string, { rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-
-      if (!token) {
-        return rejectWithValue("Unauthenticated: Missing access token");
-      }
-
-      const response = await fetch(
-        API_ENDPOINTS.LMS.GET_CLASS_MEMBERS(courseId),
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const data = await response.json();
-      console.log("API Response for getMemberInCourse:", data); // Debug log
-      if (data.code !== 1000)
-        throw new Error(data.message || "Failed to fetch members");
-      return data.result;
+      return await courseService.getMemberInCourse(courseId);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -320,33 +208,11 @@ export const getMemberInCourse = createAsyncThunk(
 // 6. Get pending members in a course (chờ gia sư duyệt)
 export const getMemberPendingInCourse = createAsyncThunk(
   "tutorCourse/getMemberPendingInCourse",
-  async (courseId: string, { getState, rejectWithValue }) => {
+  async (courseId: string, { rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-
-      if (!token) {
-        return rejectWithValue("Unauthenticated: Missing access token");
-      }
-
-      const response = await fetch(
-        API_ENDPOINTS.LMS.GET_MEMBER_PENDING(courseId),
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const data = await response.json();
-      console.log("API Response for getMemberPendingInCourse:", data); // Debug log
-      if (data.code !== 1000)
-        throw new Error(data.message || "Failed to fetch members");
-      return data.result;
+      return await courseService.getMemberPendingInCourse(courseId);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -354,36 +220,11 @@ export const getMemberPendingInCourse = createAsyncThunk(
 // 7. Get classes by tutorId
 export const getClassesByTutorId = createAsyncThunk(
   "tutorClasses/getClassesByTutorId",
-  async (tutorId: string, { getState, rejectWithValue }) => {
+  async (tutorId: string, { rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      // Nếu API này yêu cầu đăng nhập thì gửi kèm token, nếu là public thì hệ thống tự bỏ qua
-      const token = state.auth?.token;
-
-      const response = await fetch(
-        API_ENDPOINTS.LMS.GET_CLASSES_BY_TUTORID(tutorId),
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        },
-      );
-
-      const data = await response.json();
-      console.log("API Response for getClassesByTutorId:", data); // Debug log
-
-      // Xử lý dữ liệu trả về (Giả định backend trả về code 1000 là thành công)
-      if (data.code !== 1000) {
-        throw new Error(
-          data.message || "Không thể tải danh sách khóa học của gia sư",
-        );
-      }
-
-      return data.result as CourseItem[];
+      return await courseService.getClassesByTutorId(tutorId);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -393,35 +234,13 @@ export const approveMember = createAsyncThunk(
   "tutorCourse/approveMember",
   async (
     { enrollmentId, isApproved }: { enrollmentId: string; isApproved: boolean },
-    { getState, rejectWithValue },
+    { rejectWithValue },
   ) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token;
-
-      if (!token) {
-        return rejectWithValue("Unauthenticated: Missing access token");
-      }
-
-      // Đưa isApproved trực tiếp vào URL
-      const response = await fetch(
-        API_ENDPOINTS.LMS.APPROVE_ENROLLMENT(enrollmentId, isApproved),
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      const data = await response.json();
-      if (data.code !== 1000) throw new Error(data.message);
-
-      // Trả về kèm theo enrollmentId và isApproved để Reducer biết cần xử lý UI thế nào
-      return { enrollmentId, isApproved, result: data.result };
+      const result = await courseService.approveMember(enrollmentId, isApproved);
+      return { enrollmentId, isApproved, result };
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -431,29 +250,12 @@ export const getClassNotifications = createAsyncThunk(
   "tutorCourse/getClassNotifications",
   async (
     { classId, page, size }: { classId: string; page: number; size: number },
-    { getState, rejectWithValue },
+    { rejectWithValue },
   ) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      const response = await fetch(
-        `http://localhost:8888/api/v1/lms/notifications/class/${classId}?page=${page}&size=${size}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        },
-      );
-
-      const data = await response.json();
-      if (data.code !== 1000) throw new Error(data.message || "Failed to fetch notifications");
-
-      return data.result; // Trả về object chứa data, currentPage, totalPages...
+      return await courseService.getClassNotifications(classId, page, size);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -463,32 +265,27 @@ export const createClassNotification = createAsyncThunk(
   "tutorCourse/createClassNotification",
   async (
     { classId, payload }: { classId: string; payload: CreateNotificationRequest },
-    { getState, rejectWithValue },
+    { rejectWithValue },
   ) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      if (!token) return rejectWithValue("Unauthenticated");
-
-      const response = await fetch(
-        `http://localhost:8888/api/v1/lms/notifications/class/${classId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-        },
-      );
-
-      const data = await response.json();
-      if (data.code !== 1000) throw new Error(data.message || "Failed to create notification");
-
-      return data.result as ClassNotification; // Trả về cục thông báo vừa tạo thành công
+      return await courseService.createClassNotification(classId, payload);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
+
+// 11. Lấy danh sách tài liệu của lớp học (Có phân trang)
+export const getClassDocuments = createAsyncThunk(
+  "tutorCourse/getClassDocuments",
+  async (
+    { courseId, page, size }: { courseId: string; page: number; size: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await courseService.getClassDocuments(courseId, page, size);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -598,14 +395,29 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getMemberPendingInCourse.fulfilled, (state, action) => {
         state.loadingMembers = false;
-        state.pendingMembers = action.payload?.data || action.payload || []; // action.payload chính là data.result từ API
+        state.pendingMembers = action.payload?.data || action.payload || [];
       })
       .addCase(getMemberPendingInCourse.rejected, (state, action) => {
         state.loadingMembers = false;
         state.error = action.payload as string;
       });
 
-    // Vẫn trong file tutorCourseSlice.ts, thêm đoạn này vào trong extraReducers:
+    // --- Handle getClassDocuments ---
+    builder
+      .addCase(getClassDocuments.pending, (state) => {
+        state.loadingDocuments = true;
+        state.documentsError = null;
+      })
+      .addCase(getClassDocuments.fulfilled, (state, action) => {
+        state.loadingDocuments = false;
+        state.classDocuments = action.payload?.data || action.payload?.content || (Array.isArray(action.payload) ? action.payload : []);
+        state.documentsCurrentPage = action.payload?.currentPage || 1;
+        state.documentsTotalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getClassDocuments.rejected, (state, action) => {
+        state.loadingDocuments = false;
+        state.documentsError = action.payload as string;
+      });
 
     builder
       .addCase(approveMember.fulfilled, (state, action) => {
