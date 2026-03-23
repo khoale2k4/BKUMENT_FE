@@ -212,6 +212,8 @@ export const getProfileById = createAsyncThunk(
             const state = getState() as RootState;
             const token = state.auth?.token || sessionStorage.getItem('accessToken');
 
+            console.log(`Fetching profile for ID: ${profileId} with token: ${token}`);
+
             const response = await fetch(`http://localhost:8888/api/v1/profile/${profileId}`, {
                 method: 'GET',
                 headers: {

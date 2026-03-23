@@ -1,12 +1,26 @@
+'use client'; // <-- Thêm dòng này để dùng được useRouter trong Next.js
+
 import React from 'react';
 import { UserCheck, MessageCircle } from 'lucide-react';
 import { UserProfile } from '@/lib/redux/features/profileSlice';
+import { useRouter } from 'next/navigation'; // <-- Import useRouter
+import { useAppDispatch } from '@/lib/redux/hooks'; // <-- Import useAppDispatch
+import { setPendingTargetUserId } from '@/lib/redux/features/chatSlice'; // <-- Import action vừa tạo
 
 interface ProfileHeaderProps {
   profile: UserProfile;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile }) => {
+  const router = useRouter(); // <-- Khởi tạo router
+const dispatch = useAppDispatch(); // <-- Khởi tạo dispatch
+  // Hàm xử lý khi bấm nút Nhắn tin
+  const handleSayHello = () => {
+
+    dispatch(setPendingTargetUserId(profile.id)); // <-- Lưu ID người nhận vào Redux
+    router.push('/messages'); // <-- Điều hướng đến trang tin nhắn
+  };
+
   return (
     <div className="bg-white">
       {/* Ảnh bìa (Cover) */}
@@ -37,7 +51,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile }) => {
 
           {/* Các nút Hành động */}
           <div className="flex gap-2 pb-1 sm:pb-3 shrink-0">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors text-sm">
+            <button 
+              onClick={handleSayHello} // <-- Sửa lại cách gọi onClick cho chuẩn React
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors text-sm"
+            >
               <MessageCircle size={16} /> Nhắn tin
             </button>
             <button className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors text-sm">

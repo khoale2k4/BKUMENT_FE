@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setActiveConversation,
     createChatAsync,
-    fetchConversations
+    fetchConversations, setPendingTargetUserId
 } from "@/lib/redux/features/chatSlice";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { formatTimestamp } from "@/lib/utils/formatTimestamp";
 import { getChatDisplayInfo } from "./page";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
+import { useSearchParams, useRouter } from "next/navigation";
 
 interface ChatListSidebarProps {
     isOpen: boolean;
@@ -19,7 +20,7 @@ interface ChatListSidebarProps {
 
 const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
     const dispatch = useDispatch<AppDispatch>();
-    const { conversations, activeConversationId } = useSelector((state: RootState) => state.chat);
+    const { conversations, activeConversationId, pendingTargetUserId } = useSelector((state: RootState) => state.chat);
 
     const [searchValue, setSearchValue] = useState("");
     const [isCreating, setIsCreating] = useState(false); 
@@ -27,6 +28,43 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
     const [currentPage, setCurrentPage] = useState(0);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
+    const router = useRouter(); // <-- Khởi tạo router
+
+
+useEffect(() => {
+        const autoCreateChat = async () => {
+            if (pendingTargetUserId) {
+                setIsCreating(true);
+
+                try {
+                    const newChat = await dispatch(createChatAsync({
+                        type: 'DIRECT',
+                        userIds: [pendingTargetUserId]
+                    })).unwrap(); 
+
+                    // Refresh lại list
+                    await dispatch(fetchConversations({ page: 0, size: 10 })).unwrap();
+                    setCurrentPage(0);
+                    setHasMore(true);
+
+                    const chatIdToOpen = newChat.id ;
+                    if (chatIdToOpen) {
+                        dispatch(setActiveConversation(chatIdToOpen)); 
+                    }
+                    dispatch(setPendingTargetUserId(null));
+
+
+                } catch (error) {
+                    console.error("Lỗi khi tạo cuộc trò chuyện từ Profile:", error);
+                    dispatch(setPendingTargetUserId(null)); // Lỗi cũng phải xoá
+                } finally {
+                    setIsCreating(false);
+                }f
+            }
+        };
+
+        autoCreateChat();
+    }, [pendingTargetUserId, dispatch]);
 
     const handleSearchKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchValue.trim() !== '') {
@@ -146,4 +184,4 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
     );
 };
 
-export default ChatListSidebar;
+export default  ChatListSidebar ;

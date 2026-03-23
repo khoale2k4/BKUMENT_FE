@@ -36,6 +36,8 @@ interface ChatState {
     
     messagesPage: number;
     hasMoreMessages: boolean;
+
+    pendingTargetUserId: string | null; // <-- THÊM DÒNG NÀY
 }
 
 const initialState: ChatState = {
@@ -50,12 +52,15 @@ const initialState: ChatState = {
 
     messagesPage: 0,
     hasMoreMessages: true,
+
+    pendingTargetUserId: null,
 };
 
 export const fetchConversations = createAsyncThunk(
     'chat/fetchConversations',
     async ({ page, size }: { page: number; size: number }) => {
         const response: any = await chatService.getConversations(page, size);
+        console.log("Fetched conversations:", response);
 
         return {
             items: response.content as Conversation[],
@@ -91,8 +96,8 @@ export const sendMessageAsync = createAsyncThunk(
     'chat/sendMessage',
     async ({ conversationId, message, type }: { conversationId: string; message: string; type: 'TEXT' | 'IMAGE' | 'FILE' }, { rejectWithValue }) => {
         try {
-            const typeLower = type.toLowerCase() as 'text' | 'image' | 'file';
-            const response = await chatService.sendMessage(conversationId, message, typeLower);
+            // const typeUpper = type.toUpperCase() as 'TEXT' | 'IMAGE' | 'FILE';
+            const response = await chatService.sendMessage(conversationId, message, type);
             return response;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to send message');
@@ -105,6 +110,7 @@ export const createChatAsync = createAsyncThunk(
     async ({ type = 'DIRECT', userIds }: { type?: 'GROUP' | 'DIRECT'; userIds: string[] }, { rejectWithValue }) => {
         try {
             const response = await chatService.createChat(type, userIds);
+            console.log("Created chat response:", response);
             return response;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to create chat');
@@ -209,7 +215,10 @@ const chatSlice = createSlice({
                 const [chat] = state.conversations.splice(index, 1);
                 state.conversations.unshift(chat);
             }
-        }
+        },
+        setPendingTargetUserId: (state, action: PayloadAction<string | null>) => {
+            state.pendingTargetUserId = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -271,7 +280,8 @@ const chatSlice = createSlice({
 export const {
     setActiveConversation,
     clearChatState,
-    addMessage
+    addMessage,
+    setPendingTargetUserId
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
