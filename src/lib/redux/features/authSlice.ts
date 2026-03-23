@@ -103,7 +103,7 @@ export const registerUser = createAsyncThunk(
   async (payload: RegisterPayload, { rejectWithValue }) => {
     try {
       const result = await authService.register(payload);
-      if(result.code !== 1000) {
+      if (result.code !== 1000) {
         alert("Đăng ký thất bại: " + result.message);
         return rejectWithValue(result.message || "Registration failed");
       }
@@ -132,7 +132,7 @@ export const refreshToken = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       // Gọi API refresh token từ service
-      const result = await authService.refreshToken(); 
+      const result = await authService.refreshToken();
       return result; // API trả về { token: "eyJhbGci..." }
     } catch (error: any) {
       return rejectWithValue(error.message || "Refresh token failed");
@@ -182,7 +182,7 @@ export const authSlice = createSlice({
         email: action.payload.email,
       };
       state.token = action.payload.token;
-      state.roles = getRolesFromToken(action.payload.token); 
+      state.roles = getRolesFromToken(action.payload.token);
       state.currentRole = "USER";
       state.status = "idle";
       state.error = null;
@@ -198,7 +198,7 @@ export const authSlice = createSlice({
         if (token) {
           state.isAuthenticated = true;
           state.token = token;
-          state.roles = getRolesFromToken(token); 
+          state.roles = getRolesFromToken(token);
           state.currentRole = savedRole || "USER";
           if (savedUser) {
             state.user = JSON.parse(savedUser);
@@ -210,7 +210,7 @@ export const authSlice = createSlice({
       const newRole = action.payload;
       if (state.roles.includes(newRole)) {
         state.currentRole = newRole;
-        sessionStorage.setItem("currentRole", newRole); 
+        sessionStorage.setItem("currentRole", newRole);
       }
     },
     forceLogout: (state) => {
@@ -221,8 +221,15 @@ export const authSlice = createSlice({
       state.currentRole = null;
       state.status = "idle";
 
-      sessionStorage.removeItem("accessToken");
-      sessionStorage.removeItem("currentRole");
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("accessToken");
+        sessionStorage.removeItem("currentRole");
+        const currentPath = window.location.pathname + window.location.search;
+        if (!currentPath.includes("/login")) {
+          localStorage.setItem("redirectUrl", currentPath);
+        }
+        window.location.href = '/login';
+      }
     },
   },
   extraReducers: (builder) => {
@@ -239,9 +246,16 @@ export const authSlice = createSlice({
 
         if (token) {
           state.token = token;
-          state.roles = getRolesFromToken(token); 
-          state.currentRole = "USER"; 
-          sessionStorage.setItem("accessToken", token);
+          state.roles = getRolesFromToken(token);
+          state.currentRole = "USER";
+          if (typeof window !== "undefined") {
+            sessionStorage.setItem("accessToken", token);
+            const redirectUrl = localStorage.getItem("redirectUrl");
+            if (redirectUrl) {
+              localStorage.removeItem("redirectUrl");
+              window.location.href = redirectUrl;
+            }
+          }
         }
       })
       .addCase(loginUser.rejected, (state, action) => {
@@ -275,10 +289,17 @@ export const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
-        state.roles = []; 
-        state.currentRole = null; 
-        sessionStorage.removeItem("accessToken");
-        sessionStorage.removeItem("currentRole");
+        state.roles = [];
+        state.currentRole = null;
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("accessToken");
+          sessionStorage.removeItem("currentRole");
+          const currentPath = window.location.pathname + window.location.search;
+          if (!currentPath.includes("/login")) {
+            localStorage.setItem("redirectUrl", currentPath);
+          }
+          window.location.href = '/login';
+        }
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.status = "failed";
@@ -286,10 +307,17 @@ export const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
-        state.roles = []; 
-        state.currentRole = null; 
-        sessionStorage.removeItem("accessToken");
-        sessionStorage.removeItem("currentRole");
+        state.roles = [];
+        state.currentRole = null;
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("accessToken");
+          sessionStorage.removeItem("currentRole");
+          const currentPath = window.location.pathname + window.location.search;
+          if (!currentPath.includes("/login")) {
+            localStorage.setItem("redirectUrl", currentPath);
+          }
+          window.location.href = '/login';
+        }
       });
 
     // --- THÊM MỚI: Xử lý Refresh Token ---
@@ -301,7 +329,7 @@ export const authSlice = createSlice({
         if (newToken) {
           state.token = newToken;
           state.roles = getRolesFromToken(newToken); // Giải mã lại roles từ token mới
-          
+
           // An toàn: Kiểm tra xem token mới còn quyền của currentRole hiện tại không.
           // Nếu mất quyền TUTOR, tự động đẩy về USER.
           if (state.currentRole && !state.roles.includes(state.currentRole)) {
@@ -322,12 +350,19 @@ export const authSlice = createSlice({
         state.roles = [];
         state.currentRole = null;
         state.status = "idle";
-        
-        sessionStorage.removeItem("accessToken");
-        sessionStorage.removeItem("currentRole");
+
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("accessToken");
+          sessionStorage.removeItem("currentRole");
+          const currentPath = window.location.pathname + window.location.search;
+          if (!currentPath.includes("/login")) {
+            localStorage.setItem("redirectUrl", currentPath);
+          }
+          window.location.href = '/login';
+        }
       });
 
-      // --- THÊM MỚI: Get Universities ---
+    // --- THÊM MỚI: Get Universities ---
     builder
       .addCase(getUniversities.pending, (state) => {
         state.isUniversitiesLoading = true;

@@ -1,9 +1,9 @@
 'use client'
 
 import React from 'react';
+import { useParams } from 'next/navigation';
 import ActiveStep from './steps/ActiveStep';
 import FileUploader from './steps/Step1';
-import FileDescription from './steps/Step2';
 import UploadSuccess from './steps/Step3';
 import { FileUploadItem } from '@/types/FileUpload';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
@@ -16,9 +16,12 @@ import {
     uploadFile,
     saveFilesMetadata
 } from '@/lib/redux/features/documentSlice';
+import FileDescription from './steps/Step2/FileDescription';
 
 const FileUpload = () => {
     const dispatch = useAppDispatch();
+    const params = useParams();
+    const courseId = params?.course_id as string | undefined;
 
     const { files, activeStep, uploadStatus } = useAppSelector((state) => state.documents.upload);
 
@@ -68,7 +71,7 @@ const FileUpload = () => {
 
     const handleNextStep = () => {
         if (activeStep === 2) {
-            dispatch(saveFilesMetadata());
+            dispatch(saveFilesMetadata(courseId));
         } else {
             dispatch(setActiveStep(Math.min(3, activeStep + 1)));
         }
@@ -96,11 +99,11 @@ const FileUpload = () => {
     return (
         <div className="flex flex-col items-center w-full p-8 bg-white h-full">
             <div className="w-3/4 flex flex-row mb-8">
-                <ActiveStep isActice={activeStep >= 1} title={'Upload'} description={'Upload your documents'} step={1} />
+                <ActiveStep isActice={activeStep >= 1} title={'Đăng tải'} description={'Tải tải liệu lên'} step={1} />
                 <div className={`flex-grow h-0.5 mx-4 my-auto ${activeStep > 1 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-                <ActiveStep isActice={activeStep >= 2} title={'Details'} description={'Describe your documents'} step={2} />
+                <ActiveStep isActice={activeStep >= 2} title={'Chi tiết'} description={'Mô tả tài liệu'} step={2} />
                 <div className={`flex-grow h-0.5 mx-4 my-auto ${activeStep > 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-                <ActiveStep isActice={activeStep >= 3} title={'Done'} description={'Upload completed'} step={3} />
+                <ActiveStep isActice={activeStep >= 3} title={'Hoàn tất'} description={'Đăng tải hoàn tất'} step={3} />
             </div>
 
             <div className="w-1/2 text-center text-sm font-medium text-gray-500">

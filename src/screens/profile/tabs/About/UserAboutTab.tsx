@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { 
-  MapPin, Phone, Mail, Calendar, Save, Edit3, Loader2, 
-  GraduationCap, Award, Users, UserCheck 
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  MapPin, Phone, Mail, Calendar, Save, Edit3, Loader2,
+  GraduationCap, Award, Users, UserCheck, Camera
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { getMyProfile, updateMyProfile, UpdateProfileRequest } from '@/lib/redux/features/profileSlice';
+import { getMyProfile, updateMyProfile, UpdateProfileRequest, uploadAvatar } from '@/lib/redux/features/profileSlice';
 import ProfileField from './ProfileField';
 import { useRouter } from 'next/navigation'; // <-- Import useRouter
 
@@ -15,8 +15,34 @@ const UserAboutTab = () => {
   const router = useRouter(); // <-- Khởi tạo router
   const { user, isLoading, isUpdating } = useAppSelector((state) => state.profile);
 
+import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
+
+const UserAboutTab = () => {
+  const dispatch = useAppDispatch();
+  const { user, isLoading, isUpdating, isAvatarUploading } = useAppSelector((state) => state.profile);
+
+
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<UpdateProfileRequest>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const url = await dispatch(uploadAvatar(file)).unwrap();
+        setFormData((prev) => ({ ...prev, avatarUrl: url }));
+      } catch (err) {
+        console.error('Failed to upload avatar', err);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -73,7 +99,7 @@ const UserAboutTab = () => {
 
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-700 font-sans pb-10">
-      
+
       {/* Action Bar */}
       <div className="flex justify-end mb-6 h-10 items-center">
         {isEditing ? (
@@ -82,7 +108,7 @@ const UserAboutTab = () => {
               Cancel
             </button>
             <button onClick={handleSave} disabled={isUpdating} className="flex items-center gap-2 px-6 py-2 bg-[#1a8917] hover:bg-[#156d12] text-white text-sm font-bold rounded-full transition-all shadow-sm disabled:opacity-70 active:scale-95">
-              {isUpdating ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} 
+              {isUpdating ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
               Save Changes
             </button>
           </div>
@@ -95,30 +121,53 @@ const UserAboutTab = () => {
 
       {/* Header (Avatar + Name + Bio + Stats) */}
       <div className="flex flex-col md:flex-row items-center md:items-start gap-10 mb-12 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
-        
+
         {/* Avatar Area */}
-        <div className="relative group shrink-0">
-          <div className="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white shadow-lg bg-gray-50">
-            <img 
-              src={formData.avatarUrl || user?.avatarUrl || `https://ui-avatars.com/api/?name=${user?.firstName}+${user?.lastName}&background=random`} 
-              alt="Avatar" 
-              className="w-full h-full object-cover" 
-            />
+        <div className="relative group shrink-0 flex flex-col items-center">
+          <div
+            onClick={handleAvatarClick}
+            className={`w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-white shadow-lg bg-gray-50 relative ${isEditing ? 'cursor-pointer hover:border-[#1a8917] transition-colors' : ''
+              }`}
+          >
+            {formData.avatarUrl || user?.avatarUrl ? (
+              <AuthenticatedImage
+                src={(formData.avatarUrl || user?.avatarUrl) as string}
+                alt="Avatar"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src={`https://ui-avatars.com/api/?name=${user?.firstName || 'User'}+${user?.lastName || ''}&background=random`}
+                alt="Avatar"
+                className="w-full h-full object-cover"
+              />
+            )}
+
+            {isEditing && (
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera className="text-white w-8 h-8" />
+              </div>
+            )}
+
+            {isAvatarUploading && (
+              <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+                <Loader2 className="animate-spin text-[#1a8917] w-8 h-8" />
+              </div>
+            )}
           </div>
-          {isEditing && (
-            <input 
-              name="avatarUrl" 
-              value={formData.avatarUrl || ''} 
-              onChange={handleInputChange} 
-              className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-[120%] text-xs border-b border-gray-300 text-center outline-none bg-transparent focus:border-[#1a8917] transition-colors" 
-              placeholder="Paste image URL here" 
-            />
-          )}
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleAvatarChange}
+            className="hidden"
+            accept="image/*"
+          />
         </div>
 
         {/* Info Area */}
         <div className="flex-grow w-full text-center md:text-left">
-          
+
           <div className={isEditing ? "grid grid-cols-2 gap-4 mb-4" : "mb-6"}>
             {!isEditing ? (
               <>
@@ -186,35 +235,35 @@ const UserAboutTab = () => {
       <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
         <h3 className="text-lg font-bold text-gray-900 mb-6">Personal Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-          
+
           <ProfileField label="Email Address" name="email" value={user?.email} isEditing={false} onChange={() => { }} icon={<Mail size={16} className="text-gray-400" />} />
           <ProfileField label="Phone Number" name="phone" value={formData.phone} isEditing={isEditing} onChange={handleInputChange} icon={<Phone size={16} className="text-gray-400" />} />
           <ProfileField label="Date of Birth" name="dob" type="date" value={formData.dob} isEditing={isEditing} onChange={handleInputChange} icon={<Calendar size={16} className="text-gray-400" />} />
           <ProfileField label="Address" name="address" value={formData.address} isEditing={isEditing} onChange={handleInputChange} icon={<MapPin size={16} className="text-gray-400" />} />
-          
+
           {/* --- THIẾT KẾ MỚI: TRƯỜNG UNIVERSITY --- */}
           <div className="col-span-1 md:col-span-2">
             {!isEditing ? (
-              <ProfileField 
-                label="University" 
-                name="university" 
-                value={user?.university || 'Chưa cập nhật'} 
-                isEditing={false} 
-                onChange={() => { }} 
-                icon={<GraduationCap size={16} className="text-gray-400" />} 
+              <ProfileField
+                label="University"
+                name="university"
+                value={user?.university || 'Chưa cập nhật'}
+                isEditing={false}
+                onChange={() => { }}
+                icon={<GraduationCap size={16} className="text-gray-400" />}
               />
             ) : (
               /* Ở chế độ Edit, bạn đang dùng universityId (kiểu số).
                  Nếu dự án của bạn có component Dropdown/Select cho trường đại học thì có thể thay thẻ này.
                  Tạm thời mình dùng input number để đồng bộ với state formData.universityId của bạn. */
-              <ProfileField 
-                label="University ID" 
-                name="universityId" 
+              <ProfileField
+                label="University ID"
+                name="universityId"
                 type="number"
-                value={formData.universityId?.toString()} 
-                isEditing={true} 
-                onChange={handleInputChange} 
-                icon={<GraduationCap size={16} className="text-gray-400" />} 
+                value={formData.universityId?.toString()}
+                isEditing={true}
+                onChange={handleInputChange}
+                icon={<GraduationCap size={16} className="text-gray-400" />}
               />
             )}
           </div>

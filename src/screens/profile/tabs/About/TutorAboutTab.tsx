@@ -1,21 +1,22 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Star, ShieldCheck, Loader2, BookOpen, CheckCircle2, Save, Edit3, Camera } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 
 // Các Actions từ Redux
-import { getMyTutorProfile, updateTutorProfile, UpdateTutorRequest } from '@/lib/redux/features/profileSlice';
+import { getMyTutorProfile, updateTutorProfile, UpdateTutorRequest, uploadAvatar } from '@/lib/redux/features/profileSlice';
 import { getMySubjects } from '@/lib/redux/features/tutorCourseSlice';
 import { getSearchSubjects } from '@/lib/redux/features/tutorFindingSlice';
 
 import ProfileField from './ProfileField';
+import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 
 const TutorAboutTab = () => {
   const dispatch = useAppDispatch();
-  
+
   // 1. Lấy dữ liệu từ Redux
-  const { tutor, isTutorLoading } = useAppSelector((state) => state.profile);
+  const { tutor, isTutorLoading, isAvatarUploading } = useAppSelector((state) => state.profile);
   // Danh sách môn học GIA SƯ ĐANG DẠY
   const { subjects: mySubjects, loading: mySubjectsLoading } = useAppSelector((state) => state.tutorCourse);
   // Danh sách TẤT CẢ môn học có trong hệ thống (Dùng để hiển thị lúc Edit)
@@ -30,6 +31,25 @@ const TutorAboutTab = () => {
     avatar: '',
     subjectIds: []
   });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAvatarClick = () => {
+    if (isEditing) {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const url = await dispatch(uploadAvatar(file)).unwrap();
+        setFormData((prev) => ({ ...prev, avatar: url }));
+      } catch (err) {
+        console.error('Failed to upload avatar', err);
+      }
+    }
+  };
 
   // 3. Khởi tạo dữ liệu khi mount
   useEffect(() => {
@@ -41,11 +61,14 @@ const TutorAboutTab = () => {
   // 4. Đồng bộ dữ liệu gốc vào formData mỗi khi bật chế độ Edit
   useEffect(() => {
     if (tutor && mySubjects) {
+      // Trường hợp API trả về thẳng mảng, hoặc object phân trang chứa thuộc tính .data hoặc .content
+      const subjectsArray = Array.isArray(mySubjects) ? mySubjects : (mySubjects as any)?.data || (mySubjects as any)?.content || [];
+
       setFormData({
         name: tutor.name || '',
         introduction: tutor.introduction || '',
         avatar: tutor.avatar || '',
-        subjectIds: mySubjects.map(sub => sub.id) // Trích xuất mảng các ID môn học hiện tại
+        subjectIds: subjectsArray.map((sub: any) => sub.id) // Trích xuất mảng các ID môn học hiện tại an toàn
       });
     }
   }, [tutor, mySubjects, isEditing]);
@@ -76,10 +99,10 @@ const TutorAboutTab = () => {
       setIsSaving(true);
       // Gọi API Cập nhật
       await dispatch(updateTutorProfile(formData)).unwrap();
-      
+
       // Gọi lại API lấy danh sách môn học để UI cập nhật lại tên và Topics mới
       await dispatch(getMySubjects()).unwrap();
-      
+
       setIsEditing(false);
     } catch (error) {
       console.error("Cập nhật thất bại:", error);
@@ -101,7 +124,7 @@ const TutorAboutTab = () => {
 
   return (
     <div className="max-w-3xl mx-auto animate-in fade-in duration-700 font-sans pb-20">
-      
+
       {/* --- Action Bar (Edit / Save / Cancel) --- */}
       <div className="flex justify-end mb-8 h-10 items-center mt-6">
         {isEditing ? (
@@ -135,29 +158,46 @@ const TutorAboutTab = () => {
       {/* --- Profile Header Section --- */}
       <div className="flex flex-col md:flex-row items-start gap-10 mb-12 border-b border-gray-100 pb-12">
         {/* Avatar Area */}
-        <div className="relative group shrink-0 mx-auto md:mx-0">
-          <div className="w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-purple-100 shadow-xl bg-gray-100">
-            <img
-              src={isEditing ? (formData.avatar || `https://ui-avatars.com/api/?name=${formData.name}&background=6b21a8&color=fff`) : (tutor?.avatar || `https://ui-avatars.com/api/?name=${tutor?.name}&background=6b21a8&color=fff`)}
-              alt="Tutor Avatar"
-              className="w-full h-full object-cover"
-            />
-          </div>
+        <div className="relative group shrink-0 mx-auto md:mx-0 flex flex-col items-center">
+          <div
+            onClick={handleAvatarClick}
+            className={`w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-purple-100 shadow-xl bg-gray-100 relative ${isEditing ? 'cursor-pointer hover:border-purple-500 transition-colors' : ''
+              }`}
+          >
+            {(isEditing ? formData.avatar : tutor?.avatar) ? (
+              <AuthenticatedImage
+                src={(isEditing ? formData.avatar : tutor?.avatar) as string}
+                alt="Tutor Avatar"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <img
+                src={`https://ui-avatars.com/api/?name=${isEditing ? formData.name || 'Tutor' : tutor?.name || 'Tutor'}&background=6b21a8&color=fff`}
+                alt="Tutor Avatar"
+                className="w-full h-full object-cover"
+              />
+            )}
 
-          {isEditing && (
-            <>
+            {isEditing && (
               <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm pointer-events-none">
                 <Camera className="text-white" size={24} />
               </div>
-              <input
-                name="avatar"
-                value={formData.avatar}
-                onChange={handleInputChange}
-                className="absolute -bottom-8 left-0 w-full text-xs border-b border-gray-300 text-center outline-none bg-transparent"
-                placeholder="Paste avatar URL"
-              />
-            </>
-          )}
+            )}
+
+            {isAvatarUploading && (
+              <div className="absolute inset-0 bg-white/70 rounded-full flex items-center justify-center pointer-events-none">
+                <Loader2 className="animate-spin text-purple-600 w-8 h-8" />
+              </div>
+            )}
+          </div>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleAvatarChange}
+            className="hidden"
+            accept="image/*"
+          />
         </div>
 
         {/* Name & Bio Area */}
@@ -178,12 +218,12 @@ const TutorAboutTab = () => {
                 />
               </div>
             )}
-            
+
             {tutor?.status === 'ACTIVE' && !isEditing && (
               <ShieldCheck className="text-green-500 mt-2" size={28} />
             )}
           </div>
-          
+
           <p className="text-sm font-bold text-purple-600 tracking-widest uppercase mb-6 mt-2">Verified Professional Tutor</p>
 
           <div className="prose prose-lg">
@@ -234,21 +274,20 @@ const TutorAboutTab = () => {
         {isEditing ? (
           <div>
             {allSubjectsLoading ? (
-              <p className="text-sm text-gray-500"><Loader2 className="animate-spin inline mr-2" size={16}/> Đang tải toàn bộ môn học...</p>
+              <p className="text-sm text-gray-500"><Loader2 className="animate-spin inline mr-2" size={16} /> Đang tải toàn bộ môn học...</p>
             ) : (
               <div className="flex flex-wrap gap-3">
-                {allSubjects?.map((subject) => {
+                {(Array.isArray(allSubjects) ? allSubjects : (allSubjects as any)?.data || (allSubjects as any)?.content || []).map((subject: any) => {
                   const isSelected = formData.subjectIds.includes(subject.id);
                   return (
                     <button
                       type="button"
                       key={subject.id}
                       onClick={() => handleSubjectToggle(subject.id)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${
-                        isSelected 
-                          ? 'bg-purple-600 border-purple-600 text-white shadow-md transform scale-105' 
-                          : 'bg-white border-gray-200 text-gray-600 hover:border-purple-300 hover:bg-purple-50'
-                      }`}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${isSelected
+                        ? 'bg-purple-600 border-purple-600 text-white shadow-md transform scale-105'
+                        : 'bg-white border-gray-200 text-gray-600 hover:border-purple-300 hover:bg-purple-50'
+                        }`}
                     >
                       {subject.name}
                     </button>

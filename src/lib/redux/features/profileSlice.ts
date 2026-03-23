@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '@/lib/redux/store'; // Điều chỉnh path nếu cần
-import { getUserInfo, updateUserInfo } from '@/lib/services/user.service';
+import { getUserInfo, updateUserInfo, uploadAvatarImage } from '@/lib/services/user.service';
 import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 
 // --- 1. Interfaces ---
@@ -14,9 +14,9 @@ export interface UserProfile {
     lastName: string;
     university: string | null;
     universityId: number | null;
-    dob: string; 
+    dob: string;
     bio: string;
-    avatarUrl?: string | null; 
+    avatarUrl?: string | null;
     email: string;
     points: number;
     followerCount: number | null;
@@ -55,10 +55,10 @@ export interface RegisterTutorRequest {
 }
 
 export interface UpdateTutorRequest {
-  introduction: string,
-  name: string,
-  avatar: string,
-  subjectIds: string[]
+    introduction: string,
+    name: string,
+    avatar: string,
+    subjectIds: string[]
 }
 
 export interface PaginatedUsers {
@@ -76,7 +76,7 @@ interface ProfileState {
     isLoading: boolean;
     isUpdating: boolean;
     error: string | null;
-    
+
     // State cho Tutor
     tutor: TutorProfile | null;
     isTutorLoading: boolean;
@@ -95,6 +95,9 @@ interface ProfileState {
     viewedProfile: UserProfile | null;
     isViewedProfileLoading: boolean;
     viewedProfileError: string | null;
+
+    // Upload state
+    isAvatarUploading: boolean;
 }
 
 const initialState: ProfileState = {
@@ -120,6 +123,8 @@ const initialState: ProfileState = {
     viewedProfile: null,
     isViewedProfileLoading: false,
     viewedProfileError: null,
+
+    isAvatarUploading: false,
 };
 
 
@@ -232,6 +237,19 @@ export const getProfileById = createAsyncThunk(
     }
 );
 
+// Feature 2.5: Upload Avatar (User)
+export const uploadAvatar = createAsyncThunk(
+    'profile/uploadAvatar',
+    async (file: File, { rejectWithValue }) => {
+        try {
+            const avatarUrl = await uploadAvatarImage(file);
+            return avatarUrl;
+        } catch (error: any) {
+            return rejectWithValue(error.message || 'Failed to upload avatar');
+        }
+    }
+);
+
 // ==================== TUTOR THUNKS ====================
 
 // Feature 3: Get My Tutor Profile (Tutor)
@@ -253,7 +271,7 @@ export const getMyTutorProfile = createAsyncThunk(
             const data = await response.json();
             console.log("Dữ liệu tutor profile nhận được:", data);
             if (data.code !== 1000) throw new Error(data.message || 'Failed to fetch tutor profile');
-            
+
             return data.result as TutorProfile;
         } catch (error: any) {
             return rejectWithValue(error.message);
@@ -280,11 +298,11 @@ export const registerTutorProfile = createAsyncThunk(
 
             const data = await response.json();
             if (data.code !== 1000) throw new Error(data.message || 'Failed to register tutor');
-            else{
+            else {
                 alert('Tutor registration successful:');
                 console.log('Tutor registration successful:', data.result);
             }
-            
+
             return data.result as TutorProfile;
         } catch (error: any) {
             return rejectWithValue(error.message);
@@ -330,7 +348,7 @@ const profileSlice = createSlice({
             state.user = null;
             state.error = null;
             state.isLoading = false;
-            
+
             state.tutor = null;
             state.tutorError = null;
             state.isTutorLoading = false;
@@ -350,7 +368,7 @@ const profileSlice = createSlice({
             })
             .addCase(getMyProfile.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.user = action.payload as UserProfile; 
+                state.user = action.payload as UserProfile;
             })
             .addCase(getMyProfile.rejected, (state, action) => {
                 state.isLoading = false;
@@ -417,6 +435,23 @@ const profileSlice = createSlice({
                 state.viewedProfileError = action.payload as string;
             });
 
+        // --- Upload Avatar --
+        builder
+            .addCase(uploadAvatar.pending, (state) => {
+                state.isAvatarUploading = true;
+                state.error = null;
+            })
+            .addCase(uploadAvatar.fulfilled, (state, action) => {
+                state.isAvatarUploading = false;
+                if (state.user) {
+                    state.user.avatarUrl = action.payload as string;
+                }
+            })
+            .addCase(uploadAvatar.rejected, (state, action) => {
+                state.isAvatarUploading = false;
+                state.error = action.payload as string;
+            });
+
         // --- Get Tutor Profile ---
         builder
             .addCase(getMyTutorProfile.pending, (state) => {
@@ -433,7 +468,7 @@ const profileSlice = createSlice({
             });
 
 
-        
+
         // --- Update Tutor Profile ---
         builder
             .addCase(updateTutorProfile.pending, (state) => {
