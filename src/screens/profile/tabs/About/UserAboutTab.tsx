@@ -8,11 +8,19 @@ import {
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { getMyProfile, updateMyProfile, UpdateProfileRequest, uploadAvatar } from '@/lib/redux/features/profileSlice';
 import ProfileField from './ProfileField';
+import { useRouter } from 'next/navigation'; // <-- Import useRouter
+
+const UserAboutTab = () => {
+  const dispatch = useAppDispatch();
+  const router = useRouter(); // <-- Khởi tạo router
+  const { user, isLoading, isUpdating } = useAppSelector((state) => state.profile);
+
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 
 const UserAboutTab = () => {
   const dispatch = useAppDispatch();
   const { user, isLoading, isUpdating, isAvatarUploading } = useAppSelector((state) => state.profile);
+
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<UpdateProfileRequest>({});
@@ -182,9 +190,14 @@ const UserAboutTab = () => {
           </div>
 
           {/* --- THIẾT KẾ MỚI: STATS BAR (Chỉ hiện khi không ở chế độ Edit) --- */}
-          {!isEditing && (
+        {!isEditing && (
             <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
-              <div className="flex items-center gap-2.5 px-4 py-2 bg-blue-50/50 border border-blue-100 rounded-2xl">
+              
+              {/* CỤC FOLLOWERS (Clickable) */}
+              <div 
+                onClick={() => user?.id && router.push(`/profile/${user.id}/followers`)}
+                className="flex items-center gap-2.5 px-4 py-2 bg-blue-50/50 border border-blue-100 rounded-2xl cursor-pointer hover:bg-blue-100 transition-colors active:scale-95"
+              >
                 <div className="p-1.5 bg-blue-100 text-blue-600 rounded-full"><Users size={18} /></div>
                 <div className="flex flex-col items-start">
                   <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Followers</span>
@@ -192,7 +205,11 @@ const UserAboutTab = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2.5 px-4 py-2 bg-purple-50/50 border border-purple-100 rounded-2xl">
+              {/* CỤC FOLLOWING (Clickable) */}
+              <div 
+                onClick={() => user?.id && router.push(`/profile/${user.id}/followings`)}
+                className="flex items-center gap-2.5 px-4 py-2 bg-purple-50/50 border border-purple-100 rounded-2xl cursor-pointer hover:bg-purple-100 transition-colors active:scale-95"
+              >
                 <div className="p-1.5 bg-purple-100 text-purple-600 rounded-full"><UserCheck size={18} /></div>
                 <div className="flex flex-col items-start">
                   <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">Following</span>
@@ -200,6 +217,7 @@ const UserAboutTab = () => {
                 </div>
               </div>
 
+              {/* CỤC POINTS (Thường không click, giữ nguyên) */}
               <div className="flex items-center gap-2.5 px-4 py-2 bg-orange-50/50 border border-orange-100 rounded-2xl">
                 <div className="p-1.5 bg-orange-100 text-orange-600 rounded-full"><Award size={18} /></div>
                 <div className="flex flex-col items-start">
@@ -207,9 +225,9 @@ const UserAboutTab = () => {
                   <span className="font-bold text-gray-900 leading-none">{user?.points || 0}</span>
                 </div>
               </div>
+
             </div>
           )}
-
         </div>
       </div>
 

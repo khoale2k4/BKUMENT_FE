@@ -1,17 +1,7 @@
 import { GET } from "@/app/api/documents/courses/route";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8083";
-// https://bkment-identity-service-latest.onrender.com/identity/auth/login
-// const ARTICLE_URL = process.env.NEXT_PUBLIC_ARTICLE_API_URL || '';
-// const USER_URL = process.env.NEXT_PUBLIC_USER_API_URL || '';
-
-// deploy
-// const IDENTITY_URL = 'https://bkment-identity-service-latest.onrender.com/identity';
-
-//local
-// const IDENTITY_URL = 'http://localhost:8888/api/v1/identity'
-// local của tui là 8080
-const IDENTITY_URL = "http://localhost:8080/identity";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
+const IDENTITY_URL = "http://localhost:8888/api/v1/identity";
 const PROFILE_URL = "http://localhost:8888/api/v1";
 const CHAT_URL = "http://localhost:8888/api/v1";
 
@@ -30,7 +20,7 @@ export const API_ENDPOINTS = {
   },
   ACCOUNT: {
     PROFILE: `${PROFILE_URL}/identity/api/auth/me`,
-    GET_USER_INFO: `${API_BASE_URL}/profile/my-profile`,
+    GET_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
     TUTOR_GETS: `${PROFILE_URL}/api/user/tutors`,
     //    const response = await httpClient.patch('http://localhost:8081/profile/update', updateData);
     UPDATE_USER_INFO: `${PROFILE_URL}/profile/my-profile`,

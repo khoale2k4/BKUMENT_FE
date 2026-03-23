@@ -2,6 +2,9 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Heart, Star, Users, PlayCircle, BookOpen } from 'lucide-react';
 import { TutorData } from '@/lib/redux/features/tutorFindingSlice';
+import { useAppDispatch } from '@/lib/redux/hooks';
+import { profile } from 'console';
+import { setPendingTargetUserId } from '@/lib/redux/features/chatSlice';
 
 interface TutorCardProps {
   data: TutorData;
@@ -10,6 +13,11 @@ interface TutorCardProps {
 const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
   const router = useRouter();
   const { tutor, matchingClasses } = data;
+  const dispatch = useAppDispatch();
+  const handleSendMessage = () => {
+    dispatch(setPendingTargetUserId(tutor.id)); // <-- Lưu ID người nhận vào Redux
+       router.push('/messages'); // <-- Điều hướng đến trang tin nhắn
+  }
 
   // Placeholder cho avatar nếu API trả về null hoặc chuỗi "string" không hợp lệ
   const avatarUrl = tutor.avatar && tutor.avatar.startsWith('http') 
@@ -90,6 +98,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
             View more
           </button>
           <button 
+          onClick={() => handleSendMessage()}
             className="w-full md:w-40 py-2.5 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 text-sm font-bold rounded-xl transition-all active:scale-95"
           >
             Send a message
