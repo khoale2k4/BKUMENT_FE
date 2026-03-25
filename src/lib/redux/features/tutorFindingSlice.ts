@@ -174,6 +174,7 @@ export const searchTutors = createAsyncThunk(
       });
 
       const data = await response.json();
+      console.log("Search Classs API response:", data); // Debug log để xem cấu trúc dữ liệu trả về
 
       // 3. Xử lý dữ liệu trả về
       if (data.code !== 1000)
@@ -327,7 +328,7 @@ const tutorFindingSlice = createSlice({
       })
       .addCase(searchTutors.fulfilled, (state, action) => {
         state.loading = false;
-        state.tutors = action.payload || action.payload || []; // Gán data.result trả về vào list tutors
+        state.tutors = action.payload.data || action.payload || []; // Gán data.result trả về vào list tutors
       })
       .addCase(searchTutors.rejected, (state, action) => {
         state.loading = false;

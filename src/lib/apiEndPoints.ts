@@ -1,6 +1,7 @@
 import { GET } from "@/app/api/documents/courses/route";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
+// const IDENTITY_URL = "http://143.198.80.199:8888/api/v1/identity";
 const IDENTITY_URL = "http://localhost:8888/api/v1/identity";
 const PROFILE_URL = "http://localhost:8888/api/v1";
 const CHAT_URL = "http://localhost:8888/api/v1";

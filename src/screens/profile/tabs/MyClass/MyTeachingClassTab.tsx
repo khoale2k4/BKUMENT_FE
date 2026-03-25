@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Plus, Loader2, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { getAllTeachingClasses } from '@/lib/redux/features/tutorCourseSlice';
-import CourseCard from './ClassCard'; // Nhớ kiểm tra import này đúng đường dẫn chưa nhé
+import CourseCard from './CourseCard'; // Nhớ kiểm tra import này đúng đường dẫn chưa nhé
 
 const MyTeachingClassTab = () => {
   const router = useRouter();

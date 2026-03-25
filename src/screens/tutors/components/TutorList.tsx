@@ -10,6 +10,7 @@ interface TutorListProps {
 }
 
 const TutorList: React.FC<TutorListProps> = ({ tutors, loading, error }) => {
+  console.log('TutorList received tutors at tutor List:', tutors);
   // 1. Trạng thái Đang tải
   if (loading && tutors.length === 0) {
     return (

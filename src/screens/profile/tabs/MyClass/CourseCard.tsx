@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Clock, BarChart3 } from 'lucide-react';
+import { useTranslation } from 'react-i18next'; // Import hook dịch ngôn ngữ
 // Import interface từ slice của bạn (Nhớ đổi đường dẫn nếu cần)
 import { CourseItem } from '@/lib/redux/features/tutorCourseSlice'; 
 
@@ -12,6 +13,7 @@ interface CourseCardProps {
 
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
   const router = useRouter();
+  const { t } = useTranslation(); // Khởi tạo hàm t()
 
   // Đếm số buổi học 1 tuần một cách an toàn
   const sessionsPerWeek = course.schedules ? course.schedules.length : 0;
@@ -33,7 +35,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
       {/* Content */}
       <div className="p-6 flex-grow flex flex-col justify-between">
         <div>
-          <p className="text-xs text-gray-500 mb-1 italic">by {course.tutorName}</p>
+          <p className="text-xs text-gray-500 mb-1 italic">{t('by')} {course.tutorName}</p>
           <h3 
             onClick={() => router.push(`/courses/${course.id}`)}
             className={`text-xl font-bold mb-3 cursor-pointer line-clamp-2 ${
@@ -63,7 +65,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             </span>
             <span className="flex items-center gap-1 uppercase">
               <BarChart3 size={14} className="text-orange-500" /> 
-              {sessionsPerWeek} Buổi/Tuần
+              {sessionsPerWeek} {t('sessionsPerWeek')}
             </span>
           </div>
         </div>
@@ -75,7 +77,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             course.status === 'CANCELLED' ? 'bg-red-100 text-red-600' : 
             'bg-gray-100 text-gray-600'
           }`}>
-            {course.status}
+            {/* Bạn cũng có thể dùng t(`status.${course.status}`) nếu muốn dịch trạng thái */}
+            {course.status} 
           </span>
           
           {/* Ẩn nút View And Update nếu lớp đã bị hủy */}
@@ -84,7 +87,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
               onClick={() => router.push(`/courses/${course.id}`)} 
               className="text-sm font-bold text-slate-900 hover:underline"
             >
-              View And Update
+              {t('viewAndUpdate')}
             </button>
           )}
         </div>

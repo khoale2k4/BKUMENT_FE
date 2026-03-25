@@ -6,8 +6,7 @@ import { Loader2, ChevronLeft } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { getClassesByTutorId } from '@/lib/redux/features/tutorCourseSlice';
 
-// Import component CourseCard (Điều chỉnh đường dẫn theo project của bạn)
-import CourseCard from '../../profile/tabs/MyClass/ClassCard'; 
+import CourseCard from '../../profile/tabs/MyClass/CourseCard'; 
 
 const TutorDetailPage = () => {
   const params = useParams();
