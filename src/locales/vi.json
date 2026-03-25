@@ -1,0 +1,86 @@
+{
+  "sidebar": {
+    "chats": "Trò chuyện",
+    "searchPlaceholder": "Tìm cuộc trò chuyện ...",
+    "noMessages": "Chưa có tin nhắn",
+    "noMessagesDesc": "Nhập ID vào ô tìm kiếm ở trên để bắt đầu trò chuyện."
+  },
+
+  "profile": {
+    "user": {
+      "about": {
+        "cancel": "Hủy",
+        "saveChanges": "Lưu thay đổi",
+        "editProfile": "Chỉnh sửa hồ sơ",
+        "noBio": "Chưa có lời giới thiệu nào.",
+        "firstName": "Tên",
+        "lastName": "Họ",
+        "bio": "Giới thiệu bản thân",
+        "followers": "Người theo dõi",
+        "following": "Đang theo dõi",
+        "points": "Điểm thưởng",
+        "personalInfo": "Thông tin cá nhân",
+        "email": "Địa chỉ Email",
+        "phone": "Số điện thoại",
+        "dob": "Ngày sinh",
+        "address": "Địa chỉ",
+        "university": "Trường Đại học",
+        "universityId": "Mã Trường Đại học",
+        "notUpdated": "Chưa cập nhật"
+      }
+    },
+
+    "tutor": {
+      "about": {
+        "validationError": "Vui lòng nhập tên, lời giới thiệu và chọn ít nhất 1 môn học.",
+        "updateError": "Đã xảy ra lỗi khi cập nhật.",
+        "cancel": "Hủy",
+        "saveChanges": "Lưu thay đổi",
+        "editProfile": "Sửa hồ sơ",
+        "defaultName": "Tên gia sư",
+        "displayName": "Tên hiển thị",
+        "verifiedBadge": "Gia sư chuyên nghiệp đã xác thực",
+        "introduction": "Lời giới thiệu",
+        "averageRating": "Đánh giá trung bình",
+        "outOfFive": "/ 5.0",
+        "totalReviews": "Tổng số lượt đánh giá",
+        "students": "học viên",
+        "editSubjects": "Chỉnh sửa chuyên môn",
+        "subjectsExpertise": "Môn học & Chuyên môn",
+        "loadingAllSubjects": "Đang tải toàn bộ môn học...",
+        "minSubjectWarning": "* Cần chọn ít nhất 1 môn học để giảng dạy.",
+        "loadingSubjects": "Đang tải danh sách môn học...",
+        "noTopics": "Chưa có chủ đề cụ thể.",
+        "noSubjectsAdded": "Gia sư này chưa cập nhật môn học nào."
+      }
+    }
+  },
+  "dropdown": {
+    "library": "Thư viện",
+    "stats": "Thống kê",
+    "settings": "Cài đặt",
+    "help": "Trợ giúp",
+    "switchTutor": "Chuyển sang tài khoản gia sư",
+    "switchUser": "Chuyển sang tài khoản học viên",
+    "becomeTutor": "Trở thành Gia sư",
+    "becomeTutorDesc": "Chia sẻ kiến thức & kiếm tiền",
+    "signOut": "Đăng xuất"
+  },
+
+  "dashboardOverview": "Tổng quan Dashboard",
+  "overviewDescription": "Thống kê tổng quan sẽ hiển thị tại đây.",
+  "by": "bởi",
+  "sessionsPerWeek": "Buổi/Tuần",
+  "viewAndUpdate": "Xem và Cập nhật",
+  
+  "errorLoadingData": "Lỗi tải dữ liệu",
+  "activeClasses": "Lớp Đang Học",
+  "cancelledClasses": "Đã Hủy",
+  "findNewClass": "Tìm Lớp Mới",
+  "noActiveClasses": "Bạn chưa đăng ký tham gia lớp học nào.",
+  "noCancelledClasses": "Danh sách lớp học đã hủy trống.",
+  "exploreCoursesNow": "Khám phá các khóa học ngay",
+  "page": "Trang",
+  "of": "trong số"
+
+}

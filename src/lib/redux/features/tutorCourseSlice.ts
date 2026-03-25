@@ -453,7 +453,7 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getClassesByTutorId.fulfilled, (state, action) => {
         state.loadingViewedClasses = false;
-        state.viewedTutorClasses = action.payload || action.payload || []; // Gán vào biến này để không đè lên 'classes'
+        state.viewedTutorClasses = action.payload.data || action.payload || []; // Gán vào biến này để không đè lên 'classes'
       })
       .addCase(getClassesByTutorId.rejected, (state, action) => {
         state.loadingViewedClasses = false;

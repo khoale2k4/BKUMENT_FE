@@ -6,7 +6,9 @@ import {
     FileText,
     BarChart2,
     HelpCircle,
-    LucideIcon, GraduationCap
+    LucideIcon, 
+    GraduationCap,
+    Globe // Thêm icon Globe cho phần đổi ngôn ngữ thêm đẹp
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { logoutUser, switchRole } from "@/lib/redux/features/authSlice";
@@ -14,6 +16,8 @@ import { useRouter } from "next/navigation";
 import { AppRoute } from "@/lib/appRoutes";
 import Link from "next/link";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { useTranslation } from "react-i18next";
 
 interface DropdownItemProps {
     href: string;
@@ -34,6 +38,7 @@ const DropdownItem = ({ href, icon: Icon, label }: DropdownItemProps) => (
 export default function UserDropdown() {
     const dispatch = useAppDispatch();
     const router = useRouter();
+    const { t } = useTranslation(); 
     
     const { token, roles, currentRole } = useAppSelector((state) => state.auth);
     const { user } = useAppSelector((state) => state.profile);
@@ -87,16 +92,27 @@ export default function UserDropdown() {
                 <div className="absolute right-0 top-full mt-2 w-72 md:w-80 bg-white rounded shadow-[0_2px_10px_rgba(0,0,0,0.15)] border border-gray-100 py-2 animate-in fade-in zoom-in-95 duration-100 z-50">
 
                     <div className="py-2">
-                        <DropdownItem href="#" icon={BookMarked} label="Library" />
-                        <DropdownItem href="#" icon={FileText} label="Stories" />
-                        <DropdownItem href="#" icon={BarChart2} label="Stats" />
+                        {/* Đã bọc hàm t() */}
+                        <DropdownItem href="#" icon={BookMarked} label={t('dropdown.library', 'Library')} />
+                        <DropdownItem href="#" icon={FileText} label={t('dropdown.stories', 'Stories')} />
+                        <DropdownItem href="#" icon={BarChart2} label={t('dropdown.stats', 'Stats')} />
                     </div>
 
                     <div className="h-px bg-gray-100 my-1 mx-6"></div>
 
                     <div className="py-2">
-                        <DropdownItem href={AppRoute.settings} icon={Settings} label="Settings" />
-                        <DropdownItem href="#" icon={HelpCircle} label="Help" />
+                        {/* Đã bọc hàm t() */}
+                        <DropdownItem href={AppRoute.settings} icon={Settings} label={t('dropdown.settings', 'Settings')} />
+                        <DropdownItem href="#" icon={HelpCircle} label={t('dropdown.help', 'Help')} />
+                        
+                        {/* Khu vực ngôn ngữ được style lại cho đẹp */}
+                        <div className="py-2 px-6 flex justify-between items-center">
+                            <div className="flex items-center gap-4">
+                                <Globe className="w-5 h-5 text-gray-500" strokeWidth={1.5} />
+                                <span className="text-sm text-black">{t('dropdown.language', 'Language')}</span>
+                            </div>
+                            <LanguageSwitcher />
+                        </div>
                     </div>
 
                     <div className="h-px bg-gray-100 my-1 mx-6"></div>
@@ -108,14 +124,15 @@ export default function UserDropdown() {
                                     onClick={handleSwitch}
                                     className="flex w-full items-center gap-4 text-sm text-black hover:text-gray-600 transition-colors"
                                 >
-                                    Change to the {currentRole === 'USER' ? 'tutor' : 'user'} account <span className="text-blue-500">👩‍🏫</span>
+                                    {/* Thay đổi text tùy theo role hiện tại */}
+                                    {currentRole === 'USER' ? t('dropdown.switchTutor', 'Change to tutor account') : t('dropdown.switchUser', 'Change to user account')} <span className="text-blue-500">👩‍🏫</span>
                                 </button>
                             </div>
                             <div className="h-px bg-gray-100 my-1 mx-6"></div>
                         </>
                     )}
 
-{!hasTutorRole && (
+                    {!hasTutorRole && (
                         <>
                             <div className="py-1">
                                 <Link 
@@ -128,11 +145,12 @@ export default function UserDropdown() {
                                     </div>
                                     
                                     <div className="flex flex-col">
+                                        {/* Đã bọc hàm t() */}
                                         <span className="text-sm font-bold text-slate-900 group-hover:text-purple-700 transition-colors">
-                                            Become a Tutor
+                                            {t('dropdown.becomeTutor', 'Become a Tutor')}
                                         </span>
                                         <span className="text-[11px] text-gray-500">
-                                            Share your knowledge & earn
+                                            {t('dropdown.becomeTutorDesc', 'Share your knowledge & earn')}
                                         </span>
                                     </div>
                                 </Link>
@@ -146,7 +164,8 @@ export default function UserDropdown() {
                         className="py-3 px-6 hover:bg-gray-100 transition-colors cursor-pointer"
                     >
                         <button className="w-full text-left block text-sm text-gray-600 hover:text-black mb-1">
-                            Sign out
+                            {/* Đã bọc hàm t() */}
+                            {t('dropdown.signOut', 'Sign out')}
                         </button>
                         <p className="text-xs text-gray-400 truncate">
                             {user?.email || "user@example.com"}
@@ -156,13 +175,14 @@ export default function UserDropdown() {
                     <div className="h-px bg-gray-100 my-1"></div>
 
                     <div className="px-6 py-3 flex flex-wrap gap-x-3 gap-y-1">
+                        {/* Footer Links - Có thể tùy chọn bọc t() nếu bạn muốn dịch luôn phần này */}
                         {["About", "Blog", "Careers", "Privacy", "Terms", "Text to speech", "Teams"].map((item) => (
                             <Link
                                 href="#"
                                 key={item}
                                 className="text-[11px] text-gray-400 hover:text-gray-600"
                             >
-                                {item}
+                                {t(`dropdown.footer.${item.toLowerCase()}`, item)}
                             </Link>
                         ))}
                     </div>

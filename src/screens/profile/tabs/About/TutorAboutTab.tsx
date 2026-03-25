@@ -11,9 +11,11 @@ import { getSearchSubjects } from '@/lib/redux/features/tutorFindingSlice';
 
 import ProfileField from './ProfileField';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
+import { useTranslation } from 'react-i18next'; // <-- Import hook dịch thuật
 
 const TutorAboutTab = () => {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation(); // <-- Khởi tạo hàm t()
 
   // 1. Lấy dữ liệu từ Redux
   const { tutor, isTutorLoading, isAvatarUploading } = useAppSelector((state) => state.profile);
@@ -91,7 +93,8 @@ const TutorAboutTab = () => {
 
   const handleSave = async () => {
     if (!formData.name || !formData.introduction || formData.subjectIds.length === 0) {
-      alert("Vui lòng nhập tên, lời giới thiệu và chọn ít nhất 1 môn học.");
+      // Dùng t() cho cả thông báo alert
+      alert(t('profile.tutor.about.validationError', "Vui lòng nhập tên, lời giới thiệu và chọn ít nhất 1 môn học."));
       return;
     }
 
@@ -106,7 +109,7 @@ const TutorAboutTab = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Cập nhật thất bại:", error);
-      alert("Đã xảy ra lỗi khi cập nhật.");
+      alert(t('profile.tutor.about.updateError', "Đã xảy ra lỗi khi cập nhật."));
     } finally {
       setIsSaving(false);
     }
@@ -133,7 +136,7 @@ const TutorAboutTab = () => {
               onClick={handleCancel}
               className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-black transition-colors rounded-full"
             >
-              Cancel
+              {t('profile.tutor.about.cancel', 'Cancel')}
             </button>
             <button
               onClick={handleSave}
@@ -141,7 +144,7 @@ const TutorAboutTab = () => {
               className="flex items-center gap-2 px-5 py-2 bg-[#1a8917] hover:bg-[#156d12] text-white text-sm font-medium rounded-full transition-all shadow-sm active:scale-95 disabled:opacity-70"
             >
               {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-              Save Changes
+              {t('profile.tutor.about.saveChanges', 'Save Changes')}
             </button>
           </div>
         ) : (
@@ -149,7 +152,9 @@ const TutorAboutTab = () => {
             onClick={() => setIsEditing(true)}
             className="group flex items-center gap-2 text-gray-400 hover:text-[#1a8917] transition-colors"
           >
-            <span className="text-sm font-medium group-hover:underline">Edit Profile</span>
+            <span className="text-sm font-medium group-hover:underline">
+              {t('profile.tutor.about.editProfile', 'Edit Profile')}
+            </span>
             <Edit3 size={18} />
           </button>
         )}
@@ -205,12 +210,12 @@ const TutorAboutTab = () => {
           <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
             {!isEditing ? (
               <h2 className="text-4xl md:text-5xl font-bold text-gray-900 font-serif tracking-tight">
-                {tutor?.name || 'Tutor Name'}
+                {tutor?.name || t('profile.tutor.about.defaultName', 'Tutor Name')}
               </h2>
             ) : (
               <div className="w-full max-w-sm">
                 <ProfileField
-                  label="Display Name"
+                  label={t('profile.tutor.about.displayName', 'Display Name')}
                   name="name"
                   value={formData.name}
                   isEditing={true}
@@ -224,11 +229,13 @@ const TutorAboutTab = () => {
             )}
           </div>
 
-          <p className="text-sm font-bold text-purple-600 tracking-widest uppercase mb-6 mt-2">Verified Professional Tutor</p>
+          <p className="text-sm font-bold text-purple-600 tracking-widest uppercase mb-6 mt-2">
+            {t('profile.tutor.about.verifiedBadge', 'Verified Professional Tutor')}
+          </p>
 
           <div className="prose prose-lg">
             <ProfileField
-              label="Introduction"
+              label={t('profile.tutor.about.introduction', 'Introduction')}
               name="introduction"
               value={isEditing ? formData.introduction : tutor?.introduction}
               isEditing={isEditing}
@@ -244,20 +251,20 @@ const TutorAboutTab = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10 bg-purple-50 p-8 rounded-3xl mb-12">
           <div>
             <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-              Average Rating
+              {t('profile.tutor.about.averageRating', 'Average Rating')}
             </label>
             <div className="flex items-center gap-2 text-3xl font-bold text-gray-900">
               <Star className="text-orange-400 fill-orange-400" size={32} />
-              {tutor?.averageRating || "0.0"} <span className="text-sm text-gray-500 font-normal">/ 5.0</span>
+              {tutor?.averageRating || "0.0"} <span className="text-sm text-gray-500 font-normal">{t('profile.tutor.about.outOfFive', '/ 5.0')}</span>
             </div>
           </div>
 
           <div>
             <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-              Total Reviews
+              {t('profile.tutor.about.totalReviews', 'Total Reviews')}
             </label>
             <div className="text-3xl font-bold text-gray-900">
-              {tutor?.ratingCount || 0} <span className="text-sm text-gray-500 font-normal">students</span>
+              {tutor?.ratingCount || 0} <span className="text-sm text-gray-500 font-normal">{t('profile.tutor.about.students', 'students')}</span>
             </div>
           </div>
         </div>
@@ -267,14 +274,14 @@ const TutorAboutTab = () => {
       <div className={isEditing ? "bg-gray-50 p-8 rounded-3xl border border-gray-100" : ""}>
         <h3 className="text-2xl font-bold text-gray-900 mb-6 font-serif tracking-tight flex items-center gap-2">
           <BookOpen className="text-purple-600" size={24} />
-          {isEditing ? "Edit Your Subjects" : "Subjects & Expertise"}
+          {isEditing ? t('profile.tutor.about.editSubjects', 'Edit Your Subjects') : t('profile.tutor.about.subjectsExpertise', 'Subjects & Expertise')}
         </h3>
 
         {/* CHẾ ĐỘ CHỈNH SỬA MÔN HỌC */}
         {isEditing ? (
           <div>
             {allSubjectsLoading ? (
-              <p className="text-sm text-gray-500"><Loader2 className="animate-spin inline mr-2" size={16} /> Đang tải toàn bộ môn học...</p>
+              <p className="text-sm text-gray-500"><Loader2 className="animate-spin inline mr-2" size={16} /> {t('profile.tutor.about.loadingAllSubjects', 'Đang tải toàn bộ môn học...')}</p>
             ) : (
               <div className="flex flex-wrap gap-3">
                 {(Array.isArray(allSubjects) ? allSubjects : (allSubjects as any)?.data || (allSubjects as any)?.content || []).map((subject: any) => {
@@ -296,7 +303,7 @@ const TutorAboutTab = () => {
               </div>
             )}
             {formData.subjectIds.length === 0 && (
-              <p className="text-xs text-red-500 mt-3">* Cần chọn ít nhất 1 môn học để giảng dạy.</p>
+              <p className="text-xs text-red-500 mt-3">{t('profile.tutor.about.minSubjectWarning', '* Cần chọn ít nhất 1 môn học để giảng dạy.')}</p>
             )}
           </div>
 
@@ -305,7 +312,7 @@ const TutorAboutTab = () => {
           <>
             {mySubjectsLoading ? (
               <div className="flex items-center py-10 text-gray-500">
-                <Loader2 className="animate-spin mr-2" size={20} /> Đang tải danh sách môn học...
+                <Loader2 className="animate-spin mr-2" size={20} /> {t('profile.tutor.about.loadingSubjects', 'Đang tải danh sách môn học...')}
               </div>
             ) : mySubjects && mySubjects.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -324,14 +331,14 @@ const TutorAboutTab = () => {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-400 italic pl-6">Chưa có chủ đề cụ thể.</p>
+                      <p className="text-sm text-gray-400 italic pl-6">{t('profile.tutor.about.noTopics', 'Chưa có chủ đề cụ thể.')}</p>
                     )}
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-10 bg-gray-50 rounded-2xl border border-dashed border-gray-200 text-gray-500">
-                Gia sư này chưa cập nhật môn học nào.
+                {t('profile.tutor.about.noSubjectsAdded', 'Gia sư này chưa cập nhật môn học nào.')}
               </div>
             )}
           </>

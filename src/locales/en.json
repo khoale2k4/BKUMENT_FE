@@ -1,0 +1,86 @@
+{
+  "sidebar": {
+    "chats": "Chats",
+    "searchPlaceholder": "Search conversations ...",
+    "noMessages": "No messages yet",
+    "noMessagesDesc": "Enter an ID in the search box above to start chatting."
+  },
+
+  "profile": {
+    "user": {
+      "about": {
+        "cancel": "Cancel",
+        "saveChanges": "Save Changes",
+        "editProfile": "Edit Profile",
+        "noBio": "No bio added yet.",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "bio": "Bio",
+        "followers": "Followers",
+        "following": "Following",
+        "points": "Points",
+        "personalInfo": "Personal Information",
+        "email": "Email Address",
+        "phone": "Phone Number",
+        "dob": "Date of Birth",
+        "address": "Address",
+        "university": "University",
+        "universityId": "University ID",
+        "notUpdated": "Not updated yet"
+      }
+    },
+    "tutor": {
+      "about": {
+        "validationError": "Please enter your name, introduction, and select at least one subject.",
+        "updateError": "An error occurred during the update.",
+        "cancel": "Cancel",
+        "saveChanges": "Save Changes",
+        "editProfile": "Edit Profile",
+        "defaultName": "Tutor Name",
+        "displayName": "Display Name",
+        "verifiedBadge": "Verified Professional Tutor",
+        "introduction": "Introduction",
+        "averageRating": "Average Rating",
+        "outOfFive": "/ 5.0",
+        "totalReviews": "Total Reviews",
+        "students": "students",
+        "editSubjects": "Edit Your Subjects",
+        "subjectsExpertise": "Subjects & Expertise",
+        "loadingAllSubjects": "Loading all subjects...",
+        "minSubjectWarning": "* You must select at least one subject to teach.",
+        "loadingSubjects": "Loading subjects...",
+        "noTopics": "No specific topics yet.",
+        "noSubjectsAdded": "This tutor hasn't added any subjects yet."
+      }
+    }
+  },
+
+  "dropdown": {
+    "library": "Library",
+    "stats": "Stats",
+    "settings": "Settings",
+    "help": "Help",
+    "switchTutor": "Change to the tutor account",
+    "switchUser": "Change to the user account",
+    "becomeTutor": "Become a Tutor",
+    "becomeTutorDesc": "Share your knowledge & earn",
+    "signOut": "Sign out"
+  },
+  "dashboardOverview": "Dashboard Overview",
+  "overviewDescription": "General statistics will be displayed here.",
+
+  "by": "by",
+  "sessionsPerWeek": "Sessions/Week",
+  "viewAndUpdate": "View And Update",
+  
+  "errorLoadingData": "Error loading data",
+  "activeClasses": "Active Classes",
+  "cancelledClasses": "Cancelled",
+  "findNewClass": "Find New Class",
+  "noActiveClasses": "You haven't enrolled in any classes yet.",
+  "noCancelledClasses": "The cancelled classes list is empty.",
+  "exploreCoursesNow": "Explore courses now",
+  "page": "Page",
+  "of": "of"
+
+}
