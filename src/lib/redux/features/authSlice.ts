@@ -126,14 +126,12 @@ export const logoutUser = createAsyncThunk(
   },
 );
 
-// THÊM MỚI: Thunk để gọi API Refresh Token
 export const refreshToken = createAsyncThunk(
   "auth/refreshToken",
   async (_, { rejectWithValue }) => {
     try {
-      // Gọi API refresh token từ service
       const result = await authService.refreshToken();
-      return result; // API trả về { token: "eyJhbGci..." }
+      return result; 
     } catch (error: any) {
       return rejectWithValue(error.message || "Refresh token failed");
     }

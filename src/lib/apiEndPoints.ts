@@ -21,10 +21,12 @@ export const API_ENDPOINTS = {
   ACCOUNT: {
     PROFILE: `${PROFILE_URL}/identity/api/auth/me`,
     GET_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
+    PEOPLE_MAY_KNOW: (page: number, size: number) => `${API_BASE_URL}/profile/mayKnow?page=${page}&size=${size}`,
     TUTOR_GETS: `${PROFILE_URL}/api/user/tutors`,
     //    const response = await httpClient.patch('http://localhost:8081/profile/update', updateData);
     UPDATE_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
     UPDATE_TUTOR_INFO: `${PROFILE_URL}/lms/tutors/me`,
+    FOLLOW: (profile_id: string) => `${API_BASE_URL}/profile/${profile_id}/follow`,
   },
   ARTICLES: {
     GET_ALL: `${DEBUG_URL}/api/articles`,

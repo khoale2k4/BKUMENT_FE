@@ -6,6 +6,31 @@ interface SearchResponse {
     totalPages: number;
 }
 
+export interface PersonMayKnow {
+    id: string;
+    accountId: string;
+    fullName: string;
+    firstName: string;
+    lastName: string;
+    university: string;
+    universityId: number;
+    dob: string;
+    bio: string;
+    avatarUrl: string;
+    email: string;
+    points: number;
+    followerCount: number;
+    followingCount: number;
+}
+
+interface PeopleMayKnowResponse {
+    currentPage: number;
+    totalPages: number;
+    pageSize: number;
+    totalElements: number;
+    data: PersonMayKnow[];
+}
+
 /**
  * Search documents với pagination
  */
@@ -36,5 +61,21 @@ export const searchBlogs = async (page: number, size: number): Promise<SearchRes
 export const searchContent = async (query: string, page: number, size: number) => {
     const response = await httpClient.get(API_ENDPOINTS.HOME.SEARCH(query, page, size));
 
-    return response.data.result; 
+    return response.data.result;
+};
+
+/**
+ * Lấy danh sách người dùng có thể biết với pagination
+ */
+export const getPeopleMayKnow = async (page: number, size: number): Promise<PeopleMayKnowResponse> => {
+    const response = await httpClient.get(API_ENDPOINTS.ACCOUNT.PEOPLE_MAY_KNOW(page, size));
+    return response.data.result;
+};
+
+/**
+ * Theo dõi một người dùng
+ */
+export const followUser = async (profileId: string): Promise<string> => {
+    const response = await httpClient.post(API_ENDPOINTS.ACCOUNT.FOLLOW(profileId));
+    return response.data.result;
 };
