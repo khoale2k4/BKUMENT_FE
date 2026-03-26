@@ -59,7 +59,7 @@ useEffect(() => {
                     dispatch(setPendingTargetUserId(null)); // Lỗi cũng phải xoá
                 } finally {
                     setIsCreating(false);
-                }f
+                }
             }
         };
 

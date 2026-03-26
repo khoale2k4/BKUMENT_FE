@@ -9,14 +9,14 @@ import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { getMyProfile, updateMyProfile, UpdateProfileRequest, uploadAvatar } from '@/lib/redux/features/profileSlice';
 import ProfileField from './ProfileField';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
-import { useTranslation } from 'react-i18next'; // <-- Import hook dịch thuật
 
 const UserAboutTab = () => {
   const dispatch = useAppDispatch();
   const { user, isLoading, isUpdating, isAvatarUploading } = useAppSelector((state) => state.profile);
   const router = useRouter();
-  const { t } = useTranslation(); // <-- Khởi tạo hàm t()
+  const { t } = useTranslation();
 
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<UpdateProfileRequest>({});
@@ -95,7 +95,6 @@ const UserAboutTab = () => {
   return (
     <div className="max-w-4xl mx-auto animate-in fade-in duration-700 font-sans pb-10">
 
-      {/* Action Bar */}
       <div className="flex justify-end mb-6 h-10 items-center">
         {isEditing ? (
           <div className="flex gap-3">
@@ -114,7 +113,6 @@ const UserAboutTab = () => {
         )}
       </div>
 
-      {/* Header (Avatar + Name + Bio + Stats) */}
       <div className="flex flex-col md:flex-row items-center md:items-start gap-10 mb-12 bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
 
         {/* Avatar Area */}
@@ -160,7 +158,6 @@ const UserAboutTab = () => {
           />
         </div>
 
-        {/* Info Area */}
         <div className="flex-grow w-full text-center md:text-left">
 
           <div className={isEditing ? "grid grid-cols-2 gap-4 mb-4" : "mb-6"}>
@@ -184,8 +181,7 @@ const UserAboutTab = () => {
             )}
           </div>
 
-          {/* STATS BAR */}
-          {!isEditing && (
+        {!isEditing && (
             <div className="flex flex-wrap justify-center md:justify-start gap-4 mt-6">
               
               <div 
@@ -223,7 +219,6 @@ const UserAboutTab = () => {
         </div>
       </div>
 
-      {/* Details Grid */}
       <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
         <h3 className="text-lg font-bold text-gray-900 mb-6">{t('profile.user.about.personalInfo', 'Personal Information')}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
