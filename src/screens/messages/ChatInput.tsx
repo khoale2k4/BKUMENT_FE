@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { sendImageMessageAsync, sendMessageAsync } from "@/lib/redux/features/chatSlice";
+import { DateTime } from "luxon";
 
 const ChatInput = () => {
     const [text, setText] = useState("");
@@ -18,7 +19,8 @@ const ChatInput = () => {
         dispatch(sendMessageAsync({
             conversationId: activeConversationId,
             message: text.trim(),
-            type: 'TEXT'
+            type: 'TEXT',
+            tempId: DateTime.now().toString()
         }));
 
         setText("");

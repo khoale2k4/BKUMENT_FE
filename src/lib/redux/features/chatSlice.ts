@@ -5,6 +5,7 @@ import { getPresignedUrl } from '@/lib/services/document.service';
 import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 import axios from 'axios';
 import { RootState } from '../store';
+import { DateTime } from 'luxon';
 
 export interface ParticipantInfo {
     userId: string;
@@ -16,12 +17,14 @@ export interface ParticipantInfo {
 
 export interface ChatMessage {
     id: string;
+    tempId?: string;
     conversationId: string;
     type: 'TEXT' | 'IMAGE' | 'FILE';
     message: string;
     sender: ParticipantInfo;
     createdDate: string;
     isSelf?: boolean;
+    status?: 'sending' | 'sent' | 'error';
 }
 
 interface ChatState {
@@ -37,7 +40,7 @@ interface ChatState {
     messagesPage: number;
     hasMoreMessages: boolean;
 
-    pendingTargetUserId: string | null; // <-- THÊM DÒNG NÀY
+    pendingTargetUserId: string | null;
 }
 
 const initialState: ChatState = {
@@ -94,13 +97,13 @@ export const fetchMessagesByConversationId = createAsyncThunk(
 
 export const sendMessageAsync = createAsyncThunk(
     'chat/sendMessage',
-    async ({ conversationId, message, type }: { conversationId: string; message: string; type: 'TEXT' | 'IMAGE' | 'FILE' }, { rejectWithValue }) => {
+    async ({ conversationId, message, type, tempId }: { conversationId: string; message: string; type: 'TEXT' | 'IMAGE' | 'FILE', tempId: string }, { rejectWithValue }) => {
         try {
-            const typeUpper = type.toLowerCase() as 'text' | 'image' | 'file';
-            const response = await chatService.sendMessage(conversationId, message, typeUpper);
-            return response;
+            const typeUpper = type.toUpperCase() as 'TEXT' | 'IMAGE' | 'FILE';
+            const response = await chatService.sendMessage(conversationId, message, typeUpper, tempId);
+            return { ...response, tempId };
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to send message');
+            return rejectWithValue({ error: error.response?.data?.message || 'Failed to send message', tempId });
         }
     }
 );
@@ -155,7 +158,8 @@ export const sendImageMessageAsync = createAsyncThunk(
             const result = await dispatch(sendMessageAsync({
                 conversationId,
                 message: imageUrl,
-                type: 'IMAGE'
+                type: 'IMAGE',
+                tempId: DateTime.now().toString()
             })).unwrap();
 
             return result;
@@ -194,11 +198,9 @@ const chatSlice = createSlice({
             state.messagesPage = 0;
             state.hasMoreMessages = true;
         },
-        clearChatState: () => {
-            return initialState;
-        },
+        clearChatState: () => initialState,
         addMessage: (state, action: PayloadAction<ChatMessage>) => {
-            const newMessage = action.payload;
+            const newMessage = { ...action.payload, status: 'sent' as const };
 
             if (state.activeConversationId === newMessage.conversationId) {
                 const isDuplicate = state.currentMessages.some(m => m.id === newMessage.id);
@@ -262,26 +264,64 @@ const chatSlice = createSlice({
             .addCase(fetchMessagesByConversationId.rejected, (state) => {
                 state.messagesStatus = 'failed';
             });
-
+            
         builder
+            .addCase(sendMessageAsync.pending, (state, action) => {
+                const { conversationId, message, type, tempId } = action.meta.arg;
+                
+                const tempMessage: ChatMessage = {
+                    id: tempId,
+                    tempId: tempId,
+                    conversationId,
+                    type,
+                    message,
+                    sender: { userId: 'OPTIMISTIC_SELF', username: '', firstName: '', lastName: '', avatar: '' }, 
+                    createdDate: new Date().toISOString(),
+                    isSelf: true,
+                    status: 'sending'
+                };
+                
+                if (state.activeConversationId === conversationId) {
+                    state.currentMessages.push(tempMessage);
+                }
+                
+                const convIndex = state.conversations.findIndex(c => c.id === conversationId);
+                if (convIndex !== -1) {
+                    state.conversations[convIndex].lastMessage = message;
+                    const [chat] = state.conversations.splice(convIndex, 1);
+                    state.conversations.unshift(chat);
+                }
+            })
             .addCase(sendMessageAsync.fulfilled, (state, action) => {
-                chatSlice.caseReducers.addMessage(state, { payload: action.payload, type: 'chat/addMessage' });
-            });
+                const realMessage = action.payload;
+                const tempId = action.payload.tempId;
 
-        builder
-            .addCase(createChatAsync.fulfilled, (state, action) => {
-                state.activeConversationId = action.payload.conversationId;
-                state.currentMessages = [];
-                state.messagesStatus = 'idle';
+                if (state.activeConversationId === realMessage.conversationId) {
+                    const tempIndex = state.currentMessages.findIndex(m => m.tempId === tempId || m.id === tempId);
+
+                    const socketIndex = state.currentMessages.findIndex(m => m.id === realMessage.id);
+
+                    if (socketIndex !== -1) {
+                        if (tempIndex !== -1 && tempIndex !== socketIndex) {
+                            state.currentMessages.splice(tempIndex, 1);
+                        }
+                    } else if (tempIndex !== -1) {
+                        state.currentMessages[tempIndex] = { ...realMessage, status: 'sent', isSelf: true };
+                    } else {
+                        state.currentMessages.push({ ...realMessage, status: 'sent', isSelf: true });
+                    }
+                }
+            })
+            .addCase(sendMessageAsync.rejected, (state, action) => {
+                const tempId = (action.payload as any)?.tempId || action.meta.arg.tempId;
+                
+                const msgIndex = state.currentMessages.findIndex(m => m.tempId === tempId || m.id === tempId);
+                if (msgIndex !== -1) {
+                    state.currentMessages[msgIndex].status = 'error';
+                }
             });
     },
 });
 
-export const {
-    setActiveConversation,
-    clearChatState,
-    addMessage,
-    setPendingTargetUserId
-} = chatSlice.actions;
-
+export const { setActiveConversation, clearChatState, addMessage, setPendingTargetUserId } = chatSlice.actions;
 export default chatSlice.reducer;

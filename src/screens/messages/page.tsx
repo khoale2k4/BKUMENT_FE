@@ -71,7 +71,7 @@ const MessagesPage = () => {
         let currentGroup: any = null;
 
         currentMessages.forEach((msg: any) => {
-            const isSelf = msg.sender.userId === user?.id;
+            const isSelf = msg.sender.userId === user?.id || msg.sender.userId === 'OPTIMISTIC_SELF';
             const msgTime = new Date(msg.createdDate).getTime();
 
             if (currentGroup && currentGroup.senderId === msg.sender.userId) {
@@ -79,7 +79,12 @@ const MessagesPage = () => {
                 const diffInMinutes = (msgTime - prevTime) / (1000 * 60);
 
                 if (diffInMinutes <= 30) {
-                    currentGroup.messages.push({ type: msg.type, content: msg.message, id: msg.id });
+                    currentGroup.messages.push({ 
+                        type: msg.type, 
+                        content: msg.message, 
+                        id: msg.id,
+                        status: msg.status || 'sent' 
+                    });
                     currentGroup.lastMsgTime = msg.createdDate;
                     return;
                 }
@@ -97,7 +102,7 @@ const MessagesPage = () => {
                     name: `${msg.sender.lastName} ${msg.sender.firstName}`.trim() || msg.sender.username,
                     avatar: msg.sender.avatar
                 },
-                messages: [{ type: msg.type, content: msg.message, id: msg.id }]
+                messages: [{ type: msg.type, content: msg.message, id: msg.id, status: msg.status || 'sent' }]
             };
         });
 

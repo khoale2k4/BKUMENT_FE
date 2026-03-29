@@ -47,11 +47,12 @@ export const getMessages = async (conversationId: string, page: number, size: nu
     return response.data.result;
 };
 
-export const sendMessage = async (conversationId: string, message: string, type: 'text' | 'image' | 'file' = 'text'): Promise<ChatMessage> => {
+export const sendMessage = async (conversationId: string, message: string, type: 'TEXT' | 'IMAGE' | 'FILE' = 'TEXT', tempId: string): Promise<ChatMessage> => {
     const response = await httpClient.post(API_ENDPOINTS.CHAT.SEND_MESSAGE, {
         conversationId,
         message,
-        type
+        type,
+        tempId
     });
 
     return response.data.result;
