@@ -44,8 +44,7 @@ export const API_ENDPOINTS = {
 
     ANALYSE_DOCUMENT: (assetId: string, fileName?: string) =>
       buildUrl(
-        `${DOCUMENT}/analyze/${assetId}${
-          fileName ? `?fileName=${fileName}` : ""
+        `${DOCUMENT}/analyze/${assetId}${fileName ? `?fileName=${fileName}` : ""
         }`
       ),
 
@@ -60,8 +59,7 @@ export const API_ENDPOINTS = {
 
     UNIVERSITIES: (query: string) =>
       buildUrl(
-        `${DOCUMENT}/search-universities${
-          query ? `?q=${encodeURIComponent(query)}` : ""
+        `${DOCUMENT}/search-universities${query ? `?q=${encodeURIComponent(query)}` : ""
         }`
       ),
 
@@ -141,6 +139,11 @@ export const API_ENDPOINTS = {
 
     GET_CLASS_MEMBERS: (id: string) =>
       buildUrl(`${LMS}/classes/${id}/members`),
+    GET_SUBJECTS: buildUrl(`${LMS}/subjects?page=1&size=300`),
+    SEARCH_CLASSES: buildUrl(`${LMS}/classes/search`),
+    GET_CLASS_NOTIFICATIONS: (classId: string, page: number, size: number) => buildUrl(`${LMS}/notifications/class/${classId}?page=${page}&size=${size}`),
+    GET_CLASS_DOCUMENTS: (courseId: string, page: number, size: number) => buildUrl(`${API_BASE_URL}/document/course/${courseId}?page=${page}&size=${size}`),
+    CREATE_CLASS_NOTIFICATION: (classId: string) => buildUrl(`${LMS}/notifications/class/${classId}`),
 
     GET_MEMBER_PENDING: (id: string) =>
       buildUrl(`${LMS}/classes/${id}/enrollments/pending`),
