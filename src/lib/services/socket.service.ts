@@ -1,6 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 import { AppDispatch } from '../redux/store';
 import { addMessage, receiveSocketMessageThunk } from '../redux/features/chatSlice';
+import { API_ENDPOINTS } from '../apiEndPoints';
 
 class SocketService {
     private socket: Socket | null = null;
@@ -11,7 +12,7 @@ class SocketService {
 
         if (this.socket && this.socket.connected) return;
 
-        this.socket = io('http://localhost:8099', {
+        this.socket = io(API_ENDPOINTS.SOCKET.CONNECT_URL, {
             transports: ['websocket', 'polling'], 
             query: {
                 token: token 

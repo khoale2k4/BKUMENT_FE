@@ -328,7 +328,7 @@ const tutorFindingSlice = createSlice({
       })
       .addCase(searchTutors.fulfilled, (state, action) => {
         state.loading = false;
-        state.tutors = action.payload.data || action.payload || []; // Gán data.result trả về vào list tutors
+        state.tutors = action.payload || []; // Gán data.result trả về vào list tutors
       })
       .addCase(searchTutors.rejected, (state, action) => {
         state.loading = false;
