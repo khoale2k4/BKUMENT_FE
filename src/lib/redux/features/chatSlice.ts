@@ -1,31 +1,11 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import * as chatService from '@/lib/services/chat.service';
-import { Conversation, updateConversationAvatar } from '@/lib/services/chat.service';
+import { ChatMessage, Conversation, updateConversationAvatar } from '@/lib/services/chat.service';
 import { getPresignedUrl } from '@/lib/services/document.service';
 import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 import axios from 'axios';
 import { RootState } from '../store';
 import { DateTime } from 'luxon';
-
-export interface ParticipantInfo {
-    userId: string;
-    username: string;
-    firstName: string;
-    lastName: string;
-    avatar: string;
-}
-
-export interface ChatMessage {
-    id: string;
-    tempId?: string;
-    conversationId: string;
-    type: 'TEXT' | 'IMAGE' | 'FILE';
-    message: string;
-    sender: ParticipantInfo;
-    createdDate: string;
-    isSelf?: boolean;
-    status?: 'sending' | 'sent' | 'error';
-}
 
 interface ChatState {
     conversations: Conversation[];
@@ -201,8 +181,10 @@ const chatSlice = createSlice({
         clearChatState: () => initialState,
         addMessage: (state, action: PayloadAction<ChatMessage>) => {
             const newMessage = { ...action.payload, status: 'sent' as const };
+            
+            const isActiveChat = state.activeConversationId === newMessage.conversationId;
 
-            if (state.activeConversationId === newMessage.conversationId) {
+            if (isActiveChat) {
                 const isDuplicate = state.currentMessages.some(m => m.id === newMessage.id);
                 if (!isDuplicate) {
                     state.currentMessages.push(newMessage);
@@ -213,9 +195,21 @@ const chatSlice = createSlice({
             if (index !== -1) {
                 state.conversations[index].lastMessage = newMessage.message;
                 state.conversations[index].lastMessageTime = newMessage.createdDate;
+                
+                if (!newMessage.isSelf && !isActiveChat) {
+                    state.conversations[index].isRead = false;
+                } else {
+                    state.conversations[index].isRead = true;
+                }
 
                 const [chat] = state.conversations.splice(index, 1);
                 state.conversations.unshift(chat);
+            }
+        },
+        markAsRead: (state, action: PayloadAction<string>) => {
+            const index = state.conversations.findIndex(c => c.id === action.payload);
+            if (index !== -1) {
+                state.conversations[index].isRead = true;
             }
         },
         setPendingTargetUserId: (state, action: PayloadAction<string | null>) => {
@@ -323,5 +317,5 @@ const chatSlice = createSlice({
     },
 });
 
-export const { setActiveConversation, clearChatState, addMessage, setPendingTargetUserId } = chatSlice.actions;
+export const { setActiveConversation, clearChatState, addMessage, setPendingTargetUserId, markAsRead } = chatSlice.actions;
 export default chatSlice.reducer;

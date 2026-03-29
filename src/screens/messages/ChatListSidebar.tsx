@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
     setActiveConversation,
     createChatAsync,
-    fetchConversations, setPendingTargetUserId
+    fetchConversations, setPendingTargetUserId,
+    markAsRead
 } from "@/lib/redux/features/chatSlice";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { formatTimestamp } from "@/lib/utils/formatTimestamp";
@@ -23,15 +24,13 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
     const { conversations, activeConversationId, pendingTargetUserId } = useSelector((state: RootState) => state.chat);
 
     const [searchValue, setSearchValue] = useState("");
-    const [isCreating, setIsCreating] = useState(false); 
-    
+    const [isCreating, setIsCreating] = useState(false);
+
     const [currentPage, setCurrentPage] = useState(0);
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const router = useRouter(); // <-- Khởi tạo router
 
-
-useEffect(() => {
+    useEffect(() => {
         const autoCreateChat = async () => {
             if (pendingTargetUserId) {
                 setIsCreating(true);
@@ -40,23 +39,22 @@ useEffect(() => {
                     const newChat = await dispatch(createChatAsync({
                         type: 'DIRECT',
                         userIds: [pendingTargetUserId]
-                    })).unwrap(); 
+                    })).unwrap();
 
-                    // Refresh lại list
                     await dispatch(fetchConversations({ page: 0, size: 10 })).unwrap();
                     setCurrentPage(0);
                     setHasMore(true);
 
-                    const chatIdToOpen = newChat.id ;
+                    const chatIdToOpen = newChat.id;
                     if (chatIdToOpen) {
-                        dispatch(setActiveConversation(chatIdToOpen)); 
+                        dispatch(setActiveConversation(chatIdToOpen));
                     }
                     dispatch(setPendingTargetUserId(null));
 
 
                 } catch (error) {
                     console.error("Lỗi khi tạo cuộc trò chuyện từ Profile:", error);
-                    dispatch(setPendingTargetUserId(null)); // Lỗi cũng phải xoá
+                    dispatch(setPendingTargetUserId(null));
                 } finally {
                     setIsCreating(false);
                 }
@@ -75,7 +73,7 @@ useEffect(() => {
                 await dispatch(createChatAsync({
                     type: 'DIRECT',
                     userIds: [searchValue.trim()]
-                })).unwrap(); 
+                })).unwrap();
 
                 await dispatch(fetchConversations({ page: 0, size: 10 })).unwrap();
                 setCurrentPage(0);
@@ -99,7 +97,7 @@ useEffect(() => {
                 try {
                     const nextPage = currentPage + 1;
                     const actionResult = await dispatch(fetchConversations({ page: nextPage, size: 10 })).unwrap();
-                    
+
                     if (actionResult.items.length < 10) {
                         setHasMore(false);
                     }
@@ -128,7 +126,7 @@ useEffect(() => {
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             onKeyDown={handleSearchKeyDown}
-                            disabled={isCreating} 
+                            disabled={isCreating}
                             className={`w-full bg-gray-50 text-sm rounded-full pl-10 pr-4 py-2.5 focus:outline-none border border-gray-100 ${isCreating ? 'opacity-50 cursor-not-allowed' : ''}`}
                         />
                     </div>
@@ -141,24 +139,36 @@ useEffect(() => {
                                 const { name, avatar } = getChatDisplayInfo(chat, currentUserId);
                                 const isActive = chat.id === activeConversationId;
 
+                                const isUnread = chat.isRead === false;
+
                                 return (
                                     <div
                                         key={chat.id}
-                                        onClick={() => dispatch(setActiveConversation(chat.id))}
+                                        onClick={() => {
+                                            dispatch(markAsRead(chat.id));
+                                            dispatch(setActiveConversation(chat.id));
+                                        }}
                                         className={`flex items-center gap-3 p-3 mx-2 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors ${isActive ? "bg-blue-50" : ""}`}
                                     >
                                         <AuthenticatedImage src={avatar} alt={name} className="w-12 h-12 rounded-full object-cover shrink-0" />
-                                        <div className="flex-1 overflow-hidden">
-                                            <h3 className="font-semibold text-gray-900 truncate">{name}</h3>
-                                            <p className="text-sm text-gray-500 truncate">
+                                        <div className="flex-1 overflow-hidden relative">
+                                            <h3 className={`truncate ${isUnread ? 'font-bold text-gray-900' : 'font-semibold text-gray-800'}`}>
+                                                {name}
+                                            </h3>
+
+                                            <p className={`text-sm truncate pr-4 ${isUnread ? 'font-semibold text-black' : 'text-gray-500'}`}>
                                                 {chat.lastMessage && chat.lastMessage.includes('http') && chat.lastMessage.includes('asset') ? "Hình ảnh" : chat.lastMessage || "Chưa có tin nhắn"}
                                                 {chat.lastMessageTime && ` · ${formatTimestamp(chat.lastMessageTime).split(' ')[0]}`}
                                             </p>
+
+                                            {isUnread && (
+                                                <div className="absolute right-1 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm"></div>
+                                            )}
                                         </div>
                                     </div>
                                 );
                             })}
-                            
+
                             {isFetchingMore && (
                                 <div className="flex justify-center p-4">
                                     <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -184,4 +194,4 @@ useEffect(() => {
     );
 };
 
-export default  ChatListSidebar ;
+export default ChatListSidebar;

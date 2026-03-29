@@ -1,132 +1,162 @@
-import { GET } from "@/app/api/documents/courses/route";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
-// const IDENTITY_URL = "http://143.198.80.199:8888/api/v1/identity";
-const IDENTITY_URL = "http://localhost:8888/api/v1/identity";
-const PROFILE_URL = "http://localhost:8888/api/v1";
-const CHAT_URL = "http://localhost:8888/api/v1";
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:8099";
 
-const LMS_URL = "http://localhost:8888/api/v1/lms";
-const SOCKET_URL = "http://localhost:8099";
-//local
-const DEBUG_URL = "";
+const IDENTITY = "/identity";
+const PROFILE = "/profile";
+const LMS = "/lms";
+const CHAT = "/communication";
+const SOCIAL = "/social";
+const DOCUMENT = "/document";
+const BLOG = "/blog";
+const RESOURCE = "/resource";
+const AI = "/ai";
+
+const buildUrl = (path: string) => `${API_BASE_URL}${path}`;
 
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: `${IDENTITY_URL}/auth/login`,
-    SIGNUP: `${IDENTITY_URL}/accounts/registration`,
-    LOGOUT: `${IDENTITY_URL}/auth/logout`,
-    PROFILE: `${IDENTITY_URL}/identity/api/auth/me`,
-    REFRESH_TOKEN: `${IDENTITY_URL}/auth/refresh`,
+    LOGIN: buildUrl(`${IDENTITY}/auth/login`),
+    SIGNUP: buildUrl(`${IDENTITY}/accounts/registration`),
+    LOGOUT: buildUrl(`${IDENTITY}/auth/logout`),
+    PROFILE: buildUrl(`${IDENTITY}/api/auth/me`),
+    REFRESH_TOKEN: buildUrl(`${IDENTITY}/auth/refresh`),
   },
-  ACCOUNT: {
-    PROFILE: `${PROFILE_URL}/identity/api/auth/me`,
-    GET_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
-    PEOPLE_MAY_KNOW: (page: number, size: number) => `${API_BASE_URL}/profile/mayKnow?page=${page}&size=${size}`,
-    TUTOR_GETS: `${PROFILE_URL}/api/user/tutors`,
-    //    const response = await httpClient.patch('http://localhost:8081/profile/update', updateData);
-    UPDATE_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
-    UPDATE_TUTOR_INFO: `${PROFILE_URL}/lms/tutors/me`,
-    FOLLOW: (profile_id: string) => `${API_BASE_URL}/profile/${profile_id}/follow`,
-  },
-  ARTICLES: {
-    GET_ALL: `${DEBUG_URL}/api/articles`,
 
-    GET_DETAIL: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
-    CREATE: `${DEBUG_URL}/api/articles`,
-    UPDATE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
-    DELETE: (id: string | number) => `${DEBUG_URL}/api/articles/${id}`,
+  ACCOUNT: {
+    PROFILE: buildUrl(`${IDENTITY}/api/auth/me`),
+    GET_USER_INFO: buildUrl(`${PROFILE}/my-profile`),
+    PEOPLE_MAY_KNOW: (page: number, size: number) =>
+      buildUrl(`${PROFILE}/mayKnow?page=${page}&size=${size}`),
+    TUTOR_GETS: buildUrl(`/api/user/tutors`),
+    UPDATE_USER_INFO: buildUrl(`${PROFILE}/my-profile`),
+    UPDATE_TUTOR_INFO: buildUrl(`${LMS}/tutors/me`),
+    FOLLOW: (id: string) =>
+      buildUrl(`${PROFILE}/${id}/follow`),
   },
+
   DOCUMENTS: {
-    GET_ALL: `${DEBUG_URL}/api/resource`,
     SEARCH: (page: number, size: number) =>
-      `${API_BASE_URL}/document/search?page=${page}&size=${size}`,
-    UPDATE_METADATA: `${API_BASE_URL}/document/updateMetadata`,
-    ANALYSE_DOCUMENT: (asset_id: string, file_name: string | undefined) =>
-      `${API_BASE_URL}/document/analyze/${asset_id}?${file_name != undefined ? "fileName=" + file_name : ""}`,
-    TOPICS: `${DEBUG_URL}/api/documents/topics`,
+      buildUrl(`${DOCUMENT}/search?page=${page}&size=${size}`),
+
+    UPDATE_METADATA: buildUrl(`${DOCUMENT}/updateMetadata`),
+
+    ANALYSE_DOCUMENT: (assetId: string, fileName?: string) =>
+      buildUrl(
+        `${DOCUMENT}/analyze/${assetId}${
+          fileName ? `?fileName=${fileName}` : ""
+        }`
+      ),
+
     GET_DETAIL: (id: string | number) =>
-      `${API_BASE_URL}/document/search?q=${id}`,
+      buildUrl(`${DOCUMENT}/search?q=${id}`),
+
     RELATED_DOCUMENTS: (id: string, page: number, size: number) =>
-      `${API_BASE_URL}/document/related/${id}?page=${page}&size=${size}`,
+      buildUrl(`${DOCUMENT}/related/${id}?page=${page}&size=${size}`),
+
     RECOMMENDED_DOCUMENTS: (page: number, size: number) =>
-      `${API_BASE_URL}/document/recommendations?page=${page}&size=${size}`,
+      buildUrl(`${DOCUMENT}/recommendations?page=${page}&size=${size}`),
+
     UNIVERSITIES: (query: string) =>
-      `${API_BASE_URL}/document/search-universities${query ? '?q=' + encodeURIComponent(query) : ''}`,
+      buildUrl(
+        `${DOCUMENT}/search-universities${
+          query ? `?q=${encodeURIComponent(query)}` : ""
+        }`
+      ),
+
     COURSES: (query: string) =>
-      `${API_BASE_URL}/lms/subjects?q=${query}`,
-    TOPICS_BY_COURSE: (courseId: string, query: string) =>
-      `${DEBUG_URL}/api/documents/topics-by-course?courseId=${courseId}&query=${encodeURIComponent(query)}`,
+      buildUrl(`${LMS}/subjects?q=${query}`),
   },
+
   BLOGS: {
-    GET_ALL: `${DEBUG_URL}/api/resource`,
     SEARCH: (page: number, size: number) =>
-      `${API_BASE_URL}/blog/search?page=${page}&size=${size}`,
-    GET_DETAIL: (id: string | number) => `${API_BASE_URL}/blog/search?q=${id}`,
-    UPLOAD_NEW_BLOG: `${API_BASE_URL}/blog/`,
+      buildUrl(`${BLOG}/search?page=${page}&size=${size}`),
+
+    GET_DETAIL: (id: string | number) =>
+      buildUrl(`${BLOG}/search?q=${id}`),
+
+    UPLOAD_NEW_BLOG: buildUrl(`${BLOG}`),
   },
+
   RESOURCE: {
     GET_PRESIGNED_URL: (fileName: string) =>
-      `${API_BASE_URL}/resource/presign?fileName=${fileName}`,
-    UPDATE_METADATA: `${API_BASE_URL}/resource/metadata`,
+      buildUrl(`${RESOURCE}/presign?fileName=${fileName}`),
+
+    UPDATE_METADATA: buildUrl(`${RESOURCE}/metadata`),
+
     LINK_IMAGE_FILEID: (fileId: string) =>
-      `${API_BASE_URL}/resource/download/asset/${fileId}`,
+      buildUrl(`${RESOURCE}/download/asset/${fileId}`),
   },
+
   CHAT: {
     GET_CONVERSATIONS: (page: number, size: number) =>
-      `${API_BASE_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
-    START_CONVERSATIONS: `${API_BASE_URL}/communication/conversations/create`,
-    UPDATE_CONVERSATION: (con_id: string) =>
-      `${API_BASE_URL}/communication/conversations/${con_id}/metadata`,
+      buildUrl(
+        `${CHAT}/conversations/my-conversations?page=${page}&size=${size}`
+      ),
+
+    START_CONVERSATIONS: buildUrl(`${CHAT}/conversations/create`),
+
+    UPDATE_CONVERSATION: (id: string) =>
+      buildUrl(`${CHAT}/conversations/${id}/metadata`),
+
     GET_MESSAGES: (conversationId: string, page: number, size: number) =>
-      `${API_BASE_URL}/communication/messages?conversationId=${conversationId}&page=${page}&size=${size}`,
-    SEND_MESSAGE: `${API_BASE_URL}/communication/messages/create`,
+      buildUrl(
+        `${CHAT}/messages?conversationId=${conversationId}&page=${page}&size=${size}`
+      ),
+
+    SEND_MESSAGE: buildUrl(`${CHAT}/messages/create`),
   },
+
   COMMENTS: {
     GET_BY_DOC: (id: string, page: number, size: number) =>
-      `${API_BASE_URL}/social/comments/resource/${id}?page=${page}&size=${size}`,
-    GET_BY_PARENT_COMMENT: (id: string, page: number, size: number) => `${API_BASE_URL}/social/comments/reply/${id}?page=${page}&size=${size}`,
-    CREATE: `${API_BASE_URL}/social/comments`,
+      buildUrl(`${SOCIAL}/comments/resource/${id}?page=${page}&size=${size}`),
+
+    GET_BY_PARENT_COMMENT: (id: string, page: number, size: number) =>
+      buildUrl(`${SOCIAL}/comments/reply/${id}?page=${page}&size=${size}`),
+
+    CREATE: buildUrl(`${SOCIAL}/comments`),
   },
-  USERS: {
-    LIST: `${DEBUG_URL}/api/users`,
-  },
+
   HOME: {
     SEARCH: (query: string, page: number, size: number) =>
-      `${API_BASE_URL}/ai/search?query=${query}&page=${page + 1}&size=${size}`,
+      buildUrl(
+        `${AI}/search?query=${query}&page=${page + 1}&size=${size}`
+      ),
   },
-  LMS: {
-    GET_TEACHING_CLASSES: (page: number, size: number) => `${LMS_URL}/classes/teaching?page=${page}&size=${size}`,
-    GET_TUTOR_SUBJECTS: `${LMS_URL}/tutors/me/subjects?$page=1&size=300`,
-    ADD_NEW_CLASS: `${LMS_URL}/classes`,
-    UPDATE_CLASS: (classId: string) => `${LMS_URL}/classes/${classId}`,
-    CANCEL_CLASS: (classId: string) => `${LMS_URL}/classes/${classId}`,
-    GET_CLASS_DOCUMENTS: (courseId: string, page: number, size: number) => `${API_BASE_URL}/document/course/${courseId}?page=${page}&size=${size}`,
-    // `http://localhost:8082/lms/classes/${courseId}/members`,
-    GET_CLASS_MEMBERS: (courseId: string) =>
-      `${LMS_URL}/classes/${courseId}/members`,
-    //  `http://localhost:8082/lms/classes/${courseId}/enrollments/pending`,
-    GET_MEMBER_PENDING: (courseId: string) =>
-      `${LMS_URL}/classes/${courseId}/enrollments/pending`,
-    //   `http://localhost:8082/lms/classes/class/${tutorId}`,
-    GET_CLASSES_BY_TUTORID: (tutorId: string) =>
-      `${LMS_URL}/classes/tutors/${tutorId}`,
-    //  `http://localhost:8082/lms/enrollments/${enrollmentId}/approval?approved=${isApproved}`,
-    APPROVE_ENROLLMENT: (enrollmentId: string, isApproved: boolean) =>
-      `${LMS_URL}/enrollments/${enrollmentId}/approval?approved=${isApproved}`,
 
-    // API FOR USER
-    //http://localhost:8888/api/v1/lms/subjects?page=1&size=100
-    GET_SUBJECTS: `${LMS_URL}/subjects?page=1&size=300`,
-    //   const url = `http://localhost:8082/lms/classes/search${queryString ? `?${queryString}` : ""}`;
-    SEARCH_CLASSES: `${LMS_URL}/classes/search`,
-    GET_CLASS_NOTIFICATIONS: (classId: string, page: number, size: number) => `${LMS_URL}/notifications/class/${classId}?page=${page}&size=${size}`,
-    CREATE_CLASS_NOTIFICATION: (classId: string) => `${LMS_URL}/notifications/class/${classId}`,
+  LMS: {
+    GET_TEACHING_CLASSES: (page: number, size: number) =>
+      buildUrl(`${LMS}/classes/teaching?page=${page}&size=${size}`),
+
+    GET_TUTOR_SUBJECTS: buildUrl(`${LMS}/tutors/me/subjects?page=1&size=300`),
+
+    ADD_NEW_CLASS: buildUrl(`${LMS}/classes`),
+
+    UPDATE_CLASS: (id: string) =>
+      buildUrl(`${LMS}/classes/${id}`),
+
+    CANCEL_CLASS: (id: string) =>
+      buildUrl(`${LMS}/classes/${id}`),
+
+    GET_CLASS_MEMBERS: (id: string) =>
+      buildUrl(`${LMS}/classes/${id}/members`),
+
+    GET_MEMBER_PENDING: (id: string) =>
+      buildUrl(`${LMS}/classes/${id}/enrollments/pending`),
+
+    GET_CLASSES_BY_TUTORID: (id: string) =>
+      buildUrl(`${LMS}/classes/tutors/${id}`),
+
+    APPROVE_ENROLLMENT: (id: string, approved: boolean) =>
+      buildUrl(`${LMS}/enrollments/${id}/approval?approved=${approved}`),
   },
+
   REPORT: {
-    CREATE: `${API_BASE_URL}/social/reports`,
+    CREATE: buildUrl(`${SOCIAL}/reports`),
   },
+
   SOCKET: {
-    CONNECT_URL: `${SOCKET_URL}`,
+    CONNECT_URL: SOCKET_URL,
   },
 };

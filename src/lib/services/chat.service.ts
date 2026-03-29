@@ -1,8 +1,25 @@
 import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 import httpClient from './http';
-import { ChatMessage } from '../redux/features/chatSlice';
 
-// --- INTERFACES ---
+export interface ParticipantInfo {
+    userId: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    avatar: string;
+}
+
+export interface ChatMessage {
+    id: string;
+    tempId?: string;
+    conversationId: string;
+    type: 'TEXT' | 'IMAGE' | 'FILE';
+    message: string;
+    sender: ParticipantInfo;
+    createdDate: string;
+    isSelf?: boolean;
+    status?: 'sending' | 'sent' | 'error';
+}
 
 export interface ParticipantInfo {
     userId: string;
@@ -23,6 +40,7 @@ export interface Conversation {
     lastMessage: string;
     lastMessageTime: string;  
     modifiedDate: string;     
+    isRead?: boolean;
 }
 
 export interface PaginatedResponse<T> {
