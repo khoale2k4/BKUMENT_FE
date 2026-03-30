@@ -1,6 +1,7 @@
 import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 import httpClient from './http';
 import { CreateClassRequest, CourseItem, Subject, ClassNotification, CreateNotificationRequest } from '../redux/features/tutorCourseSlice';
+import { SearchFilters } from '../redux/features/tutorFindingSlice';
 
 export const getAllTeachingClasses = async (page: number, size: number) => {
     const response = await httpClient.get(API_ENDPOINTS.LMS.GET_TEACHING_CLASSES(page, size));
@@ -63,3 +64,41 @@ export const getClassDocuments = async (courseId: string, page: number, size: nu
     response.data.result.coverImage = response.data.result.coverImage || response.data.result.previewImageUrl;
     return response.data.result;
 };
+
+// 1. Lấy danh sách Môn học & Chủ đề (Public)
+export const getSearchSubjects = async () => {
+    const response = await httpClient.get(API_ENDPOINTS.LMS.GET_SUBJECTS);
+    return response.data.result;
+};
+
+// 2. Tìm kiếm Lớp học / Gia sư (Dùng params của httpClient tự động sinh query string)
+export const searchTutors = async (filters: SearchFilters) => {
+    const response = await httpClient.get(API_ENDPOINTS.LMS.SEARCH_CLASSES, { 
+        params: filters // httpClient tự động loại bỏ các field undefined và nối thành ?keyword=...&subjectName=...
+    });
+    return response.data.result;
+};
+
+// 3. Lấy danh sách Lớp học Học viên ĐANG HỌC
+export const getAllStudyingClasses = async (page: number, size: number) => {
+    // Tùy theo cách bạn định nghĩa trong apiEndPoints.ts, có thể là function hoặc string + params
+    // Ví dụ nếu là string:
+    const response = await httpClient.get(API_ENDPOINTS.LMS.GET_STUDYING_CLASSES(page, size));
+    return response.data.result; 
+};
+
+// 4. Lấy chi tiết một Lớp học bằng ID
+export const getClassDetailsById = async (classId: string) => {
+    // Giả sử GET_CLASS_DETAILS là một function nhận classId
+    const response = await httpClient.get(API_ENDPOINTS.LMS.GET_CLASS_DETAILS(classId));
+    return response.data.result;
+};
+
+// 5. Học viên Đăng ký tham gia Lớp học
+export const enrollInClass = async (classId: string) => {
+    // Giả sử ENROLL_CLASS là function nhận classId
+    const response = await httpClient.post(API_ENDPOINTS.LMS.ENROLL_CLASS(classId));
+    return response.data.result;
+};
+
+

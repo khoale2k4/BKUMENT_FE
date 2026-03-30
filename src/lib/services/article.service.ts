@@ -79,3 +79,8 @@ export const followUser = async (profileId: string): Promise<string> => {
     const response = await httpClient.post(API_ENDPOINTS.ACCOUNT.FOLLOW(profileId));
     return response.data.result;
 };
+
+export const unFollowUser = async (profileId: string): Promise<string> => {
+    const response = await httpClient.delete(API_ENDPOINTS.ACCOUNT.UNFOLLOW(profileId));
+    return response.data.result;
+};

@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 // Thay đổi đường dẫn import RootState cho phù hợp với dự án của bạn
 import { RootState } from "@/lib/redux/store";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
-// Interface cho các tham số tìm kiếm đầu vào
+import * as courseService from '@/lib/services/course.service';
 export interface SearchFilters {
   keyword?: string; // Từ khóa tìm kiếm chung (có thể dùng để tìm theo tên gia sư, tên lớp, mô tả, v.v.)
   subjectName?: string;
@@ -121,23 +121,24 @@ export const getSearchSubjects = createAsyncThunk(
   "tutorFinding/getSearchSubjects",
   async (_, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth?.token;
-      const response = await fetch(API_ENDPOINTS.LMS.GET_SUBJECTS, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
+      // const state = getState() as RootState;
+      // const token = state.auth?.token;
+      // const response = await fetch(API_ENDPOINTS.LMS.GET_SUBJECTS, {
+      //   method: "GET",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     ...(token && { Authorization: `Bearer ${token}` }),
+      //   },
+      // });
 
-      const data = await response.json();
-      //   console.log("Subjects API response:", data); // Debug log để xem cấu trúc dữ liệu trả về
+      // const data = await response.json();
+      // //   console.log("Subjects API response:", data); // Debug log để xem cấu trúc dữ liệu trả về
 
-      if (data.code !== 1000) {
-        throw new Error(data.message || "Failed to fetch subjects");
-      }
-      return data.result as Subject[];
+      // if (data.code !== 1000) {
+      //   throw new Error(data.message || "Failed to fetch subjects");
+      // }
+      // return data.result as Subject[];
+      return await courseService.getSearchSubjects(); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -149,37 +150,38 @@ export const searchTutors = createAsyncThunk(
   "tutorFinding/searchTutors",
   async (filters: SearchFilters, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth?.token;
+      // const state = getState() as RootState;
+      // const token = state.auth?.token;
 
-      // 1. Tự động xây dựng Query String động bằng URLSearchParams
-      // Nó sẽ tự động mã hóa UTF-8 tiếng Việt thành định dạng %C6%A1... chuẩn HTTP
-      const queryParams = new URLSearchParams();
+      // // 1. Tự động xây dựng Query String động bằng URLSearchParams
+      // // Nó sẽ tự động mã hóa UTF-8 tiếng Việt thành định dạng %C6%A1... chuẩn HTTP
+      // const queryParams = new URLSearchParams();
 
-      if (filters.subjectName)
-        queryParams.append("subjectName", filters.subjectName);
-      if (filters.topicName) queryParams.append("topicName", filters.topicName);
-      if (filters.format) queryParams.append("format", filters.format);
-      if (filters.keyword) queryParams.append("keyword", filters.keyword);
-      const queryString = queryParams.toString();
-      const url = `${API_ENDPOINTS.LMS.SEARCH_CLASSES}${queryString ? `?${queryString}` : ""}`;
-      // 2. Gửi Request
-      const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          // Tùy chọn: Gửi token nếu API search yêu cầu đăng nhập, nếu là public thì bỏ đoạn này đi
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      });
+      // if (filters.subjectName)
+      //   queryParams.append("subjectName", filters.subjectName);
+      // if (filters.topicName) queryParams.append("topicName", filters.topicName);
+      // if (filters.format) queryParams.append("format", filters.format);
+      // if (filters.keyword) queryParams.append("keyword", filters.keyword);
+      // const queryString = queryParams.toString();
+      // const url = `${API_ENDPOINTS.LMS.SEARCH_CLASSES}${queryString ? `?${queryString}` : ""}`;
+      // // 2. Gửi Request
+      // const response = await fetch(url, {
+      //   method: "GET",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     // Tùy chọn: Gửi token nếu API search yêu cầu đăng nhập, nếu là public thì bỏ đoạn này đi
+      //     ...(token && { Authorization: `Bearer ${token}` }),
+      //   },
+      // });
 
-      const data = await response.json();
-      console.log("Search Classs API response:", data); // Debug log để xem cấu trúc dữ liệu trả về
+      // const data = await response.json();
+      // console.log("Search Classs API response:", data); // Debug log để xem cấu trúc dữ liệu trả về
 
-      // 3. Xử lý dữ liệu trả về
-      if (data.code !== 1000)
-        throw new Error(data.message || "Failed to search tutors");
-      return data.result as TutorData[];
+      // // 3. Xử lý dữ liệu trả về
+      // if (data.code !== 1000)
+      //   throw new Error(data.message || "Failed to search tutors");
+      // return data.result as TutorData[];
+      return await courseService.searchTutors(filters); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -194,27 +196,28 @@ export const getAllStudyingClasses = createAsyncThunk(
     { getState, rejectWithValue },
   ) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token || sessionStorage.getItem("accessToken");
+      // const state = getState() as RootState;
+      // const token = state.auth.token || sessionStorage.getItem("accessToken");
 
-      // Chèn page và size vào URL
-      const response = await fetch(
-        `http://localhost:8888/api/v1/lms/classes/my-class?page=${page}&size=${size}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        },
-      );
+      // // Chèn page và size vào URL
+      // const response = await fetch(
+      //   `http://localhost:8888/api/v1/lms/classes/my-class?page=${page}&size=${size}`,
+      //   {
+      //     method: "GET",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       ...(token && { Authorization: `Bearer ${token}` }),
+      //     },
+      //   },
+      // );
 
-      const data = await response.json();
-      console.log("API Response for getAllStudyingClasses:", data); // Debug log
-      if (data.code !== 1000) throw new Error(data.message);
+      // const data = await response.json();
+      // console.log("API Response for getAllStudyingClasses:", data); // Debug log
+      // if (data.code !== 1000) throw new Error(data.message);
 
-      // Trả về toàn bộ cục result (chứa cả data và totalPages)
-      return data.result;
+      // // Trả về toàn bộ cục result (chứa cả data và totalPages)
+      // return data.result;
+      return await courseService.getAllStudyingClasses(page, size); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -226,27 +229,28 @@ export const getClassDetailsById = createAsyncThunk(
   "tutorFinding/getClassDetailsById",
   async (classId: string, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token || sessionStorage.getItem("accessToken");
+      // const state = getState() as RootState;
+      // const token = state.auth.token || sessionStorage.getItem("accessToken");
 
-      const response = await fetch(
-        `http://localhost:8888/api/v1/lms/classes/${classId}`, // Sử dụng classId được truyền vào
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        },
-      );
+      // const response = await fetch(
+      //   `http://localhost:8888/api/v1/lms/classes/${classId}`, // Sử dụng classId được truyền vào
+      //   {
+      //     method: "GET",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       ...(token && { Authorization: `Bearer ${token}` }),
+      //     },
+      //   },
+      // );
 
-      const data = await response.json();
-      console.log("API Response for getClassDetailsById:", data);
+      // const data = await response.json();
+      // console.log("API Response for getClassDetailsById:", data);
 
-      if (data.code !== 1000) throw new Error(data.message || "Failed to fetch class details");
+      // if (data.code !== 1000) throw new Error(data.message || "Failed to fetch class details");
 
-      // Trả về object Course chi tiết
-      return data.result as Course;
+      // // Trả về object Course chi tiết
+      // return data.result as Course;
+      return await courseService.getClassDetailsById(classId); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -259,34 +263,35 @@ export const enrollInClass = createAsyncThunk(
   "tutorFinding/enrollInClass",
   async (classId: string, { getState, rejectWithValue }) => {
     try {
-      const state = getState() as RootState;
-      const token = state.auth.token || sessionStorage.getItem("accessToken");
+      // const state = getState() as RootState;
+      // const token = state.auth.token || sessionStorage.getItem("accessToken");
 
-      if (!token) {
-        return rejectWithValue("Vui lòng đăng nhập để đăng ký lớp học.");
-      }
+      // if (!token) {
+      //   return rejectWithValue("Vui lòng đăng nhập để đăng ký lớp học.");
+      // }
 
-      const response = await fetch(
-        `http://localhost:8888/api/v1/lms/classes/${classId}/enroll`,
-        {
-          method: "POST", // Thường Enroll là POST
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          // body: JSON.stringify({}), // Thêm body nếu Backend yêu cầu (ví dụ gửi ghi chú cho gia sư)
-        }
-      );
+      // const response = await fetch(
+      //   `http://localhost:8888/api/v1/lms/classes/${classId}/enroll`,
+      //   {
+      //     method: "POST", // Thường Enroll là POST
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer ${token}`,
+      //     },
+      //     // body: JSON.stringify({}), // Thêm body nếu Backend yêu cầu (ví dụ gửi ghi chú cho gia sư)
+      //   }
+      // );
 
-      const data = await response.json();
-      console.log("API Response for enrollInClass:", data);
+      // const data = await response.json();
+      // console.log("API Response for enrollInClass:", data);
 
-      if (data.code !== 1000) {
-        throw new Error(data.message || "Đăng ký tham gia lớp học thất bại.");
-      }
+      // if (data.code !== 1000) {
+      //   throw new Error(data.message || "Đăng ký tham gia lớp học thất bại.");
+      // }
 
-      // Trả về kết quả thành công
-      return data.result;
+      // // Trả về kết quả thành công
+      // return data.result;
+      return await courseService.enrollInClass(classId); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
     }

@@ -96,8 +96,8 @@ export const sendMessageAsync = createAsyncThunk(
     'chat/sendMessage',
     async ({ conversationId, message, type }: { conversationId: string; message: string; type: 'TEXT' | 'IMAGE' | 'FILE' }, { rejectWithValue }) => {
         try {
-            const typeUpper = type.toLowerCase() as 'text' | 'image' | 'file';
-            const response = await chatService.sendMessage(conversationId, message, typeUpper);
+            const typeUpper = type.toUpperCase() as 'TEXT' | 'IMAGE' | 'FILE';
+            const response = await chatService.sendMessage(conversationId, message, typeUpper as any);
             return response;
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to send message');

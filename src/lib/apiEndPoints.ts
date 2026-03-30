@@ -2,11 +2,16 @@ import { GET } from "@/app/api/documents/courses/route";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
 // const IDENTITY_URL = "http://143.198.80.199:8888/api/v1/identity";
+//http://143.198.80.199:8888/api/v1
 const IDENTITY_URL = "http://localhost:8888/api/v1/identity";
 const PROFILE_URL = "http://localhost:8888/api/v1";
+// const PROFILE_URL = "http://143.198.80.199:8888/api/v1";
+// const CHAT_URL = "http://143.198.80.199:8888/api/v1";
 const CHAT_URL = "http://localhost:8888/api/v1";
+// const LMS_URL = "http://143.198.80.199:8888/api/v1/lms";
 
 const LMS_URL = "http://localhost:8888/api/v1/lms";
+// const SOCKET_URL = "http://localhost:8099";
 const SOCKET_URL = "http://localhost:8099";
 //local
 const DEBUG_URL = "";
@@ -27,7 +32,8 @@ export const API_ENDPOINTS = {
     //    const response = await httpClient.patch('http://localhost:8081/profile/update', updateData);
     UPDATE_USER_INFO: `${PROFILE_URL}/profile/my-profile`,
     UPDATE_TUTOR_INFO: `${PROFILE_URL}/lms/tutors/me`,
-    FOLLOW: (profile_id: string) => `${API_BASE_URL}/profile/${profile_id}/follow`,
+    FOLLOW: (profile_id: string) => `${PROFILE_URL}/profile/${profile_id}/follow`,
+    UNFOLLOW: (profile_id: string) => `${PROFILE_URL}/profile/${profile_id}/follow`,
   },
   ARTICLES: {
     GET_ALL: `${DEBUG_URL}/api/articles`,
@@ -74,13 +80,23 @@ export const API_ENDPOINTS = {
   },
   CHAT: {
     GET_CONVERSATIONS: (page: number, size: number) =>
-      `${API_BASE_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
-    START_CONVERSATIONS: `${API_BASE_URL}/communication/conversations/create`,
+      `${CHAT_URL}/communication/conversations/my-conversations?page=${page}&size=${size}`,
+    START_CONVERSATIONS: `${CHAT_URL}/communication/conversations/create`,
     UPDATE_CONVERSATION: (con_id: string) =>
-      `${API_BASE_URL}/communication/conversations/${con_id}/metadata`,
+      `${CHAT_URL}/communication/conversations/${con_id}/metadata`,
     GET_MESSAGES: (conversationId: string, page: number, size: number) =>
-      `${API_BASE_URL}/communication/messages?conversationId=${conversationId}&page=${page}&size=${size}`,
-    SEND_MESSAGE: `${API_BASE_URL}/communication/messages/create`,
+      `${CHAT_URL}/communication/messages?conversationId=${conversationId}&page=${page}&size=${size}`,
+    SEND_MESSAGE: `${CHAT_URL}/communication/messages/create`,
+    GET_APP_NOTIFICATION: (page: number, size: number) =>
+      `${CHAT_URL}/communication/notifications?page=${page}&size=${size}`,
+    COUNT_UNREAD_NOTIFICATIONS: `${CHAT_URL}/communication/notifications/unread-count`,
+    MARK_ALL_NOTIFICATIONS_READ: `${CHAT_URL}/communication/notifications/read-all`,
+    MARK_NOTIFICATION_READ: (notificationId: string) =>
+      `${CHAT_URL}/communication/notifications/${notificationId}/read`,
+    // http://localhost:8888/api/v1/communication/notifications/69c8dced2bfca05a67b17b3a/read
+    // http://localhost:8888/api/v1/communication/notifications/read-all
+    //http://localhost:8888/api/v1/communication/notifications/unread-count
+    //http://143.198.80.199:8888/api/v1/communication/conversations/my-conversations?page=0&size=10
   },
   COMMENTS: {
     GET_BY_DOC: (id: string, page: number, size: number) =>
@@ -97,6 +113,9 @@ export const API_ENDPOINTS = {
   },
   LMS: {
     GET_TEACHING_CLASSES: (page: number, size: number) => `${LMS_URL}/classes/teaching?page=${page}&size=${size}`,
+    GET_STUDYING_CLASSES: (page: number, size: number) => `${LMS_URL}/classes/my-class?page=${page}&size=${size}`,
+    GET_CLASS_DETAILS: (classId: string) => `${LMS_URL}/classes/${classId}`,
+    ENROLL_CLASS: (classId: string) => `${LMS_URL}/classes/${classId}/enroll`,
     GET_TUTOR_SUBJECTS: `${LMS_URL}/tutors/me/subjects?$page=1&size=300`,
     ADD_NEW_CLASS: `${LMS_URL}/classes`,
     UPDATE_CLASS: (classId: string) => `${LMS_URL}/classes/${classId}`,
@@ -115,6 +134,7 @@ export const API_ENDPOINTS = {
     APPROVE_ENROLLMENT: (enrollmentId: string, isApproved: boolean) =>
       `${LMS_URL}/enrollments/${enrollmentId}/approval?approved=${isApproved}`,
 
+
     // API FOR USER
     //http://localhost:8888/api/v1/lms/subjects?page=1&size=100
     GET_SUBJECTS: `${LMS_URL}/subjects?page=1&size=300`,
@@ -129,4 +149,5 @@ export const API_ENDPOINTS = {
   SOCKET: {
     CONNECT_URL: `${SOCKET_URL}`,
   },
+
 };

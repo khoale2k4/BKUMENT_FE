@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "@/lib/redux/store";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as courseService from '@/lib/services/course.service';
+import httpClient from "@/lib/services/http";
 // --- Interfaces ---
 
 export interface Schedule {
@@ -289,6 +290,8 @@ export const getClassDocuments = createAsyncThunk(
     }
   },
 );
+
+
 
 const tutorCourseSlice = createSlice({
   name: "tutorCourse",
