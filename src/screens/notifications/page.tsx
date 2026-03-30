@@ -178,7 +178,7 @@ const NotificationsPage = () => {
                 </div>
 
                 {/* --- COMPONENT PAGINATION --- */}
-                {totalPages >= 1 && !loading && (
+                {totalPages > 1 && !loading && (
                     <Pagination
                         currentPage={currentPage } // Biến đổi hệ 0-based của Redux sang hệ 1-based của Component Pagination
                         totalPages={totalPages}

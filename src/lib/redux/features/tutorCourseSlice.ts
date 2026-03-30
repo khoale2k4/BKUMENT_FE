@@ -456,7 +456,11 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getClassesByTutorId.fulfilled, (state, action) => {
         state.loadingViewedClasses = false;
-        state.viewedTutorClasses = action.payload.data || action.payload || []; // Gán vào biến này để không đè lên 'classes'
+        
+        // CÁCH SỬA LỖI TẠI ĐÂY: Ép kiểu payload thành any để TypeScript không báo lỗi thuộc tính 'data'
+        const payload = action.payload as any;
+        
+        state.viewedTutorClasses = Array.isArray(payload) ? payload : (payload?.data || payload?.content || []);
       })
       .addCase(getClassesByTutorId.rejected, (state, action) => {
         state.loadingViewedClasses = false;

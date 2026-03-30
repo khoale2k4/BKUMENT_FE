@@ -162,7 +162,7 @@ const modalSlice = createSlice({
       .addCase(getAppNotifications.fulfilled, (state, action) => {
         state.appNotifications.loading = false;
 
-        const newData = action.payload.data || action.payload.content || [];
+        const newData = action.payload.data  || [];
 
         // LUÔN LUÔN GHI ĐÈ DATA MỚI (Dùng cho Pagination rời)
         state.appNotifications.data = newData;

@@ -43,12 +43,18 @@ export default function NotificationDropdown() {
     ? notifications 
     : notifications.filter(noti => !noti.read);
 
-  // Fetch dữ liệu khi Component được mount
+// 1. Chỉ lấy số lượng chưa đọc khi Component mới mount
   useEffect(() => {
     dispatch(getUnreadNotificationCount());
-    dispatch(getAppNotifications({ page: 1, size: 20 })); // Tăng lên 20 để xem unread cho dễ
   }, [dispatch]);
 
+  // 2. Lấy danh sách thông báo KHI VÀ CHỈ KHI Dropdown được mở ra
+  useEffect(() => {
+    if (isNotiOpen) {
+      dispatch(getAppNotifications({ page: 1, size: 10 })); // Hoặc size 20 tùy ý bạn cho Dropdown
+    }
+  }, [isNotiOpen, dispatch]);
+  
   // Xử lý click ra ngoài để đóng Dropdown
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
