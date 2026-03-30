@@ -17,6 +17,7 @@ export default function Sidebar() {
     const dispatch = useAppDispatch();
     const pathname = usePathname();
     const sidebarRef = useRef<HTMLElement>(null);
+      const { data: notifications = [], loading, unreadCount } = useAppSelector((state) => state.modal.appNotifications) || {};
 
     const mainMenuItems = [
         { icon: Home, label: 'Home', href: AppRoute.home, count: 0 },
@@ -27,7 +28,7 @@ export default function Sidebar() {
         { icon: File, label: 'My Documents', href: AppRoute.documents.my, count: 0 },
         { icon: Send, label: 'Messages', href: AppRoute.messages, count: 2 },
         // { icon: UserSearch, label: 'Find Tutors', href: AppRoute.tutors, count: 0 },
-        { icon: Bell, label: 'Notifications', href: AppRoute.notifications, count: 2 },
+        { icon: Bell, label: 'Notifications', href: AppRoute.notifications, count: unreadCount },
     ];
 
     const secondaryMenuItems = [

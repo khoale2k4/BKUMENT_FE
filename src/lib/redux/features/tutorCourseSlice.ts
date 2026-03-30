@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "@/lib/redux/store";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as courseService from '@/lib/services/course.service';
+import httpClient from "@/lib/services/http";
 // --- Interfaces ---
 
 export interface Schedule {
@@ -290,6 +291,8 @@ export const getClassDocuments = createAsyncThunk(
   },
 );
 
+
+
 const tutorCourseSlice = createSlice({
   name: "tutorCourse",
   initialState,
@@ -453,7 +456,11 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getClassesByTutorId.fulfilled, (state, action) => {
         state.loadingViewedClasses = false;
-        state.viewedTutorClasses =  action.payload || [];
+        
+        // CÁCH SỬA LỖI TẠI ĐÂY: Ép kiểu payload thành any để TypeScript không báo lỗi thuộc tính 'data'
+        const payload = action.payload as any;
+        
+        state.viewedTutorClasses = Array.isArray(payload) ? payload : (payload?.data || payload?.content || []);
       })
       .addCase(getClassesByTutorId.rejected, (state, action) => {
         state.loadingViewedClasses = false;

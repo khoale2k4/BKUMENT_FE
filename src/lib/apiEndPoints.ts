@@ -1,15 +1,24 @@
+import { GET } from "@/app/api/documents/courses/route";
+import { UNDERSCORE_GLOBAL_ERROR_ROUTE } from "next/dist/shared/lib/entry-constants";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:8099";
+const SOCKET_URL =
+  process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:8099";
 
+//http://143.198.80.199:8888/api/v1
 const IDENTITY = "/identity";
 const PROFILE = "/profile";
 const LMS = "/lms";
+// const PROFILE_URL = "http://143.198.80.199:8888/api/v1";
+// const CHAT_URL = "http://143.198.80.199:8888/api/v1";
 const CHAT = "/communication";
+// const LMS_URL = "http://143.198.80.199:8888/api/v1/lms";
 const SOCIAL = "/social";
 const DOCUMENT = "/document";
 const BLOG = "/blog";
+// const SOCKET_URL = "http://localhost:8099";
 const RESOURCE = "/resource";
 const AI = "/ai";
 
@@ -32,8 +41,7 @@ export const API_ENDPOINTS = {
     TUTOR_GETS: buildUrl(`/api/user/tutors`),
     UPDATE_USER_INFO: buildUrl(`${PROFILE}/my-profile`),
     UPDATE_TUTOR_INFO: buildUrl(`${LMS}/tutors/me`),
-    FOLLOW: (id: string) =>
-      buildUrl(`${PROFILE}/${id}/follow`),
+    FOLLOW: (id: string) => buildUrl(`${PROFILE}/${id}/follow`),
   },
 
   DOCUMENTS: {
@@ -44,12 +52,12 @@ export const API_ENDPOINTS = {
 
     ANALYSE_DOCUMENT: (assetId: string, fileName?: string) =>
       buildUrl(
-        `${DOCUMENT}/analyze/${assetId}${fileName ? `?fileName=${fileName}` : ""
-        }`
+        `${DOCUMENT}/analyze/${assetId}${
+          fileName ? `?fileName=${fileName}` : ""
+        }`,
       ),
 
-    GET_DETAIL: (id: string | number) =>
-      buildUrl(`${DOCUMENT}/search?q=${id}`),
+    GET_DETAIL: (id: string | number) => buildUrl(`${DOCUMENT}/search?q=${id}`),
 
     RELATED_DOCUMENTS: (id: string, page: number, size: number) =>
       buildUrl(`${DOCUMENT}/related/${id}?page=${page}&size=${size}`),
@@ -59,20 +67,19 @@ export const API_ENDPOINTS = {
 
     UNIVERSITIES: (query: string) =>
       buildUrl(
-        `${DOCUMENT}/search-universities${query ? `?q=${encodeURIComponent(query)}` : ""
-        }`
+        `${DOCUMENT}/search-universities${
+          query ? `?q=${encodeURIComponent(query)}` : ""
+        }`,
       ),
 
-    COURSES: (query: string) =>
-      buildUrl(`${LMS}/subjects?q=${query}`),
+    COURSES: (query: string) => buildUrl(`${LMS}/subjects?q=${query}`),
   },
 
   BLOGS: {
     SEARCH: (page: number, size: number) =>
       buildUrl(`${BLOG}/search?page=${page}&size=${size}`),
 
-    GET_DETAIL: (id: string | number) =>
-      buildUrl(`${BLOG}/search?q=${id}`),
+    GET_DETAIL: (id: string | number) => buildUrl(`${BLOG}/search?q=${id}`),
 
     UPLOAD_NEW_BLOG: buildUrl(`${BLOG}`),
   },
@@ -90,7 +97,7 @@ export const API_ENDPOINTS = {
   CHAT: {
     GET_CONVERSATIONS: (page: number, size: number) =>
       buildUrl(
-        `${CHAT}/conversations/my-conversations?page=${page}&size=${size}`
+        `${CHAT}/conversations/my-conversations?page=${page}&size=${size}`,
       ),
 
     START_CONVERSATIONS: buildUrl(`${CHAT}/conversations/create`),
@@ -100,10 +107,20 @@ export const API_ENDPOINTS = {
 
     GET_MESSAGES: (conversationId: string, page: number, size: number) =>
       buildUrl(
-        `${CHAT}/messages?conversationId=${conversationId}&page=${page}&size=${size}`
+        `${CHAT}/messages?conversationId=${conversationId}&page=${page}&size=${size}`,
       ),
 
     SEND_MESSAGE: buildUrl(`${CHAT}/messages/create`),
+
+    GET_APP_NOTIFICATION: (page: number, size: number) =>
+      buildUrl(
+        `${CHAT}/notifications?page=${page}&size=${size}`,
+      ),
+    COUNT_UNREAD_NOTIFICATIONS: buildUrl(`${CHAT}/notifications/unread-count`),
+    MARK_ALL_NOTIFICATIONS_READ: buildUrl(`${CHAT}/notifications/read-all`),
+    MARK_NOTIFICATION_READ: (id: string) =>
+      buildUrl(`${CHAT}/notifications/${id}/read`),
+    
   },
 
   COMMENTS: {
@@ -118,33 +135,40 @@ export const API_ENDPOINTS = {
 
   HOME: {
     SEARCH: (query: string, page: number, size: number) =>
-      buildUrl(
-        `${AI}/search?query=${query}&page=${page + 1}&size=${size}`
-      ),
+      buildUrl(`${AI}/search?query=${query}&page=${page + 1}&size=${size}`),
   },
 
   LMS: {
     GET_TEACHING_CLASSES: (page: number, size: number) =>
       buildUrl(`${LMS}/classes/teaching?page=${page}&size=${size}`),
+    GET_STUDYING_CLASSES: (page: number, size: number) =>
+      buildUrl(`${LMS}/classes/my-class?page=${page}&size=${size}`),
+    GET_CLASS_DETAILS: (id: string) => buildUrl(`${LMS}/classes/${id}`),
+
+    ENROLL_CLASS: (id: string) => buildUrl(`${LMS}/classes/${id}/enroll`),
 
     GET_TUTOR_SUBJECTS: buildUrl(`${LMS}/tutors/me/subjects?page=1&size=300`),
 
     ADD_NEW_CLASS: buildUrl(`${LMS}/classes`),
 
-    UPDATE_CLASS: (id: string) =>
-      buildUrl(`${LMS}/classes/${id}`),
+    UPDATE_CLASS: (id: string) => buildUrl(`${LMS}/classes/${id}`),
 
-    CANCEL_CLASS: (id: string) =>
-      buildUrl(`${LMS}/classes/${id}`),
+    CANCEL_CLASS: (id: string) => buildUrl(`${LMS}/classes/${id}`),
 
-    GET_CLASS_MEMBERS: (id: string) =>
-      buildUrl(`${LMS}/classes/${id}/members`),
+    GET_CLASS_MEMBERS: (id: string) => buildUrl(`${LMS}/classes/${id}/members`),
     GET_SUBJECTS: buildUrl(`${LMS}/subjects?page=1&size=300`),
     SEARCH_CLASSES: buildUrl(`${LMS}/classes/search`),
-    GET_CLASS_NOTIFICATIONS: (classId: string, page: number, size: number) => buildUrl(`${LMS}/notifications/class/${classId}?page=${page}&size=${size}`),
-    GET_CLASS_DOCUMENTS: (courseId: string, page: number, size: number) => buildUrl(`${API_BASE_URL}/document/course/${courseId}?page=${page}&size=${size}`),
-    CREATE_CLASS_NOTIFICATION: (classId: string) => buildUrl(`${LMS}/notifications/class/${classId}`),
-
+    GET_CLASS_NOTIFICATIONS: (classId: string, page: number, size: number) =>
+      buildUrl(
+        `${LMS}/notifications/class/${classId}?page=${page}&size=${size}`,
+      ),
+    GET_CLASS_DOCUMENTS: (courseId: string, page: number, size: number) =>
+      buildUrl(
+        `${API_BASE_URL}/document/course/${courseId}?page=${page}&size=${size}`,
+      ),
+    CREATE_CLASS_NOTIFICATION: (classId: string) =>
+      buildUrl(`${LMS}/notifications/class/${classId}`),
+    // http://localhost:8888/api/v1/lms/classes/my-class?page=1&size=10
     GET_MEMBER_PENDING: (id: string) =>
       buildUrl(`${LMS}/classes/${id}/enrollments/pending`),
 
