@@ -30,6 +30,16 @@ interface ModalState {
     totalPages: number;
     unreadCount: number; // Có thể thêm trường này nếu bạn muốn hiển thị số lượng thông báo chưa đọc ở đâu đó trong UI
   };
+  
+  // 4. THÊM MỚI: Dành cho Popup Xác nhận (Delete, Logout, ...)
+  confirmModal: {
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: (() => void) | null;
+    confirmText?: string;
+    cancelText?: string;
+  };
 }
 
 const initialState: ModalState = {
@@ -52,6 +62,14 @@ const initialState: ModalState = {
     currentPage: 1,
     totalPages: 1,
     unreadCount: 0,
+  },
+  confirmModal: {
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+    confirmText: "Xác nhận",
+    cancelText: "Hủy",
   },
 };
 
@@ -147,6 +165,25 @@ const modalSlice = createSlice({
       state.reportModal.targetId = null;
     },
 
+    openConfirmModal: (state, action: PayloadAction<{
+      title: string;
+      message: string;
+      onConfirm: () => void;
+      confirmText?: string;
+      cancelText?: string;
+    }>) => {
+      state.confirmModal.isOpen = true;
+      state.confirmModal.title = action.payload.title;
+      state.confirmModal.message = action.payload.message;
+      state.confirmModal.onConfirm = action.payload.onConfirm;
+      state.confirmModal.confirmText = action.payload.confirmText || "Xác nhận";
+      state.confirmModal.cancelText = action.payload.cancelText || "Hủy";
+    },
+    closeConfirmModal: (state) => {
+      state.confirmModal.isOpen = false;
+      state.confirmModal.onConfirm = null;
+    },
+
     // Thêm reducer để reset danh sách thông báo nếu cần
     clearAppNotifications: (state) => {
       state.appNotifications.data = [];
@@ -208,6 +245,8 @@ export const {
   hideNotification,
   openReportModal,
   closeReportModal,
+  openConfirmModal,
+  closeConfirmModal,
   clearAppNotifications, // Export thêm action này
 } = modalSlice.actions;
 

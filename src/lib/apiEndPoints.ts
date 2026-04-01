@@ -73,6 +73,9 @@ export const API_ENDPOINTS = {
       ),
 
     COURSES: (query: string) => buildUrl(`${LMS}/subjects?q=${query}`),
+    MY_DOCUMENTS: (page: number, size: number) =>
+      buildUrl(`${DOCUMENT}/my-documents?page=${page}&size=${size}`),
+    DELETE: (id: string) => buildUrl(`${DOCUMENT}/${id}`),
   },
 
   BLOGS: {
@@ -82,6 +85,9 @@ export const API_ENDPOINTS = {
     GET_DETAIL: (id: string | number) => buildUrl(`${BLOG}/search?q=${id}`),
 
     UPLOAD_NEW_BLOG: buildUrl(`${BLOG}`),
+    MY_BLOGS: (page: number, size: number) =>
+      buildUrl(`${BLOG}/my-blogs?page=${page}&size=${size}`),
+    DELETE: (id: string) => buildUrl(`${BLOG}/${id}`),
   },
 
   RESOURCE: {

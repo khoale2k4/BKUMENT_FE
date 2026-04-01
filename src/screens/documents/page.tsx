@@ -1,10 +1,11 @@
 'use client';
-import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp, Flag } from 'lucide-react';
+import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp, Flag, MoreHorizontal, Trash2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { clearCurrentDocument, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments } from '@/lib/redux/features/documentSlice';
-import { openReportModal, showNotification } from '@/lib/redux/features/modalSlice';
+import { openConfirmModal, openReportModal, showNotification } from '@/lib/redux/features/modalSlice';
+import { deleteDocumentAsync } from '@/lib/redux/features/myDocumentSlice';
 import CommentSection from './commentSection/page';
 import { getAccessToken } from '@/lib/utils/token';
 import Pagination from '@/components/ui/Pagination';
@@ -17,6 +18,7 @@ import { DescriptionWithShowMore } from './DescriptionWithShowMore/page';
 import httpClient from '@/lib/services/http';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { showToast } from '@/lib/redux/features/toastSlice';
+import { clsx } from 'clsx';
 
 const PDFViewer = dynamic(() => import('./pdfViewer/page'), { ssr: false, });
 const WordViewer = dynamic(() => import('./wordViewer/page'), { ssr: false });
@@ -28,6 +30,7 @@ const Skeleton = ({ className }: { className: string }) => (
 export default function DocumentDetailPage({ params }: { params: { id: string } }) {
     const dispatch = useAppDispatch();
     const { currentDocument, currentAuthor, detailStatus, relatedDocuments, relatedStatus, relatedPage, relatedTotalPages } = useAppSelector((state) => state.documents);
+    const currentUser = useAppSelector(state => state.profile.user);
     const [token, setToken] = useState<string | null>(() => getAccessToken());
     const router = useRouter();
 
@@ -35,7 +38,6 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
         if (!currentDocument) return;
 
         try {
-            console.log(currentDocument.downloadUrl);
             const response = await httpClient.get(currentDocument.downloadUrl, {
                 responseType: 'blob',
             });
@@ -53,7 +55,11 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Tải file thất bại:", error);
-            alert("Không thể tải file, vui lòng thử lại.");
+            dispatch(showToast({
+                type: 'error',
+                title: 'Lỗi',
+                message: 'Không thể tải file, vui lòng thử lại.'
+            }));
         }
     };
 
@@ -66,29 +72,44 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     const handleShare = async () => {
         try {
             await navigator.clipboard.writeText(window.location.href);
-            
             dispatch(showToast({
-                type: 'success', 
-                title: 'Thành công', 
-                message: 'Đã sao chép đường dẫn bài viết!' 
+                type: 'success',
+                title: 'Thành công',
+                message: 'Đã sao chép đường dẫn!'
             }));
         } catch (error) {
             console.error("Lỗi khi copy:", error);
             dispatch(showToast({
-                type: 'error', 
-                title: 'Lỗi', 
-                message: 'Không thể sao chép đường dẫn lúc này.' 
+                type: 'error',
+                title: 'Lỗi',
+                message: 'Không thể sao chép đường dẫn lúc này.'
             }));
         }
     };
 
+    const handleDelete = () => {
+        if (!currentDocument) return;
+        dispatch(openConfirmModal({
+            title: "Xóa tài liệu",
+            message: `Bạn có chắc chắn muốn xóa "${currentDocument.title}"? Hành động này không thể hoàn tác.`,
+            confirmText: "Xóa",
+            cancelText: "Hủy",
+            onConfirm: async () => {
+                try {
+                    await dispatch(deleteDocumentAsync(currentDocument.id)).unwrap();
+                    router.push(AppRoute.home);
+                } catch (error) {
+                    console.error("Xóa thất bại:", error);
+                }
+            }
+        }));
+    };
+
     useEffect(() => {
         if (params.id) {
-            if (params.id) {
-                dispatch(fetchDocumentById(params.id));
-                dispatch(fetchCommentsByDocId({ documentId: params.id, page: 0, size: 5 }));
-                dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
-            }
+            dispatch(fetchDocumentById(params.id));
+            dispatch(fetchCommentsByDocId({ documentId: params.id, page: 0, size: 5 }));
+            dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
             return () => {
                 dispatch(clearCurrentDocument());
             };
@@ -136,6 +157,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     }
 
     const isDocLoading = detailStatus === 'loading' || !currentDocument;
+    const isOwner = currentDocument?.author?.id === currentUser?.id;
 
     return (
         <main className="min-h-screen bg-white pb-20">
@@ -162,7 +184,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-gray-100 pb-8">
                     <div className="flex items-center gap-3 justify-center sm:justify-start">
-                        {currentDocument?.author === null ? (
+                        {currentDocument?.author === null || !currentDocument?.author ? (
                             <>
                                 <Skeleton className="w-12 h-12 rounded-full" />
                                 <div className="space-y-2">
@@ -173,18 +195,12 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                         ) : (
                             <>
                                 <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-100 shrink-0">
-                                    {!currentDocument?.author && <img src={currentDocument?.author?.avatarUrl} alt={currentAuthor?.user} className="w-full h-full object-cover" />}
-                                    {currentDocument?.author && <AuthenticatedImage src={currentDocument?.author?.avatarUrl} alt={currentAuthor?.user} className="w-full h-full object-cover" />}
+                                    <AuthenticatedImage src={currentDocument.author.avatarUrl} alt={currentDocument.author.name} className="w-full h-full object-cover" />
                                 </div>
                                 <div>
-                                    <div className="font-semibold text-gray-900">{currentDocument?.author.name}</div>
+                                    <div className="font-semibold text-gray-900">{currentDocument.author.name}</div>
                                     <div className="text-xs text-gray-500">
-                                        {/* {currentDocument?.course
-                                            ? `Học ${currentDocument.course} tại ${currentDocument.university}`
-                                            : `Học tại ${currentDocument?.university}`
-                                        }
-                                        {" - "} */}
-                                        {currentDocument?.createdAt && new Date(currentDocument.createdAt).toLocaleDateString("vi-VN")}
+                                        {currentDocument.createdAt && new Date(currentDocument.createdAt).toLocaleDateString("vi-VN")}
                                     </div>
                                 </div>
                             </>
@@ -194,29 +210,25 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                     <div className="flex items-center justify-center gap-3">
                         <button
                             disabled={isDocLoading || !currentDocument?.downloadable}
-                            onClick={() => handleDownload()}
-                            className={`
-                                flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition
-                                ${!isDocLoading && currentDocument?.downloadable
+                            onClick={handleDownload}
+                            className={clsx(
+                                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition",
+                                !isDocLoading && currentDocument?.downloadable
                                     ? "bg-black text-white hover:opacity-80 cursor-pointer shadow-sm"
                                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                }
-                            `}
+                            )}
                         >
                             <Download size={18} />
                             <span>Download</span>
                         </button>
-                        <button className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer" title="Chia sẻ" onClick={() => handleShare()}>
-                            <Share2 size={20} />
-                        </button>
-
-                        <button
-                            onClick={() => handleReport()}
-                            className="p-2 text-gray-400 hover:text-[#8B2C1F] hover:bg-red-50 rounded-full transition cursor-pointer"
-                            title="Báo cáo vi phạm"
-                        >
-                            <Flag size={20} />
-                        </button>
+                        
+                        <DocumentActionsMenu 
+                            onShare={handleShare}
+                            onReport={handleReport}
+                            onDelete={handleDelete}
+                            isOwner={isOwner}
+                            disabled={isDocLoading}
+                        />
                     </div>
                 </div>
             </div>
@@ -301,5 +313,75 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                 <CommentSection params={params} />
             </div>
         </main>
+    );
+}
+
+function DocumentActionsMenu({ onShare, onReport, onDelete, isOwner, disabled }: { 
+    onShare: () => void, 
+    onReport: () => void, 
+    onDelete: () => void, 
+    isOwner: boolean,
+    disabled: boolean
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
+
+    if (disabled) return <div className="w-10 h-10 bg-gray-100 animate-pulse rounded-full" />;
+
+    return (
+        <div className="relative" ref={menuRef}>
+            <button 
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer"
+                title="Thêm"
+            >
+                <MoreHorizontal size={20} />
+            </button>
+
+            {isOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                    <button
+                        onClick={() => { setIsOpen(false); onShare(); }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        <Share2 size={16} />
+                        Chia sẻ
+                    </button>
+                    
+                    <button
+                        onClick={() => { setIsOpen(false); onReport(); }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        <Flag size={16} />
+                        Báo cáo
+                    </button>
+
+                    {isOwner && (
+                        <>
+                            <div className="h-px bg-gray-100 my-1 mx-2" />
+                            <button
+                                onClick={() => { setIsOpen(false); onDelete(); }}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
+                            >
+                                <Trash2 size={16} />
+                                Xóa tài liệu
+                            </button>
+                        </>
+                    )}
+                </div>
+            )}
+        </div>
     );
 }

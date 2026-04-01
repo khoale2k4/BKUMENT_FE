@@ -5,6 +5,7 @@ import GlobalToast from "@/components/ui/ToastNotification";
 import { MantineProvider } from "@mantine/core";
 import ReportModal from "@/components/ui/ReportModal";
 import I18nProvider from "./providers/I18nProvider";
+import ConfirmationModal from "@/components/ui/ConfirmationModal";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +15,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <StoreProvider>
           <MantineProvider>{children}</MantineProvider>
           <ModalNotification />
-          <GlobalToast />
+          <GlobalToast />                
+          <ConfirmationModal />
           <ReportModal />
         </StoreProvider>
 

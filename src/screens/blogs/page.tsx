@@ -8,6 +8,12 @@ import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { useEffect } from 'react';
 import { fetchPost } from '@/lib/redux/features/blogSlice';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
+import { openConfirmModal, openReportModal } from '@/lib/redux/features/modalSlice';
+import { deleteBlogAsync } from '@/lib/redux/features/myBlogSlice';
+import { showToast } from '@/lib/redux/features/toastSlice';
+import { IconDots, IconTrash, IconFlag, IconShare } from '@tabler/icons-react';
+import { AppRoute } from '@/lib/appRoutes';
+import { useState, useRef } from 'react';
 
 import parse, { HTMLReactParserOptions, Element } from 'html-react-parser';
 
@@ -23,9 +29,11 @@ export default function BlogDetailPage(params: PageProps) {
     const router = useRouter();
     const dispatch = useAppDispatch();
 
-    const { title, contentHTML, coverImage, visibility, author, createdAt, status } = useAppSelector(
+    const { id, title, contentHTML, coverImage, visibility, author, createdAt, status } = useAppSelector(
         (state) => state.blogs
     );
+    const currentUser = useAppSelector(state => state.profile.user);
+    const isOwner = currentUser?.id === author?.id;
 
     const parseOptions: HTMLReactParserOptions = {
         replace(domNode) {
@@ -50,16 +58,16 @@ export default function BlogDetailPage(params: PageProps) {
         dispatch(fetchPost(params.params.id));
     }, [dispatch]);
 
-    // if (status === 'getting' || status === 'idle') {
-    //     return (
-    //         <div className="min-h-screen flex items-center justify-center bg-white">
-    //             <div className="flex flex-col items-center gap-3 text-gray-500">
-    //                 <div className="w-8 h-8 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
-    //                 <span className="text-sm font-medium">Đang tải bài viết...</span>
-    //             </div>
-    //         </div>
-    //     );
-    // }
+    if (status === 'getting' || status === 'idle') {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-white">
+                <div className="flex flex-col items-center gap-3 text-gray-500">
+                    <div className="w-8 h-8 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
+                    <span className="text-sm font-medium">Đang tải bài viết...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-white font-sans pb-20">
@@ -74,9 +82,34 @@ export default function BlogDetailPage(params: PageProps) {
                     </button>
 
                     <div className="flex gap-2">
-                        <ActionIcon variant="subtle" color="gray" radius="xl">
-                            <IconShare3 size={20} stroke={1.5} />
-                        </ActionIcon>
+                        <BlogActionsMenu 
+                            onShare={() => {
+                                navigator.clipboard.writeText(window.location.href);
+                                dispatch(showToast({ type: 'success', title: 'Thành công', message: 'Đã sao chép đường dẫn!' }));
+                            }}
+                            onReport={() => {
+                                if (id) dispatch(openReportModal({ targetId: id, type: 'BLOG' }));
+                            }}
+                            onDelete={() => {
+                                if (id) {
+                                    dispatch(openConfirmModal({
+                                        title: "Xóa bài viết",
+                                        message: `Bạn có chắc chắn muốn xóa "${title}"? Hành động này không thể hoàn tác.`,
+                                        confirmText: "Xóa",
+                                        cancelText: "Hủy",
+                                        onConfirm: async () => {
+                                            try {
+                                                await dispatch(deleteBlogAsync(id)).unwrap();
+                                                router.push(AppRoute.home);
+                                            } catch (error) {
+                                                console.error("Xóa thất bại:", error);
+                                            }
+                                        }
+                                    }));
+                                }
+                            }}
+                            isOwner={isOwner}
+                        />
                     </div>
                 </div>
             </div>
@@ -171,6 +204,74 @@ export default function BlogDetailPage(params: PageProps) {
                     </div>
                 </div>
             </article>
+        </div>
+    );
+}
+
+function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: { 
+    onShare: () => void, 
+    onReport: () => void, 
+    onDelete: () => void, 
+    isOwner: boolean 
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
+
+    return (
+        <div className="relative" ref={menuRef}>
+            <ActionIcon 
+                variant="subtle" 
+                color="gray" 
+                radius="xl"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <IconDots size={20} stroke={1.5} />
+            </ActionIcon>
+
+            {isOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                    <button
+                        onClick={() => { setIsOpen(false); onShare(); }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        <IconShare size={16} />
+                        Chia sẻ
+                    </button>
+                    
+                    <button
+                        onClick={() => { setIsOpen(false); onReport(); }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        <IconFlag size={16} />
+                        Báo cáo
+                    </button>
+
+                    {isOwner && (
+                        <>
+                            <div className="h-px bg-gray-100 my-1 mx-2" />
+                            <button
+                                onClick={() => { setIsOpen(false); onDelete(); }}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
+                            >
+                                <IconTrash size={16} />
+                                Xóa bài viết
+                            </button>
+                        </>
+                    )}
+                </div>
+            )}
         </div>
     );
 }
