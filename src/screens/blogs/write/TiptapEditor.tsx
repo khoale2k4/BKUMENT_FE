@@ -1,4 +1,4 @@
-'use client';
+import { useTranslation } from 'react-i18next';
 import { useRef, useState, useEffect } from 'react';
 import { ReactNodeViewRenderer, useEditor } from '@tiptap/react';
 import TiptapImage from '@tiptap/extension-image';
@@ -23,6 +23,7 @@ const SecureImageExtension = TiptapImage.extend({
 });
 
 export default function TiptapEditor() {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const [isUploading, setIsUploading] = useState(false);
     const editorInputRef = useRef<HTMLInputElement>(null);
@@ -61,7 +62,7 @@ export default function TiptapEditor() {
                 },
             }),
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
-            Placeholder.configure({ placeholder: 'Hãy kể câu chuyện của bạn...' }),
+            Placeholder.configure({ placeholder: t('blogs.write.editorPlaceholder', 'Tell your story...') }),
             SecureImageExtension.configure({ inline: false }),
         ],
         content: '',

@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslation } from "react-i18next";
 import React, { useState, useEffect, useRef } from "react";
 import { FileUploadItem } from "@/types/FileUpload";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
@@ -17,6 +20,7 @@ const FileItemEditor = ({
     onUpdate: (field: keyof FileUploadItem, value: any) => void;
     onDelete: () => void;
 }) => {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const { universities, universitiesStatus, courses, coursesStatus } = useAppSelector(
         (state) => state.documents
@@ -205,20 +209,20 @@ const FileItemEditor = ({
 
             <div className="p-6 space-y-6 overflow-visible">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                    <label className="md:col-span-3 text-base font-bold text-black">Tiêu đề:</label>
+                    <label className="md:col-span-3 text-base font-bold text-black">{t('documents.upload.step2.fileTitle')}:</label>
                     <div className="md:col-span-9">
                         <input
                             type="text"
                             value={file.title || ""}
                             onChange={(e) => onUpdate("title", e.target.value)}
-                            placeholder="Nhập tiêu đề tài liệu..."
+                            placeholder={t('documents.upload.step2.placeholderTitle', 'Enter document title...')}
                             className="w-full px-4 py-2.5 border border-black rounded-lg outline-none focus:ring-2 focus:ring-black/20 text-sm transition-all"
                         />
                     </div>
                 </div>
 
                 <AutocompleteField
-                    label="Môn học"
+                    label={t('documents.upload.step2.course', 'Course')}
                     value={courseQuery}
                     onChange={(value) => {
                         setCourseQuery(value);
@@ -229,7 +233,7 @@ const FileItemEditor = ({
                     items={courses}
                     isLoading={coursesStatus === 'loading'}
                     showDropdown={showCourseDropdown}
-                    placeholder="Nhập để tìm kiếm môn học..."
+                    placeholder={t('documents.upload.step2.placeholderCourse', 'Select course...')}
                     renderItem={(course) => (
                         <div className="text-sm text-gray-900">{course.id} - {course.name}</div>
                     )}
@@ -237,7 +241,7 @@ const FileItemEditor = ({
                 />
 
                 <AutocompleteField
-                    label="Chủ đề"
+                    label={t('documents.upload.step2.course', 'Topic')}
                     value={topicQuery}
                     onChange={setTopicQuery}
                     onFocus={handleTopicFocus}
@@ -245,7 +249,7 @@ const FileItemEditor = ({
                     items={filteredTopics}
                     showDropdown={showTopicDropdown}
                     disabled={!selectedCourse}
-                    placeholder={!selectedCourse ? "Vui lòng chọn môn học trước" : "Nhập để tìm kiếm chủ đề..."}
+                    placeholder={!selectedCourse ? t('documents.upload.step2.placeholderCourse', 'Select course...') : t('documents.upload.step2.placeholderTitle', 'Select topic...')}
                     renderItem={(topic) => (
                         <div className="text-sm text-gray-900">{topic.name}</div>
                     )}
@@ -253,13 +257,13 @@ const FileItemEditor = ({
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
-                    <label className="md:col-span-3 text-base font-bold text-black pt-2">Mô tả:</label>
+                    <label className="md:col-span-3 text-base font-bold text-black pt-2">{t('documents.upload.step2.fileDescription', 'Description')}:</label>
                     <div className="md:col-span-9">
                         <textarea
                             value={file.description || ""}
                             onChange={(e) => onUpdate("description", e.target.value)}
                             rows={4}
-                            placeholder="Nhập mô tả tài liệu..."
+                            placeholder={t('documents.upload.step2.placeholderDesc', 'Briefly describe the document contents...')}
                             className="w-full px-4 py-2.5 border border-black rounded-lg outline-none focus:ring-2 focus:ring-black/20 text-sm resize-none transition-all"
                         />
                     </div>
@@ -272,7 +276,7 @@ const FileItemEditor = ({
                 />
 
                 <AutocompleteField
-                    label="Trường đại học"
+                    label={t('documents.upload.step2.university', 'University')}
                     value={universityQuery}
                     onChange={(value) => {
                         setUniversityQuery(value);
@@ -283,7 +287,7 @@ const FileItemEditor = ({
                     items={universities}
                     isLoading={universitiesStatus === 'loading'}
                     showDropdown={showUniversityDropdown}
-                    placeholder="Nhập để tìm kiếm trường đại học..."
+                    placeholder={t('documents.upload.step2.placeholderUni', 'Select university...')}
                     renderItem={(university) => (
                         <div className="text-sm text-gray-900">
                             <span className="font-semibold">{university.abbreviation}</span> - {university.name}

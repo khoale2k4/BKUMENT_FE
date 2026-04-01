@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react"; // Import useState
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { login, loginUser } from "@/lib/redux/features/authSlice";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,7 @@ import { API_ENDPOINTS } from "../../../lib/apiEndPoints";
 import { AppRoute } from "@/lib/appRoutes";
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -32,8 +34,8 @@ export default function LoginPage() {
       dispatch(
         showToast({
           type: "success",
-          title: "Thành công!",
-          message: "Bạn đã đăng nhập thành công!",
+          title: t('auth.login.successTitle', 'Success!'),
+          message: t('auth.login.successMsg', 'You have logged in successfully!'),
         })
       );
 
@@ -44,8 +46,8 @@ export default function LoginPage() {
       dispatch(
         showToast({
           type: "error",
-          title: "Đăng nhập thất bại",
-          message: (errorMsg as string) || "Tài khoản hoặc mật khẩu không hợp lệ!",
+          title: t('auth.login.failTitle', 'Login Failed'),
+          message: (errorMsg as string) || t('auth.login.failMsg', 'Invalid account or password!'),
         })
       );
     }
@@ -58,17 +60,17 @@ export default function LoginPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 lg:p-24">
         <div className="w-full max-w-md">
           <h1 className="text-4xl font-bold mb-8 text-gray-900 font-serif">
-            Welcome back!
+            {t('auth.login.title', 'Welcome back!')}
           </h1>
           <h2 className="text-2xl mb-8 text-gray-900 font-serif">
-            Enter your Credentials to access your account
+            {t('auth.login.subtitle', 'Enter your Credentials to access your account')}
           </h2>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <Input
-              label="Username / Email"
+              label={t('auth.login.usernameLabel', 'Username / Email')}
               type="text"
-              placeholder="Enter your username"
+              placeholder={t('auth.login.usernamePlaceholder', 'Enter your username')}
               required
               value={username}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -80,20 +82,20 @@ export default function LoginPage() {
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <label className="text-sm font-semibold text-gray-900">
-                  Password
+                  {t('auth.login.passwordLabel', 'Password')}
                 </label>
 
                 <Link
                   href={AppRoute.forgot_password}
                   className="text-sm text-blue-600 font-medium hover:underline"
                 >
-                  Forgot password?
+                  {t('auth.login.forgot', 'Forgot password?')}
                 </Link>
               </div>
 
               <Input
                 type="password"
-                placeholder="Enter your password"
+                placeholder={t('auth.login.passwordPlaceholder', 'Enter your password')}
                 required
                 value={password}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -114,9 +116,9 @@ export default function LoginPage() {
                 htmlFor="terms"
                 className="text-xs font-semibold text-gray-900"
               >
-                I agree to the{" "}
+                {t('auth.login.agreeTerms', 'I agree to the')}{" "}
                 <Link href="#" className="underline">
-                  terms & policy
+                  {t('auth.login.termsPolicy', 'terms & policy')}
                 </Link>
               </label>
             </div>
@@ -126,7 +128,7 @@ export default function LoginPage() {
               className="bg-[#3F5D38] hover:bg-[#2d4228] w-full"
               disabled={isReduxLoading}
             >
-              {isReduxLoading ? "Logging in..." : "Login"}
+              {isReduxLoading ? t('auth.login.loggingIn', 'Logging in...') : t('auth.login.loginBtn', 'Login')}
             </Button>
           </form>
 
@@ -135,7 +137,7 @@ export default function LoginPage() {
               <span className="w-full border-t border-gray-200"></span>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-900 font-bold">Or</span>
+              <span className="bg-white px-2 text-gray-900 font-bold">{t('auth.login.or', 'Or')}</span>
             </div>
           </div>
 
@@ -146,7 +148,7 @@ export default function LoginPage() {
               className="flex items-center gap-2 font-semibold"
             >
               <GoogleIcon />
-              Log in with Google
+              {t('auth.login.google', 'Log in with Google')}
             </Button>
             <Button
               variant="outline"
@@ -154,14 +156,14 @@ export default function LoginPage() {
               className="flex items-center gap-2 font-semibold"
             >
               <AppleIcon />
-              Log in with Apple
+              {t('auth.login.apple', 'Log in with Apple')}
             </Button>
           </div>
 
           <p className="mt-8 text-center text-sm font-semibold text-gray-900">
-            Don't have an account?{" "}
+            {t('auth.login.noAccount', "Don't have an account?")}{" "}
             <Link href={AppRoute.register} className="text-blue-600 hover:underline">
-              Sign Up
+              {t('auth.login.signUp', 'Sign Up')}
             </Link>
           </p>
         </div>

@@ -1,4 +1,4 @@
-'use client';
+import { useTranslation } from 'react-i18next';
 import { Button, Select } from '@mantine/core';
 import { IconWorld, IconLock } from '@tabler/icons-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
@@ -9,6 +9,7 @@ import { AppRoute } from '@/lib/appRoutes';
 import { showToast } from '@/lib/redux/features/toastSlice';
 
 export default function CreatePostHeader() {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const router = useRouter();
     const { visibility, status, id } = useAppSelector(state => state.blogs);
@@ -21,20 +22,17 @@ export default function CreatePostHeader() {
             dispatch(
                 showToast({
                     type: "success",
-                    title: "Thành công!",
-                    message: "Đăng bài viết thành công!",
+                    title: t('blogs.write.header.successTitle', 'Success!'),
+                    message: t('blogs.write.header.successMsg', 'Post published successfully!'),
                 })
             );
-
-            // chỗ này nối API vô thì ko cần nữa
-            // router.push('/blogs/9f30a3ce-a937-42ca-a3e5-faff19931f09'); 
 
         } catch (error) {
             dispatch(
                 showToast({
                     type: "error",
-                    title: "Thất bại!",
-                    message: "Đăng bài viết không thành công!",
+                    title: t('blogs.write.header.failTitle', 'Failed!'),
+                    message: t('blogs.write.header.failMsg', 'Post publication failed!'),
                 })
             );
         } finally {
@@ -58,10 +56,10 @@ export default function CreatePostHeader() {
                 <div className="flex items-center gap-3">
                     <Select
                         id="post-visibility"
-                        placeholder="Visibility"
+                        placeholder={t('blogs.write.header.visibility', 'Visibility')}
                         data={[
-                            { value: 'PUBLIC', label: 'Công khai' },
-                            { value: 'PRIVATE', label: 'Riêng tư' },
+                            { value: 'PUBLIC', label: t('blogs.write.header.public', 'Public') },
+                            { value: 'PRIVATE', label: t('blogs.write.header.private', 'Private') },
                         ]}
                         value={visibility}
                         onChange={(val) => dispatch(setVisibility(val as any))}
@@ -81,7 +79,7 @@ export default function CreatePostHeader() {
                         loading={isSubmitting}
                         onClick={handlePublish}
                     >
-                        Xuất bản
+                        {isSubmitting ? t('blogs.write.header.publishing', 'Publishing...') : t('blogs.write.header.publish', 'Publish')}
                     </Button>
                 </div>
             </div>

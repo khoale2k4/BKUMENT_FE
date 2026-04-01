@@ -1,4 +1,6 @@
-'use client';
+"use client";
+
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import {
@@ -21,6 +23,7 @@ const PAGE_SIZE = 10;
 const PEOPLE_PAGE_SIZE = 10;
 
 export default function HomePage() {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const {
         items, status, error, currentPage, totalPages,
@@ -38,9 +41,9 @@ export default function HomePage() {
     const tabs = ['Following', 'Documents', 'People'];
 
     const tabToText = (tab: string) => {
-        if (tab === 'Following') return 'Bài viết';
-        if (tab === 'Documents') return 'Tài liệu';
-        return 'Có thể biết';
+        if (tab === 'Following') return t('home.tabs.following', 'Articles');
+        if (tab === 'Documents') return t('home.tabs.documents', 'Documents');
+        return t('home.tabs.people', 'People');
     };
 
     const urlSearchQuery = searchParams.get('search');
@@ -63,8 +66,8 @@ export default function HomePage() {
                         console.error('Search failed:', serializedError);
                         dispatch(showToast({
                             type: 'error',
-                            title: 'Lỗi',
-                            message: 'Tìm kiếm thất bại. Vui lòng thử lại.',
+                            title: t('auth.login.error'),
+                            message: t('home.search.fail', 'Search failed. Please try again.'),
                         }));
                     }
                 });
@@ -84,8 +87,8 @@ export default function HomePage() {
                         console.error('Fetch failed:', serializedError);
                         dispatch(showToast({
                             type: 'error',
-                            title: 'Lỗi',
-                            message: 'Không thể tải nội dung. Vui lòng thử lại.',
+                            title: t('auth.login.error'),
+                            message: t('home.error.desc', "We couldn't load the feed. Please try again later."),
                         }));
                     }
                 });
@@ -106,8 +109,8 @@ export default function HomePage() {
             if (err?.name !== 'AbortError') {
                 dispatch(showToast({
                     type: 'error',
-                    title: 'Lỗi',
-                    message: 'Không thể tải danh sách người dùng.',
+                    title: t('auth.login.error'),
+                    message: t('home.error.loadPeopleFail', 'Could not load people list.'),
                 }));
             }
         });
@@ -147,14 +150,14 @@ export default function HomePage() {
             await dispatch(followPerson(person.id)).unwrap();
             dispatch(showToast({
                 type: 'success',
-                title: 'Thành công!',
-                message: `Bạn đã theo dõi ${person.fullName}!`,
+                title: t('auth.login.success'),
+                message: t('home.people.followSuccess', 'You are now following {{name}}!', { name: person.fullName }),
             }));
         } catch {
             dispatch(showToast({
                 type: 'error',
-                title: 'Lỗi',
-                message: 'Theo dõi thất bại. Vui lòng thử lại.',
+                title: t('auth.login.error'),
+                message: t('home.people.followFail', 'Follow failed. Please try again.'),
             }));
         } finally {
             setFollowingLoading(prev => {
@@ -172,24 +175,24 @@ export default function HomePage() {
     function EmptyState({ tab }: { tab: string }) {
         const messageMap: Record<string, { title: string; desc: string }> = {
             Following: {
-                title: 'Chưa có nội dung',
-                desc: 'Hãy theo dõi thêm tác giả để xem bài viết mới.',
+                title: t('home.empty.following.title', 'No content yet'),
+                desc: t('home.empty.following.desc', 'Follow more authors to see new articles.'),
             },
             Recommended: {
-                title: 'Chưa có đề xuất',
-                desc: 'Chúng tôi sẽ gợi ý nội dung phù hợp hơn sớm thôi.',
+                title: t('home.empty.recommended.title', 'No recommendations'),
+                desc: t('home.empty.recommended.desc', 'We will suggest relevant content soon.'),
             },
             Documents: {
-                title: 'Chưa có tài liệu',
-                desc: 'Hiện chưa có tài liệu nào được chia sẻ.',
+                title: t('home.empty.documents.title', 'No documents'),
+                desc: t('home.empty.documents.desc', 'No documents shared yet.'),
             },
             People: {
-                title: 'Không có gợi ý nào',
-                desc: 'Hiện chưa có gợi ý kết nối nào dành cho bạn.',
+                title: t('home.empty.people.title', 'No suggestions'),
+                desc: t('home.empty.people.desc', 'No connection suggestions available at the moment.'),
             },
             Search: {
-                title: 'Không tìm thấy kết quả',
-                desc: `Không tìm thấy kết quả nào cho "${urlSearchQuery}".`,
+                title: t('home.empty.following.title', 'No search results found'),
+                desc: t('home.search.results', 'No results for "{{query}}"', { query: urlSearchQuery }),
             },
         };
 
@@ -245,7 +248,7 @@ export default function HomePage() {
                             <p className="text-xs text-gray-500 truncate mt-0.5">{person.university}</p>
                         )}
                         <p className="text-xs text-gray-400 mt-0.5">
-                            {person.followerCount ?? 0} người theo dõi
+                            {person.followerCount ?? 0} {t('home.people.followers', 'followers')}
                         </p>
                     </div>
                 </button>
@@ -263,9 +266,9 @@ export default function HomePage() {
                     )}
                 >
                     {isFollowed ? (
-                        <><Check className="w-3 h-3" /> Đã theo dõi</>
+                        <><Check className="w-3 h-3" /> {t('home.people.following', 'Following')}</>
                     ) : (
-                        <><UserPlus className="w-3 h-3" /> Theo dõi</>
+                        <><UserPlus className="w-3 h-3" /> {t('home.people.follow', 'Follow')}</>
                     )}
                 </button>
             </div>
@@ -279,10 +282,10 @@ export default function HomePage() {
                     <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900">
-                                Kết quả cho "{urlSearchQuery}"
+                                {t('home.search.results', 'Results for "{{query}}"', { query: urlSearchQuery })}
                             </h2>
                             <p className="text-sm text-gray-500 mt-1">
-                                Tìm thấy {totalItems} kết quả
+                                {t('home.search.found', 'Found {{count}} results', { count: totalItems })}
                             </p>
                         </div>
                         <button
@@ -292,7 +295,7 @@ export default function HomePage() {
                             }}
                             className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-full border border-gray-200 cursor-pointer"
                         >
-                            Xóa tìm kiếm
+                            {t('home.search.clear', 'Clear search')}
                         </button>
                     </div>
                 )}
@@ -324,9 +327,9 @@ export default function HomePage() {
                                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                                     <Frown className="w-8 h-8 text-red-500" />
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">Oops! Something went wrong</h3>
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('home.error.title', 'Oops! Something went wrong')}</h3>
                                 <p className="text-gray-500 mb-6 max-w-sm">
-                                    {error || "We couldn't load the feed. Please try again later."}
+                                    {error || t('home.error.desc', "We couldn't load the feed. Please try again later.")}
                                 </p>
                                 <button
                                     onClick={() => {
@@ -338,7 +341,7 @@ export default function HomePage() {
                                     }}
                                     className="px-6 py-2 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200"
                                 >
-                                    Thử lại
+                                    {t('home.error.retry', 'Try again')}
                                 </button>
                             </div>
                         )}
@@ -398,8 +401,8 @@ export default function HomePage() {
                 {/* People May Know Tab */}
                 {activeTab === 'People' && (
                     <div>
-                        <h2 className="text-lg font-bold text-gray-900 mb-1">Những người bạn có thể biết</h2>
-                        <p className="text-sm text-gray-500 mb-6">Khám phá và kết nối với những người dùng khác.</p>
+                        <h2 className="text-lg font-bold text-gray-900 mb-1">{t('home.people.title', 'People you may know')}</h2>
+                        <p className="text-sm text-gray-500 mb-6">{t('home.people.desc', 'Discover and connect with other users.')}</p>
 
                         {peopleStatus === 'loading' && (
                             <div className="space-y-4">
@@ -421,12 +424,12 @@ export default function HomePage() {
                                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                                     <Frown className="w-8 h-8 text-red-500" />
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">Không thể tải dữ liệu</h3>
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('home.error.desc', "We couldn't load the feed. Please try again later.")}</h3>
                                 <button
                                     onClick={() => dispatch(fetchPeopleMayKnow({ page: peopleCurrentPage, size: PEOPLE_PAGE_SIZE }))}
                                     className="px-6 py-2 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors"
                                 >
-                                    Thử lại
+                                    {t('home.error.retry', 'Try again')}
                                 </button>
                             </div>
                         )}
@@ -462,7 +465,7 @@ export default function HomePage() {
             </main>
 
             <aside className="hidden xl:block w-80 pl-10 py-8 border-l border-gray-100">
-                <h3 className="font-bold text-gray-900 mb-4">Recommended topics</h3>
+                <h3 className="font-bold text-gray-900 mb-4">{t('home.sidebar.recommended', 'Recommended topics')}</h3>
                 <div className="flex flex-wrap gap-2 mb-8">
                     {['Technology', 'Money', 'Business', 'Productivity', 'Art', 'Mindfulness'].map(tag => (
                         <span

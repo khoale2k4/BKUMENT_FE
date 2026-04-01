@@ -1,5 +1,6 @@
-'use client';
+"use client";
 
+import { useTranslation } from 'react-i18next';
 import { formatTimeAgo } from "@/lib/utils/formatTimeAgo";
 import { CardProp } from "./props";
 import { BookmarkPlus, MoreHorizontal } from "lucide-react";
@@ -13,6 +14,7 @@ import { Flag, Share2, Trash2 } from "lucide-react";
 import { clsx } from "clsx";
 
 export default function ContentCard({ data }: { data: CardProp }) {
+    const { t } = useTranslation();
     const timeRead = Math.ceil((data?.content?.split(" ")?.length || 0) / 200) || 1;
 
     const authorName = 'Unknown';
@@ -33,7 +35,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                 <div className="flex items-center text-[13px] leading-none">
                     <span className="font-medium text-gray-900">{data.author.name}</span>
                     <span className="mx-1 text-gray-400">·</span>
-                    <span className="text-gray-500">{data?.time ? formatTimeAgo(data.time) : ''}</span>
+                    <span className="text-gray-500">{data?.time ? formatTimeAgo(data.time, t) : ''}</span>
                 </div>
             </div>
 
@@ -62,7 +64,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                         </span>
                     )}
 
-                    <span className="text-[13px] text-gray-500">Khoảng {timeRead} phút đọc</span>
+                    <span className="text-[13px] text-gray-500">{t('home.contentCard.minRead', '{{count}} min read', { count: timeRead })}</span>
                 </div>
 
                 <div className="flex items-center gap-4 text-gray-500 relative">

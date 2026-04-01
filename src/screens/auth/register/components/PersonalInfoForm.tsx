@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/TextInput";
 import { Button } from "@/components/ui/button";
 
@@ -26,6 +27,7 @@ export default function PersonalInfoForm({
   universities,
   isLoadingUnis
 }: PersonalInfoFormProps) {
+  const { t } = useTranslation();
   
   return (
     <form onSubmit={onNext} className="space-y-4 animate-in fade-in slide-in-from-left-4 duration-500">
@@ -33,13 +35,13 @@ export default function PersonalInfoForm({
       {/* Row 1: Name */}
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="First Name" name="firstName" type="text"
-          placeholder="e.g. John" value={formData.firstName}
+          label={t('auth.register.firstNameLabel', 'First Name')} name="firstName" type="text"
+          placeholder={t('auth.register.firstNamePlaceholder', 'e.g. John')} value={formData.firstName}
           onChange={handleChange} required className={inputClassName}
         />
         <Input
-          label="Last Name" name="lastName" type="text"
-          placeholder="e.g. Doe" value={formData.lastName}
+          label={t('auth.register.lastNameLabel', 'Last Name')} name="lastName" type="text"
+          placeholder={t('auth.register.lastNamePlaceholder', 'e.g. Doe')} value={formData.lastName}
           onChange={handleChange} required className={inputClassName}
         />
       </div>
@@ -47,13 +49,13 @@ export default function PersonalInfoForm({
       {/* Row 2: Contact */}
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="Email Address" name="email" type="email"
-          placeholder="john@example.com" value={formData.email}
+          label={t('auth.register.emailLabel', 'Email Address')} name="email" type="email"
+          placeholder={t('auth.register.emailPlaceholder', 'john@example.com')} value={formData.email}
           onChange={handleChange} required className={inputClassName}
         />
         <Input
-          label="Phone Number" name="phone" type="tel"
-          placeholder="+84..." value={formData.phone}
+          label={t('auth.register.phoneLabel', 'Phone Number')} name="phone" type="tel"
+          placeholder={t('auth.register.phonePlaceholder', '+84...')} value={formData.phone}
           onChange={handleChange} required className={inputClassName}
         />
       </div>
@@ -61,14 +63,16 @@ export default function PersonalInfoForm({
       {/* Row 3: Education & DOB */}
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label="Date of Birth" name="dob" type="date"
+          label={t('auth.register.dobLabel', 'Date of Birth')} name="dob" type="date"
           value={formData.dob} onChange={handleChange}
           required className={inputClassName}
         />
         
         {/* INPUT UNIVERSITY THÀNH THẺ SELECT */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">University <span className="text-red-500">*</span></label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            {t('auth.register.universityLabel', 'University')} <span className="text-red-500">*</span>
+          </label>
           <select 
             name="universityId" 
             value={formData.universityId} 
@@ -85,7 +89,7 @@ export default function PersonalInfoForm({
           >
             {/* Lựa chọn mặc định */}
             <option value={0} disabled>
-              {isLoadingUnis ? "Đang tải danh sách..." : "-- Chọn trường Đại học --"}
+              {isLoadingUnis ? t('auth.register.loadingUniversities', 'Loading list...') : t('auth.register.selectUniversity', '-- Select University --')}
             </option>
 
             {/* Render danh sách các trường đổ về từ API */}
@@ -100,18 +104,20 @@ export default function PersonalInfoForm({
 
       {/* Row 4: Address (Full width) */}
       <Input
-        label="Address" name="address" type="text"
-        placeholder="123 Street, City, Country" value={formData.address}
+        label={t('auth.register.addressLabel', 'Address')} name="address" type="text"
+        placeholder={t('auth.register.addressPlaceholder', '123 Street, City, Country')} value={formData.address}
         onChange={handleChange} className={inputClassName}
       />
 
       {/* Row 5: Bio (Textarea) */}
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-semibold text-gray-700">Bio <span className="text-gray-400 font-normal">(Optional)</span></label>
+        <label className="text-sm font-semibold text-gray-700">
+          {t('auth.register.bioLabel', 'Bio')} <span className="text-gray-400 font-normal">{t('auth.register.optional', '(Optional)')}</span>
+        </label>
         <textarea
           name="bio"
           rows={3}
-          placeholder="Tell us a little bit about yourself..."
+          placeholder={t('auth.register.bioPlaceholder', 'Tell us a little bit about yourself...')}
           value={formData.bio}
           onChange={handleChange}
           className={`${inputClassName} resize-none`}
@@ -120,7 +126,7 @@ export default function PersonalInfoForm({
 
       {/* Submit Button */}
       <Button type="submit" className="bg-[#3F5D38] hover:bg-[#2d4228] w-full text-white py-6 rounded-xl mt-6 font-bold text-md shadow-md">
-        Next Step
+        {t('auth.register.next', 'Next Step')}
       </Button>
     </form>
   );

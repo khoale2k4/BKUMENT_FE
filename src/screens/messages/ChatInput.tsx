@@ -1,5 +1,4 @@
-"use client";
-
+import { useTranslation } from "react-i18next";
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/redux/store";
@@ -7,6 +6,7 @@ import { sendImageMessageAsync, sendMessageAsync } from "@/lib/redux/features/ch
 import { DateTime } from "luxon";
 
 const ChatInput = () => {
+    const { t } = useTranslation();
     const [text, setText] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -46,7 +46,7 @@ const ChatInput = () => {
         if (!file || !activeConversationId) return;
 
         if (!file.type.startsWith('image/')) {
-            alert("Vui lòng chọn định dạng ảnh!");
+            alert(t('chat.input.imageFormatError', 'Vui lòng chọn định dạng ảnh!'));
             return;
         }
 
@@ -57,7 +57,7 @@ const ChatInput = () => {
                 file: file
             })).unwrap();
         } catch (error) {
-            alert("Gửi ảnh thất bại!");
+            alert(t('chat.input.sendImageFail', 'Gửi ảnh thất bại!'));
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -91,7 +91,7 @@ const ChatInput = () => {
                 
                 <input
                     type="text"
-                    placeholder="Aa"
+                    placeholder={t('chat.input.placeholder', 'Aa')}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={handleKeyDown}

@@ -1,4 +1,5 @@
 'use client';
+import { useTranslation } from 'react-i18next';
 import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp, Flag, MoreHorizontal, Trash2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
@@ -28,6 +29,7 @@ const Skeleton = ({ className }: { className: string }) => (
 );
 
 export default function DocumentDetailPage({ params }: { params: { id: string } }) {
+    const { t, i18n } = useTranslation();
     const dispatch = useAppDispatch();
     const { currentDocument, currentAuthor, detailStatus, relatedDocuments, relatedStatus, relatedPage, relatedTotalPages } = useAppSelector((state) => state.documents);
     const currentUser = useAppSelector(state => state.profile.user);
@@ -58,7 +60,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             dispatch(showToast({
                 type: 'error',
                 title: 'Lỗi',
-                message: 'Không thể tải file, vui lòng thử lại.'
+                message: t('documents.detail.downloadFail', 'Download failed, please try again.')
             }));
         }
     };
@@ -73,16 +75,16 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
         try {
             await navigator.clipboard.writeText(window.location.href);
             dispatch(showToast({
-                type: 'success',
-                title: 'Thành công',
-                message: 'Đã sao chép đường dẫn!'
+                type: 'success', 
+                title: t('auth.login.success'), 
+                message: t('documents.detail.shareSuccess', 'Link copied to clipboard!') 
             }));
         } catch (error) {
             console.error("Lỗi khi copy:", error);
             dispatch(showToast({
-                type: 'error',
-                title: 'Lỗi',
-                message: 'Không thể sao chép đường dẫn lúc này.'
+                type: 'error', 
+                title: t('auth.login.error'), 
+                message: t('documents.detail.shareError', 'Could not copy link at this time.') 
             }));
         }
     };
@@ -129,7 +131,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             );
         }
 
-        if (!currentDocument.viewUrl) return <div className="p-8 text-center text-gray-500">Không có tài liệu</div>;
+        if (!currentDocument.viewUrl) return <div className="p-8 text-center text-gray-500">{t('documents.detail.noDoc', 'No document content.')}</div>;
 
         const fileExtension = currentDocument.documentType || 'application/pdf';
 
@@ -143,7 +145,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
 
         return (
             <div className="flex items-center justify-center h-full text-gray-500 p-8">
-                Định dạng này không hỗ trợ xem trước. Vui lòng tải về.
+                {t('documents.detail.noViewer', 'This format does not support preview. Please download to view.')}
             </div>
         );
     };
@@ -151,7 +153,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     if (detailStatus === 'failed') {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center text-gray-500">Không tìm thấy tài liệu.</div>
+                <div className="text-center text-gray-500">{t('documents.detail.notFound', 'Document not found.')}</div>
             </div>
         );
     }
@@ -164,7 +166,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             <div className="max-w-4xl mx-auto px-4 pt-10 pb-6">
                 <div className="flex items-center gap-2 mb-4">
                     <span className="bg-blue-50 text-blue-600 text-xs px-2.5 py-0.5 rounded-full font-medium">
-                        Documents
+                        {t('documents.detail.category', 'Documents')}
                     </span>
                     <span className="text-gray-400 text-xs">•</span>
                     {isDocLoading ? (
@@ -200,7 +202,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                                 <div>
                                     <div className="font-semibold text-gray-900">{currentDocument.author.name}</div>
                                     <div className="text-xs text-gray-500">
-                                        {currentDocument.createdAt && new Date(currentDocument.createdAt).toLocaleDateString("vi-VN")}
+                                        {currentDocument?.createdAt && new Date(currentDocument.createdAt).toLocaleDateString(i18n.language === 'vi' ? "vi-VN" : "en-US")}
                                     </div>
                                 </div>
                             </>
@@ -219,7 +221,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                             )}
                         >
                             <Download size={18} />
-                            <span>Download</span>
+                            <span>{t('documents.detail.download', 'Download')}</span>
                         </button>
                         
                         <DocumentActionsMenu 
@@ -235,7 +237,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
 
             <div className="max-w-4xl mx-auto px-4">
                 <div className="mb-8">
-                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-2">Description</h3>
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-2">{t('documents.detail.description', 'Description')}</h3>
                     {isDocLoading ? (
                         <div className="space-y-2">
                             <Skeleton className="h-4 w-full" />
@@ -260,11 +262,11 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                         <>
                             <div className="flex items-center gap-2">
                                 <Eye size={18} />
-                                <span>{currentDocument?.downloadCount?.toLocaleString()} Views</span>
+                                <span>{currentDocument?.downloadCount?.toLocaleString()} {t('documents.detail.views', 'Views')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Download size={18} />
-                                <span>{currentDocument?.downloadCount?.toLocaleString()} Downloads</span>
+                                <span>{currentDocument?.downloadCount?.toLocaleString()} {t('documents.detail.downloads', 'Downloads')}</span>
                             </div>
                         </>
                     )}
@@ -272,7 +274,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             </div>
 
             <div className="max-w-4xl mx-auto px-4 mb-16 border-t border-gray-100 pt-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Tài liệu liên quan</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-6">{t('documents.detail.related', 'Related Documents')}</h3>
 
                 {relatedStatus === 'loading' ? (
                     <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
@@ -300,12 +302,12 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                                 className="min-w-[100px] flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-50 rounded-xl border border-dashed border-gray-300 transition"
                                 onClick={() => onRelatedPageChange(relatedPage + 2)}
                             >
-                                <span className="text-sm font-medium text-gray-500">Xem thêm</span>
+                                <span className="text-sm font-medium text-gray-500">{t('documents.detail.viewMore', 'View more')}</span>
                             </div>
                         </div>
                     </div>
                 ) : (
-                    <div className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">Không có tài liệu liên quan nào.</div>
+                    <div className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">{t('documents.detail.noRelated', 'No related documents found.')}</div>
                 )}
             </div>
 

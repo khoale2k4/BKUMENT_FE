@@ -1,4 +1,4 @@
-'use client';
+import { useTranslation } from 'react-i18next';
 import { useRef, useState } from 'react';
 import { IconPlus, IconX } from '@tabler/icons-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
@@ -6,6 +6,7 @@ import { setCoverImage, uploadImage } from '@/lib/redux/features/blogSlice';
 import { AuthenticatedImage } from '../../../components/ui/AuthenticatedImage';
 
 export default function PostCoverImage() {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const coverImage = useAppSelector(state => state.blogs.coverImage);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -20,7 +21,7 @@ export default function PostCoverImage() {
             const url = await dispatch(uploadImage(file)).unwrap();
             dispatch(setCoverImage(url));
         } catch (err) {
-            alert('Upload failed');
+            alert(t('blogs.write.cover.failed', 'Upload failed'));
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';
@@ -34,13 +35,13 @@ export default function PostCoverImage() {
             {!coverImage && !isUploading && (
                 <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-2 text-gray-400 hover:text-gray-700 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors cursor-pointer">
                     <IconPlus size={16} stroke={1.5} />
-                    <span>Thêm ảnh bìa</span>
+                    <span>{t('blogs.write.cover.add', 'Add cover image')}</span>
                 </button>
             )}
 
             {isUploading && (
                 <div className="w-full h-48 bg-gray-50 rounded-lg flex items-center justify-center animate-pulse">
-                    <span className="text-sm text-gray-400">Đang tải ảnh lên...</span>
+                    <span className="text-sm text-gray-400">{t('blogs.write.cover.uploading', 'Uploading image...')}</span>
                 </div>
             )}
 
@@ -51,6 +52,7 @@ export default function PostCoverImage() {
                     </div>
                     <button
                         onClick={() => dispatch(setCoverImage(null))}
+                        aria-label={t('blogs.write.cover.remove', 'Remove cover image')}
                         className="absolute top-4 right-4 bg-white/90 p-2 rounded-full text-gray-600 hover:text-red-600 shadow-sm opacity-0 group-hover:opacity-100 transition-all"
                     >
                         <IconX size={18} />

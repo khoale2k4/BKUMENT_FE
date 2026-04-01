@@ -1,4 +1,5 @@
 "use client";
+import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { Badge, ActionIcon } from '@mantine/core';
 import { IconArrowLeft, IconEye, IconCalendar, IconUser, IconShare3 } from '@tabler/icons-react';
@@ -25,7 +26,7 @@ interface PageProps {
 }
 
 export default function BlogDetailPage(params: PageProps) {
-    console.log(params);
+    const { t, i18n } = useTranslation();
     const router = useRouter();
     const dispatch = useAppDispatch();
 
@@ -43,7 +44,7 @@ export default function BlogDetailPage(params: PageProps) {
                 return (
                     <AuthenticatedImage 
                         src={src} 
-                        alt={alt || 'Nội dung bài viết'} 
+                        alt={alt || t('blogs.detail.imageAlt', 'Post content image')} 
                         className={className} 
                         onError={(e: any) => {
                             e.currentTarget.src = "https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg";
@@ -78,7 +79,7 @@ export default function BlogDetailPage(params: PageProps) {
                         className="flex items-center gap-2 text-gray-500 hover:text-black transition-colors"
                     >
                         <IconArrowLeft size={20} stroke={1.5} />
-                        <span className="text-sm font-medium">Quay lại</span>
+                        <span className="text-sm font-medium">{t('blogs.detail.back', 'Back')}</span>
                     </button>
 
                     <div className="flex gap-2">
@@ -121,21 +122,21 @@ export default function BlogDetailPage(params: PageProps) {
                         variant="light"
                         size="sm"
                     >
-                        {visibility}
+                        {visibility === 'PUBLIC' ? t('blogs.write.header.public', 'Public') : t('blogs.write.header.private', 'Private')}
                     </Badge>
                     <span className="text-gray-400 text-xs uppercase tracking-wide font-semibold">
                         •
                     </span>
                     <span className="text-gray-500 text-sm font-medium">
                         {createdAt
-                            ? new Date(createdAt).toLocaleDateString("vi-VN")
-                            : 'Đang tải'}
+                            ? new Date(createdAt).toLocaleDateString(i18n.language === 'vi' ? "vi-VN" : "en-US")
+                            : t('blogs.detail.loading', 'Loading')}
                     </span>
                     <span className="text-gray-400 text-xs uppercase tracking-wide font-semibold">
                         •
                     </span>
                     <span className="text-gray-500 text-sm font-medium">
-                        Vừa cập nhật
+                        {t('blogs.detail.updatedJustNow', 'Updated just now')}
                     </span>
                 </div>
 
@@ -146,21 +147,27 @@ export default function BlogDetailPage(params: PageProps) {
                 <div className="flex items-center justify-between border-t border-b border-gray-100 py-4 mb-8">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
-                            <img
-                                src="https://images2.thanhnien.vn/zoom/80_80/528068263637045248/2023/7/8/img6578-16888121214401842466449.jpg"
-                                alt="Author"
-                                className="w-full h-full object-cover"
-                            />
+                            {author?.avatarUrl ? (
+                                <img
+                                    src={author.avatarUrl}
+                                    alt="Author"
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                                    <IconUser size={20} />
+                                </div>
+                            )}
                         </div>
                         <div>
-                            <div className="font-bold text-gray-900 text-sm">Lý Thanh Nhật Quang</div>
+                            <div className="font-bold text-gray-900 text-sm">{author?.name || 'Author Name'}</div>
                             <div className="text-xs text-gray-500">lythanhnhatquangthongnhat2004@gmail.com</div>
                         </div>
                     </div>
 
                     <div className="flex gap-4 text-gray-400 text-sm">
                         <div className="flex items-center gap-1">
-                            <IconEye size={16} /> 0
+                            <IconEye size={16} /> 0 {t('blogs.detail.views', 'views')}
                         </div>
                     </div>
                 </div>
@@ -174,7 +181,7 @@ export default function BlogDetailPage(params: PageProps) {
                     </div>
                 )}
 
-<div
+                <div
                     className={clsx(
                         "prose prose-lg prose-slate max-w-none",
                         "prose-headings:font-bold prose-headings:text-gray-900",
@@ -185,12 +192,12 @@ export default function BlogDetailPage(params: PageProps) {
                         "first-letter:text-5xl first-letter:font-bold first-letter:mr-3 first-letter:float-left first-letter:text-gray-900"
                     )}
                 >
-                    {contentHTML ? parse(contentHTML, parseOptions) : null}
+                    {contentHTML ? parse(contentHTML, parseOptions) : <p className="text-gray-400 italic">{t('blogs.detail.noContent', 'No content available')}</p>}
                 </div>
 
                 <div className="mt-12 pt-8 border-t border-gray-100">
                     <h4 className="text-sm font-bold text-gray-900 uppercase mb-4">
-                        Tags
+                        {t('blogs.detail.tags', 'Tags')}
                     </h4>
                     <div className="flex flex-wrap gap-2">
                         {["Preview", "Draft"].map((tag) => (

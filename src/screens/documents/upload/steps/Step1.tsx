@@ -1,6 +1,9 @@
+"use client";
+
+import { useTranslation } from 'react-i18next';
 import React, { useRef } from "react";
 import { FileUploadItem } from "@/types/FileUpload";
-import { EllipsisVertical, Trash, Upload, FileText } from "lucide-react";
+import { Trash, Upload, FileText } from "lucide-react";
 import { FaFileWord, FaFilePdf } from "react-icons/fa";
 
 interface FileUploaderProps {
@@ -11,6 +14,7 @@ interface FileUploaderProps {
 }
 
 const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUploaderProps) => {
+    const { t } = useTranslation();
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleDrop = (e: any) => {
@@ -49,14 +53,14 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                 onDragOver={handleDragOver}
             >
                 <Upload className="text-4xl text-blue-600 mb-4" />
-                <p className="text-lg font-semibold text-gray-800">Kéo & thả tệp</p>
-                <p className="text-sm text-gray-500">Hoặc nhấp vào bất kỳ đâu để chọn</p>
+                <p className="text-lg font-semibold text-gray-800">{t('documents.upload.step1.dropzone', 'Drag & drop files here or click to browse')}</p>
+                <p className="text-sm text-gray-500">{t('documents.upload.step1.limit', 'Maximum 10 files at once')}</p>
 
                 <button
                     type="button"
-                    className="mt-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors pointer-events-none" // pointer-events-none để click xuyên qua div cha
+                    className="mt-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors pointer-events-none"
                 >
-                    Chọn tệp từ thiết bị
+                    {t('documents.upload.step1.dropzone', 'Drag & drop files here or click to browse')}
                 </button>
 
                 <input
@@ -70,14 +74,14 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                     onClick={(e) => e.stopPropagation()}
                 />
 
-                <p className="mt-4 text-xs text-gray-500">Định dạng hỗ trợ: PDF, DOC, DOCX</p>
+                <p className="mt-4 text-xs text-gray-500">{t('documents.upload.step1.support', 'Support PDF, DOCX, PPTX (Max 50MB)')}</p>
             </div>
 
             <div className="mt-8 flex-1 overflow-y-auto border border-gray-100 rounded-xl space-y-4 p-2 max-h-[400px] shadow-inner bg-gray-50/50">
                 {files.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                         <FileText className="w-12 h-12 mb-3 opacity-20" />
-                        <p>Chưa có tệp nào được tải lên</p>
+                        <p>{t('documents.detail.noDoc', 'No document content.')}</p>
                     </div>
                 ) : (
                     files.map((file) => (
@@ -102,7 +106,7 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                             <div className="flex items-center space-x-3">
                                 {file.status === 'error' ? (
                                     <div className="flex items-center text-red-500 bg-red-50 px-3 py-1 rounded-full border border-red-100">
-                                        <span className="text-xs font-semibold">Lỗi</span>
+                                        <span className="text-xs font-semibold">{t('auth.login.error')}</span>
                                     </div>
                                 ) : file.status === 'analyzing' ? (
                                     <div className="flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
@@ -111,13 +115,13 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
                                         </div>
-                                        <span className="text-xs font-semibold text-blue-600">Đang phân tích...</span>
+                                        <span className="text-xs font-semibold text-blue-600">Analyzing...</span>
                                     </div>
                                 ) : (
                                     <div className="flex items-center space-x-2">
                                         {file.progress === 100 ? (
                                             <div className="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
-                                                <span className="text-xs font-semibold">Sẵn sàng</span>
+                                                <span className="text-xs font-semibold">Ready</span>
                                             </div>
                                         ) : (
                                             <div className="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">
@@ -134,7 +138,7 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                                             onDeleteFile && onDeleteFile(file.localId);
                                         }}
                                         className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                        title="Xóa tệp" 
+                                        title={t('blogs.write.cover.remove', 'Remove cover image')} 
                                     >
                                         <Trash className="w-4 h-4" />
                                     </button>
