@@ -80,6 +80,7 @@ export const fetchFeed = createAsyncThunk(
       tags:
         dta.tags ||
         (category === "Documents" ? ["PDF", "Doc"] : ["Hot", "24h"]),
+      views: dta.views || 0,
     }));
 
     return {
@@ -119,6 +120,7 @@ export const searchKeyword = createAsyncThunk(
 
       tags: result.tags || ["Kết quả tìm kiếm"],
       score: result.score,
+      views: result.views || 0,
     }));
 
     return {

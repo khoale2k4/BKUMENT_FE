@@ -8,7 +8,8 @@ export interface CardProp {
     content: string,
     tags: string[],
     onClick: (id: string) => void,
-    token: string
+    token: string,
+    views: number
 }
 
 interface Author {

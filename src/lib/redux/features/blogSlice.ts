@@ -22,6 +22,7 @@ interface BlogState {
 
     averageRating: number | null;
     myRating: number | null;
+    views: number | null;
 }
 
 const initialState: BlogState = {
@@ -35,6 +36,7 @@ const initialState: BlogState = {
     createdAt: null,
     averageRating: null,
     myRating: null,
+    views: null,
 };
 
 export const uploadImage = createAsyncThunk(
@@ -147,6 +149,7 @@ export const blogSlice = createSlice({
                 state.title = action.payload.name;
                 state.author = action.payload.author;
                 state.createdAt = action.payload.createdAt;
+                state.views = action.payload.views;
                 state.status = 'succeeded';
             })
             .addCase(fetchPost.pending, (state) => {

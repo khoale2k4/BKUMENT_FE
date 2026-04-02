@@ -368,6 +368,7 @@ export default function HomePage() {
                                                         ...content,
                                                         token: token,
                                                         onClick: () => onDocumentClick(content.id),
+                                                        views: content.views || 0,
                                                     }}
                                                 />
                                             ))}

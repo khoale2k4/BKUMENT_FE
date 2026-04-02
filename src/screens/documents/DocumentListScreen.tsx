@@ -113,7 +113,8 @@ export default function DocumentListScreen() {
                                             time: doc.createdAt.toString(),
                                             tags: [doc.documentType || 'Document'],
                                             onClick: () => onDocumentClick(doc.id),
-                                            token: token || ''
+                                            token: token || '',
+                                            views: doc.views || 0
                                         }}
                                     />
                                 ))}

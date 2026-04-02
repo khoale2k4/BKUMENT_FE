@@ -15,6 +15,7 @@ export interface DocumentDetail {
     university?: string;
     course?: string;
     createdAt: Date;
+    views: number;
 }
 
 interface Author {

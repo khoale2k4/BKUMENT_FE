@@ -16,6 +16,7 @@ import { AppRoute } from '@/lib/appRoutes';
 import { useRouter } from 'next/navigation';
 import RelatedDocumentCard from './RelatedDocumentCard';
 import { DescriptionWithShowMore } from './DescriptionWithShowMore/page';
+import { formatDate } from '@/lib/utils/formatDate';
 import httpClient from '@/lib/services/http';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { showToast } from '@/lib/redux/features/toastSlice';
@@ -227,8 +228,13 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                                 </div>
                                 <div>
                                     <div className="font-semibold text-gray-900">{currentDocument.author.name}</div>
-                                    <div className="text-xs text-gray-500">
-                                        {currentDocument?.createdAt && new Date(currentDocument.createdAt).toLocaleDateString(i18n.language === 'vi' ? "vi-VN" : "en-US")}
+                                    <div className="text-[13px] text-gray-500 font-medium flex items-center gap-2">
+                                        <span>{currentDocument?.createdAt ? formatDate(new Date(currentDocument.createdAt).toISOString()) : ''}</span>
+                                        <span className="text-gray-300">•</span>
+                                        <div className="flex items-center gap-1.5">
+                                            <Eye size={15} strokeWidth={2} />
+                                            <span>{currentDocument?.views || 0}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </>

@@ -13,6 +13,7 @@ import { openConfirmModal, openReportModal } from '@/lib/redux/features/modalSli
 import { deleteBlogAsync } from '@/lib/redux/features/myBlogSlice';
 import { showToast } from '@/lib/redux/features/toastSlice';
 import { IconDots, IconTrash, IconFlag, IconShare } from '@tabler/icons-react';
+import { Eye } from 'lucide-react';
 import { AppRoute } from '@/lib/appRoutes';
 import { useState, useRef } from 'react';
 import StarRating from '@/components/ui/StarRating';
@@ -42,7 +43,8 @@ export default function BlogDetailPage(params: PageProps) {
         createdAt, 
         status, 
         averageRating, 
-        myRating 
+        myRating,
+        views
     } = useAppSelector(
         (state) => state.blogs
     );
@@ -156,6 +158,13 @@ export default function BlogDetailPage(params: PageProps) {
                     <span className="text-gray-500 text-sm font-medium">
                         {t('blogs.detail.updatedJustNow', 'Updated just now')}
                     </span>
+                    <span className="text-gray-400 text-xs uppercase tracking-wide font-semibold">
+                        •
+                    </span>
+                    <div className="flex items-center gap-1.5 text-gray-500 text-sm font-medium">
+                        <Eye size={16} strokeWidth={2} />
+                        <span>{views || 0}</span>
+                    </div>
                 </div>
 
                 <h1 className="text-3xl md:text-5xl font-extrabold text-black tracking-tight leading-[1.1] mb-6">

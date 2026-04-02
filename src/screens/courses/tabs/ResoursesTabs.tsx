@@ -91,6 +91,7 @@ const ResourcesTab = () => {
                   ...doc,
                   token: token,
                   onClick: () => onDocumentClick(doc.id),
+                  views: doc.views || 0,
                 }}
               />
             ))}

@@ -18,6 +18,7 @@ interface BlogDetail {
     name: string;
     authorId: string;
     createdAt: string;
+    views: number;
 }
 
 /**

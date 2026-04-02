@@ -3,7 +3,7 @@
 import { useTranslation } from 'react-i18next';
 import { formatTimeAgo } from "@/lib/utils/formatTimeAgo";
 import { CardProp } from "./props";
-import { BookmarkPlus, MoreHorizontal } from "lucide-react";
+import { BookmarkPlus, MoreHorizontal, Eye } from "lucide-react";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 import { useState, useRef, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
@@ -65,6 +65,13 @@ export default function ContentCard({ data }: { data: CardProp }) {
                     )}
 
                     <span className="text-[13px] text-gray-500">{t('home.contentCard.minRead', '{{count}} min read', { count: timeRead })}</span>
+                    
+                    <span className="text-gray-300">•</span>
+                    
+                    <div className="flex items-center gap-1 text-gray-500">
+                        <Eye size={14} strokeWidth={2} />
+                        <span className="text-[13px] font-medium">{data.views || 0}</span>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-4 text-gray-500 relative">

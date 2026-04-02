@@ -113,7 +113,8 @@ export default function BlogListScreen() {
                                             time: blog.createdAt ? blog.createdAt.toString() : '',
                                             tags: ['Blog'],
                                             onClick: () => onBlogClick(blog.id),
-                                            token: token || ''
+                                            token: token || '',
+                                            views: blog.views || 0
                                         }}
                                     />
                                 ))}
