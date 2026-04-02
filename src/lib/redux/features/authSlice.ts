@@ -2,7 +2,10 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as authService from "@/lib/services/auth.service";
 import { RegisterPayload } from "@/lib/services/auth.service";
+import httpClient from "@/lib/services/http";
+import { get } from "http";
 // --- Helper to get token from sessionStorage (Safe for Next.js SSR) ---
+import { fetchUniversities } from "../../services/auth.service";
 const getStoredToken = () => {
   if (typeof window !== "undefined") {
     return sessionStorage.getItem("accessToken");
@@ -31,6 +34,7 @@ export const parseJwt = (token: string | null) => {
 
 const getRolesFromToken = (token: string): string[] => {
   const decoded = parseJwt(token);
+  console.log("roles decoded from token:", decoded?.scope); // Debug log để kiểm tra roles sau khi giải mã
   return decoded?.scope ? decoded.scope.split(" ") : [];
 };
 
@@ -39,6 +43,14 @@ const getStoredCurrentRole = () => {
     return sessionStorage.getItem("currentRole");
   }
   return null;
+};
+
+const determineDefaultRole = (roles: string[]): string => {
+  if (roles.includes("ADMIN")) return "ADMIN";
+  if (roles.includes("MODERATOR")) return "MODERATOR";
+  // Kể cả khi có TUTOR, mặc định khi vào app vẫn là USER (họ sẽ tự switch sau)
+  if (roles.includes("USER") || roles.includes("TUTOR")) return "USER";
+  return roles[0] || "USER"; // Fallback an toàn
 };
 
 // --- Interfaces ---
@@ -50,24 +62,32 @@ interface AuthState {
   currentRole: string | null; // <-- LƯU ROLE HIỆN TẠI ĐANG SỬ DỤNG
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
-
-  // --- THÊM MỚI: State lưu danh sách trường Đại học ---
   universities: University[];
   isUniversitiesLoading: boolean;
   universitiesError: string | null;
 }
+
+export interface University {
+  id: number;
+  name: string;
+  // Thêm các trường khác nếu API của bạn trả về thêm (ví dụ: code, address...)
+}
+
 const initialToken = getStoredToken();
+const initialRoles = initialToken ? getRolesFromToken(initialToken) : [];
+const storedRole = getStoredCurrentRole();
+const initialCurrentRole = (storedRole && initialRoles.includes(storedRole)) 
+  ? storedRole 
+  : (initialRoles.length > 0 ? determineDefaultRole(initialRoles) : "USER");
 
 const initialState: AuthState = {
   isAuthenticated: !!getStoredToken(), // Auto-set to true if token exists
   token: getStoredToken(), // Load token from storage
   user: null, // Note: You might want to fetch user profile separately if token exists
   roles: initialToken ? getRolesFromToken(initialToken) : [], // Tự động lấy roles nếu có token
-  currentRole: getStoredCurrentRole() || "USER",
+  currentRole: initialCurrentRole,
   status: "idle",
   error: null,
-
-  // --- THÊM MỚI: State lưu danh sách trường Đại học ---
   universities: [],
   isUniversitiesLoading: false,
   universitiesError: null,
@@ -76,12 +96,6 @@ const initialState: AuthState = {
 interface LoginPayload {
   username: string;
   password: string;
-}
-
-export interface University {
-  id: number;
-  name: string;
-  // Thêm các trường khác nếu API của bạn trả về thêm (ví dụ: code, address...)
 }
 
 // --- Async Thunks ---
@@ -131,38 +145,27 @@ export const refreshToken = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const result = await authService.refreshToken();
-      return result; 
+      return result;
     } catch (error: any) {
       return rejectWithValue(error.message || "Refresh token failed");
     }
-  }
+  },
 );
 
 export const getUniversities = createAsyncThunk(
   "auth/getUniversities",
-  async (_, { rejectWithValue }) => {
+  async (_: void, { rejectWithValue }) => {
     try {
-      // Bạn có thể đưa URL này vào file API_ENDPOINTS.ts cho gọn nhé
-      const response = await fetch("http://localhost:8888/api/v1/profile/universities", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await response.json();
-
-      // Dựa theo format chung của dự án bạn (code 1000 là success)
-      if (data.code !== 1000) {
-        throw new Error(data.message || "Failed to fetch universities");
-      }
-      console.log("Danh sách trường Đại học nhận được:", data.result);
-
-      return data.result as University[];
+      // Gọi đúng tên hàm API Service
+      const response = await fetchUniversities();
+      console.log("uni", response); // Debug log để kiểm tra dữ liệu trả về từ API
+      return response as University[];
     } catch (error: any) {
-      return rejectWithValue(error.message || "Lỗi kết nối khi tải danh sách trường");
+      return rejectWithValue(
+        error.message || "Lỗi kết nối khi tải danh sách trường",
+      );
     }
-  }
+  },
 );
 // --- Slice ---
 
@@ -181,23 +184,40 @@ export const authSlice = createSlice({
       };
       state.token = action.payload.token;
       state.roles = getRolesFromToken(action.payload.token);
-      state.currentRole = "USER";
+      state.currentRole = determineDefaultRole(state.roles);
       state.status = "idle";
       state.error = null;
 
       sessionStorage.setItem("accessToken", action.payload.token);
-      sessionStorage.setItem("user", JSON.stringify({ name: action.payload.name, email: action.payload.email }));
+      sessionStorage.setItem("currentRole", state.currentRole);
+      sessionStorage.setItem(
+        "user",
+        JSON.stringify({
+          name: action.payload.name,
+          email: action.payload.email,
+        }),
+      );
     },
     initializeAuth: (state) => {
       if (typeof window !== "undefined") {
         const token = sessionStorage.getItem("accessToken");
         const savedUser = sessionStorage.getItem("user");
         const savedRole = sessionStorage.getItem("currentRole");
+
         if (token) {
           state.isAuthenticated = true;
           state.token = token;
           state.roles = getRolesFromToken(token);
-          state.currentRole = savedRole || "USER";
+
+          // Kiểm tra chéo: savedRole có hợp lệ không?
+          if (savedRole && state.roles.includes(savedRole)) {
+            state.currentRole = savedRole;
+          } else {
+            // Nếu session lưu bậy bạ, reset về mặc định an toàn
+            state.currentRole = determineDefaultRole(state.roles);
+            sessionStorage.setItem("currentRole", state.currentRole);
+          }
+
           if (savedUser) {
             state.user = JSON.parse(savedUser);
           }
@@ -205,10 +225,20 @@ export const authSlice = createSlice({
       }
     },
     switchRole: (state, action: PayloadAction<string>) => {
-      const newRole = action.payload;
-      if (state.roles.includes(newRole)) {
-        state.currentRole = newRole;
-        sessionStorage.setItem("currentRole", newRole);
+      const targetRole = action.payload;
+
+      // Chỉ cho phép chuyển đổi qua lại giữa USER và TUTOR
+      const allowedToSwitch = ["USER", "TUTOR"].includes(targetRole);
+
+      if (allowedToSwitch && state.roles.includes(targetRole)) {
+        state.currentRole = targetRole;
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("currentRole", targetRole);
+        }
+      } else {
+        console.warn(
+          `Attempted to switch to unauthorized or invalid role: ${targetRole}`,
+        );
       }
     },
     forceLogout: (state) => {
@@ -226,7 +256,7 @@ export const authSlice = createSlice({
         if (!currentPath.includes("/login")) {
           localStorage.setItem("redirectUrl", currentPath);
         }
-        window.location.href = '/login';
+        window.location.href = "/login";
       }
     },
   },
@@ -240,14 +270,19 @@ export const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.isAuthenticated = true;
-        const token = action.payload.token;
+        const token = action.payload.token; // Đảm bảo trích xuất đúng token
 
         if (token) {
           state.token = token;
           state.roles = getRolesFromToken(token);
-          state.currentRole = "USER";
+
+          // SỬ DỤNG HÀM XÁC ĐỊNH ROLE MẶC ĐỊNH
+          state.currentRole = determineDefaultRole(state.roles);
+
           if (typeof window !== "undefined") {
             sessionStorage.setItem("accessToken", token);
+            sessionStorage.setItem("currentRole", state.currentRole); // Phải lưu currentRole vào session
+
             const redirectUrl = localStorage.getItem("redirectUrl");
             if (redirectUrl) {
               localStorage.removeItem("redirectUrl");
@@ -296,7 +331,7 @@ export const authSlice = createSlice({
           if (!currentPath.includes("/login")) {
             localStorage.setItem("redirectUrl", currentPath);
           }
-          window.location.href = '/login';
+          window.location.href = "/login";
         }
       })
       .addCase(logoutUser.rejected, (state, action) => {
@@ -314,7 +349,7 @@ export const authSlice = createSlice({
           if (!currentPath.includes("/login")) {
             localStorage.setItem("redirectUrl", currentPath);
           }
-          window.location.href = '/login';
+          window.location.href = "/login";
         }
       });
 
@@ -356,7 +391,7 @@ export const authSlice = createSlice({
           if (!currentPath.includes("/login")) {
             localStorage.setItem("redirectUrl", currentPath);
           }
-          window.location.href = '/login';
+          window.location.href = "/login";
         }
       });
 
@@ -377,5 +412,6 @@ export const authSlice = createSlice({
   },
 });
 
-export const { login, initializeAuth, forceLogout, switchRole } = authSlice.actions;
+export const { login, initializeAuth, forceLogout, switchRole } =
+  authSlice.actions;
 export default authSlice.reducer;

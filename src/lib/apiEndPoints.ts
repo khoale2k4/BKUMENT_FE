@@ -1,11 +1,12 @@
 import { GET } from "@/app/api/documents/courses/route";
 import { UNDERSCORE_GLOBAL_ERROR_ROUTE } from "next/dist/shared/lib/entry-constants";
+import { RegisterTutorRequest } from "./redux/features/profileSlice";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "http://143.198.80.199:8888/api/v1";
 
 const SOCKET_URL =
-  process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:8099";
+  process.env.NEXT_PUBLIC_SOCKET_URL || "http://143.198.80.199:8099";
 
 //http://143.198.80.199:8888/api/v1
 const IDENTITY = "/identity";
@@ -40,8 +41,17 @@ export const API_ENDPOINTS = {
       buildUrl(`${PROFILE}/mayKnow?page=${page}&size=${size}`),
     TUTOR_GETS: buildUrl(`/api/user/tutors`),
     UPDATE_USER_INFO: buildUrl(`${PROFILE}/my-profile`),
+    GET_UNIVERSITIES: (page: number, size: number) =>
+      buildUrl(`${PROFILE}/universities/search?page=${page}&size=${size}`),
+      // http://143.198.80.199:8888/api/v1/profile/universities/search?page=1&size=10
     UPDATE_TUTOR_INFO: buildUrl(`${LMS}/tutors/me`),
     FOLLOW: (id: string) => buildUrl(`${PROFILE}/${id}/follow`),
+    GET_FOLLOWERS: (id: string, page: number, size: number) =>
+      buildUrl(`${PROFILE}/${id}/followers?page=${page}&size=${size}`),
+    GET_FOLLOWING: (id: string, page: number, size: number) =>
+      buildUrl(`${PROFILE}/${id}/following?page=${page}&size=${size}`),
+    GET_PROFILE_BY_ID: (id: string) => buildUrl(`${PROFILE}/${id}`),
+   
   },
 
   DOCUMENTS: {
@@ -65,14 +75,13 @@ export const API_ENDPOINTS = {
     RECOMMENDED_DOCUMENTS: (page: number, size: number) =>
       buildUrl(`${DOCUMENT}/recommendations?page=${page}&size=${size}`),
 
-    UNIVERSITIES: (query: string) =>
-      buildUrl(
-        `${DOCUMENT}/search-universities${
-          query ? `?q=${encodeURIComponent(query)}` : ""
-        }`,
-      ),
+    GET_UNIVERSITIES: buildUrl(`${PROFILE}/universities`),
 
     COURSES: (query: string) => buildUrl(`${LMS}/subjects?q=${query}`),
+
+    // http://143.198.80.199:8888/api/v1/profile/universities/search?query=HC&page=1&size=10
+
+    SEARCH_UNIVERSITIES: (query: string, page: number, size: number) => buildUrl(`${PROFILE}/search?q=${query}&page=${page}&size=${size}`),
   },
 
   BLOGS: {
@@ -113,14 +122,11 @@ export const API_ENDPOINTS = {
     SEND_MESSAGE: buildUrl(`${CHAT}/messages/create`),
 
     GET_APP_NOTIFICATION: (page: number, size: number) =>
-      buildUrl(
-        `${CHAT}/notifications?page=${page}&size=${size}`,
-      ),
+      buildUrl(`${CHAT}/notifications?page=${page}&size=${size}`),
     COUNT_UNREAD_NOTIFICATIONS: buildUrl(`${CHAT}/notifications/unread-count`),
     MARK_ALL_NOTIFICATIONS_READ: buildUrl(`${CHAT}/notifications/read-all`),
     MARK_NOTIFICATION_READ: (id: string) =>
       buildUrl(`${CHAT}/notifications/${id}/read`),
-    
   },
 
   COMMENTS: {
@@ -177,7 +183,21 @@ export const API_ENDPOINTS = {
 
     APPROVE_ENROLLMENT: (id: string, approved: boolean) =>
       buildUrl(`${LMS}/enrollments/${id}/approval?approved=${approved}`),
+
+    TUTOR_REGISTRATION: buildUrl(`${LMS}/tutors/registration`),
+
+    GET_TUTORS_APPLICATION: (status: string, page: number, size: number) =>
+      buildUrl(
+        `${LMS}/tutors/admin/applications?status=${status}&page=${page}&size=${size}`,
+      ),
+
+    APPROVE_APPLICATION: (id: string) =>
+      buildUrl(`${LMS}/tutors/admin/applications/${id}/approve`),
+
+    REJECT_APPLICATION: (id: string) =>
+      buildUrl(`${LMS}/tutors/admin/applications/${id}/reject`),
   },
+
 
   REPORT: {
     CREATE: buildUrl(`${SOCIAL}/reports`),

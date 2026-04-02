@@ -7,6 +7,8 @@ import {
 } from "@/lib/services/user.service";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as profileService from "@/lib/services/profile.service";
+import { fetchProfileById } from "@/lib/services/profile.service";
+import httpClient from '../../services/http';
 // --- 1. Interfaces ---
 
 // USER PROFILES
@@ -55,10 +57,13 @@ export interface TutorProfile {
 
 export interface RegisterTutorRequest {
   introduction: string;
+  experience: string;
+  cvUrl: string;
   name: string;
   avatar: string;
   subjectIds: string[];
 }
+
 
 export interface UpdateTutorRequest {
   introduction: string;
@@ -171,41 +176,6 @@ export const updateMyProfile = createAsyncThunk(
   },
 );
 
-// export const getFollowingByProfileId = createAsyncThunk(
-//   "profile/getFollowingByProfileId",
-//   async (
-//     {
-//       profileId,
-//       page = 1,
-//       size = 10,
-//     }: { profileId: string; page?: number; size?: number },
-//     { getState, rejectWithValue },
-//   ) => {
-//     try {
-//       const state = getState() as RootState;
-//       const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-//       const response = await fetch(
-//         `http://localhost:8888/api/v1/profile/${profileId}/following?page=${page}&size=${size}`,
-//         {
-//           method: "GET",
-//           headers: {
-//             "Content-Type": "application/json",
-//             ...(token && { Authorization: `Bearer ${token}` }),
-//           },
-//         },
-//       );
-
-//       const data = await response.json();
-//       if (data.code !== 1000)
-//         throw new Error(data.message || "Failed to fetch following list");
-
-//       return data.result as PaginatedUsers;
-//     } catch (error: any) {
-//       return rejectWithValue(error.message);
-//     }
-//   },
-// );
 
 export const getFollowingByProfileId = createAsyncThunk(
   "profile/getFollowingByProfileId",
@@ -230,26 +200,6 @@ export const getFollowersByProfileId = createAsyncThunk(
     { getState, rejectWithValue },
   ) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      // const response = await fetch(
-      //   `http://localhost:8888/api/v1/profile/${profileId}/followers?page=${page}&size=${size}`,
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       ...(token && { Authorization: `Bearer ${token}` }),
-      //     },
-      //   },
-      // );
-
-      // const data = await response.json();
-      // if (data.code !== 1000)
-      //   throw new Error(data.message || "Failed to fetch followers list");
-
-      // return data.result as PaginatedUsers;
-
       return await profileService.fetchFollowersByProfileId(profileId, page, size);
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -257,36 +207,40 @@ export const getFollowersByProfileId = createAsyncThunk(
   },
 );
 
-// === THÊM MỚI: Lấy thông tin Profile của một người dùng bất kỳ theo ID ===
 export const getProfileById = createAsyncThunk(
   "profile/getProfileById",
   async (profileId: string, { getState, rejectWithValue }) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth?.token || sessionStorage.getItem("accessToken");
+      // 1. Lấy token an toàn cho cả Client lẫn Server (SSR)
+      const state = getState() as RootState;
+      let token = state.auth?.token;
+      if (!token && typeof window !== "undefined") {
+        token = sessionStorage.getItem("accessToken");
+      }
 
-      // console.log(`Fetching profile for ID: ${profileId} with token: ${token}`);
+      console.log(`Fetching profile for ID: ${profileId} with token: ${token}`);
 
-      // const response = await fetch(
-      //   `http://localhost:8888/api/v1/profile/${profileId}`,
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       ...(token && { Authorization: `Bearer ${token}` }),
-      //     },
-      //   },
-      // );
+      // 2. Dùng httpClient và API_ENDPOINTS để không bị hardcode IP
+      // Đồng thời "bơm" trực tiếp token vào Header để vá lỗi của Interceptor khi chạy SSR
+      const response = await httpClient.get(
+        API_ENDPOINTS.ACCOUNT.GET_PROFILE_BY_ID(profileId),
+        {
+          headers: {
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+        }
+      );
 
-      // const data = await response.json();
-      // if (data.code !== 1000)
-      //   throw new Error(data.message || "Failed to fetch profile by ID");
+      // 3. Xử lý kết quả trả về từ Axios
+      if (response.data.code !== 1000) {
+        throw new Error(response.data.message || "Failed to fetch profile by ID");
+      }
 
-      // return data.result as UserProfile;
-
-      return await profileService.fetchProfileById(profileId);
+      return response.data.result as UserProfile;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      // Nếu lỗi từ Axios thì message thường nằm ở error.response.data.message
+      const errorMessage = error.response?.data?.message || error.message || "Đã xảy ra lỗi";
+      return rejectWithValue(errorMessage);
     }
   },
 );
@@ -311,26 +265,6 @@ export const getMyTutorProfile = createAsyncThunk(
   "profile/getMyTutorProfile",
   async (_, { getState, rejectWithValue }) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      // const response = await fetch(
-      //   "http://localhost:8888/api/v1/lms/tutors/me",
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       ...(token && { Authorization: `Bearer ${token}` }),
-      //     },
-      //   },
-      // );
-
-      // const data = await response.json();
-      // console.log("Dữ liệu tutor profile nhận được:", data);
-      // if (data.code !== 1000)
-      //   throw new Error(data.message || "Failed to fetch tutor profile");
-
-      // return data.result as TutorProfile;
       return await profileService.fetchMyTutorProfile();
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -343,30 +277,6 @@ export const registerTutorProfile = createAsyncThunk(
   "profile/registerTutorProfile",
   async (payload: RegisterTutorRequest, { getState, rejectWithValue }) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      // const response = await fetch(
-      //   "http://localhost:8888/api/v1/lms/tutors/registration",
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       ...(token && { Authorization: `Bearer ${token}` }),
-      //     },
-      //     body: JSON.stringify(payload),
-      //   },
-      // );
-
-      // const data = await response.json();
-      // if (data.code !== 1000)
-      //   throw new Error(data.message || "Failed to register tutor");
-      // else {
-      //   alert("Tutor registration successful:");
-      //   console.log("Tutor registration successful:", data.result);
-      // }
-
-      // return data.result as TutorProfile;
       return await profileService.registerTutor(payload);
     } catch (error: any) {
       return rejectWithValue(error.message);

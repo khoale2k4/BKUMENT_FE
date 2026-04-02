@@ -94,8 +94,8 @@ export const getRelatedDocuments = async (id: string, page: number, size: number
 /**
  * Search universities by query
  */
-export const searchUniversities = async (query: string): Promise<{ id: number; name: string; abbreviation: string; logoUrl: string | null }[]> => {
-    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.UNIVERSITIES(query));
+export const searchUniversities = async (query: string, page: number, size: number): Promise<{ id: number; name: string; abbreviation: string; logoUrl: string | null }[]> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.SEARCH_UNIVERSITIES(query, page, size));
     return response.data.result;
 };
 

@@ -2,12 +2,16 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 // Thay đổi đường dẫn import RootState cho phù hợp với dự án của bạn
 import { RootState } from "@/lib/redux/store";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
-import * as courseService from '@/lib/services/course.service';
+import * as courseService from "@/lib/services/course.service";
+import * as profileService from "@/lib/services/profile.service";
+
 export interface SearchFilters {
   keyword?: string; // Từ khóa tìm kiếm chung (có thể dùng để tìm theo tên gia sư, tên lớp, mô tả, v.v.)
   subjectName?: string;
   topicName?: string;
   format?: string;
+  page?: number; // Thêm page vào filters để hỗ trợ phân trang
+  size?: number; // Thêm size vào filters để hỗ trợ phân trang
 }
 
 // Thêm Interface cho Topic và Subject (từ API mới)
@@ -52,6 +56,13 @@ interface TutorInfo {
   status: string;
   name: string;
   avatar: string;
+
+  experience?: string;
+  cvUrl?: string;
+  profileId?: string;
+  subjectIds?: string[];
+  rejectionReason?: string | null;
+  createdAt?: string;
 }
 
 // Interface định nghĩa kết quả trả về từ API (dựa theo response JSON trước đó của bạn)
@@ -84,6 +95,8 @@ interface TutorFindingState {
   isEnrolling: boolean;
   enrollError: string | null;
   enrollSuccess: boolean;
+  currentPage: number;
+  totalPages: number;
 }
 
 const initialState: TutorFindingState = {
@@ -95,6 +108,8 @@ const initialState: TutorFindingState = {
     subjectName: "",
     topicName: "",
     format: "",
+    page: 1, // Mặc định bắt đầu từ trang 1
+    size: 3, // Mặc định mỗi trang có 3 kết quả
   },
 
   subjects: [],
@@ -112,6 +127,8 @@ const initialState: TutorFindingState = {
   isEnrolling: false,
   enrollError: null,
   enrollSuccess: false,
+  currentPage: 1,
+  totalPages: 1,
 };
 
 // --- Async Thunks ---
@@ -295,10 +312,49 @@ export const enrollInClass = createAsyncThunk(
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
-  }
+  },
 );
 
+export const getTutorApplication = createAsyncThunk(
+  "profile/getTutorApplication",
+  async (
+    { status, page, size }: { status: string; page: number; size: number },
+    { getState, rejectWithValue },
+  ) => {
+    try {
+      return await profileService.getTutorsApplication(status, page, size);
 
+      // Gọi trực tiếp service đã được viết sẵn
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const approveTutorApplication = createAsyncThunk(
+  "profile/approveTutorApplication",
+  async (tutorId: string, { rejectWithValue }) => {
+    try {
+      return await profileService.approveTutorApplication(tutorId);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const rejectTutorApplication = createAsyncThunk(
+  "profile/rejectTutorApplication",
+  async (
+    { tutorId, reason }: { tutorId: string; reason: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await profileService.rejectTutorApplication(tutorId, reason);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
 
 // --- Slice ---
 
@@ -323,7 +379,7 @@ const tutorFindingSlice = createSlice({
       state.isEnrolling = false;
       state.enrollError = null;
       state.enrollSuccess = false;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -334,6 +390,8 @@ const tutorFindingSlice = createSlice({
       .addCase(searchTutors.fulfilled, (state, action) => {
         state.loading = false;
         state.tutors = action.payload.data || []; // Gán data.result trả về vào list tutors
+        state.currentPage = action.payload.currentPage || 1;
+        state.totalPages = action.payload.totalPages || 1;
       })
       .addCase(searchTutors.rejected, (state, action) => {
         state.loading = false;
@@ -349,7 +407,10 @@ const tutorFindingSlice = createSlice({
       .addCase(getSearchSubjects.fulfilled, (state, action) => {
         state.loadingSubjects = false;
         const payloadData = action.payload as any;
-        state.subjects = payloadData?.data || payloadData?.content || (Array.isArray(payloadData) ? payloadData : []);
+        state.subjects =
+          payloadData?.data ||
+          payloadData?.content ||
+          (Array.isArray(payloadData) ? payloadData : []);
       })
       .addCase(getSearchSubjects.rejected, (state, action) => {
         state.loadingSubjects = false;
@@ -404,9 +465,94 @@ const tutorFindingSlice = createSlice({
         state.enrollError = action.payload as string;
         state.enrollSuccess = false;
       });
+    // Xử lý GET Tutor Application (Dành cho ADMIN)
+    builder
+      .addCase(getTutorApplication.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getTutorApplication.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log("Tutor applications fetched successfully:", action.payload);
+
+        const adminData = action.payload.data || [];
+
+        // TỐI ƯU HÓA: Chuẩn hóa dữ liệu Admin về chung form với dữ liệu User
+        state.tutors = adminData.map((item: any) => ({
+          tutor: {
+            id: item.id,
+            name: item.name,
+            avatar: item.avatar,
+            introduction: item.introduction,
+            status: item.status,
+            // Các trường riêng của Admin
+            experience: item.experience,
+            cvUrl: item.cvUrl,
+            profileId: item.profileId,
+            subjectIds: item.subjectIds,
+            rejectionReason: item.rejectionReason,
+            createdAt: item.createdAt,
+            // Fallback cho các trường của User
+            averageRating: 0,
+            ratingCount: 0,
+          },
+          matchingClasses: [], // Admin không có thông tin lớp học matching
+        }));
+        state.currentPage = action.payload.currentPage || 1;
+        state.totalPages = action.payload.totalPages || 1;
+      })
+      .addCase(getTutorApplication.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+
+      builder
+      .addCase(approveTutorApplication.pending, (state) => {
+        // Bạn có thể không cần set loading = true ở đây nếu không muốn giật UI
+        // state.loading = true; 
+        state.error = null;
+      })
+      .addCase(approveTutorApplication.fulfilled, (state, action) => {
+        // state.loading = false;
+        
+        // Tuyệt chiêu: Lấy tutorId mà bạn đã truyền vào thunk thông qua action.meta.arg
+        const tutorId = action.meta.arg; 
+
+        // Tìm gia sư đó trong state và cập nhật trạng thái thành APPROVED
+        const tutorIndex = state.tutors.findIndex((t) => t.tutor.id === tutorId);
+        if (tutorIndex !== -1) {
+          state.tutors[tutorIndex].tutor.status = 'APPROVED';
+        }
+      })
+      .addCase(approveTutorApplication.rejected, (state, action) => {
+        // state.loading = false;
+        state.error = action.payload as string;
+      });
+
+    // ==========================================
+    // Xử lý Từ chối (Reject) Gia sư
+    // ==========================================
+    builder
+      .addCase(rejectTutorApplication.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(rejectTutorApplication.fulfilled, (state, action) => {
+        // Lấy thông tin tutorId và reason đã truyền vào thunk
+        const { tutorId} = action.meta.arg;
+
+        // Tìm gia sư đó trong state và cập nhật trạng thái thành REJECTED + gắn lý do
+        const tutorIndex = state.tutors.findIndex((t) => t.tutor.id === tutorId);
+        if (tutorIndex !== -1) {
+          state.tutors[tutorIndex].tutor.status = 'REJECTED';
+        }
+      })
+      .addCase(rejectTutorApplication.rejected, (state, action) => {
+        state.error = action.payload as string;
+      });
   },
 });
 
-export const { setFilters, clearFilters, clearClassDetail, resetEnrollStatus } = tutorFindingSlice.actions;
+export const { setFilters, clearFilters, clearClassDetail, resetEnrollStatus } =
+  tutorFindingSlice.actions;
 
 export default tutorFindingSlice.reducer;

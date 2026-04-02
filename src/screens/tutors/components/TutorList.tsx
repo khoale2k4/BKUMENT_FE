@@ -10,7 +10,6 @@ interface TutorListProps {
 }
 
 const TutorList: React.FC<TutorListProps> = ({ tutors, loading, error }) => {
-  console.log('TutorList received tutors at tutor List:', tutors);
   
   // 1. Trạng thái Đang tải
   if (loading && tutors.length === 0) {
@@ -46,6 +45,7 @@ const TutorList: React.FC<TutorListProps> = ({ tutors, loading, error }) => {
     <div className="space-y-6">
       {tutors.map((data, index) => (
         <TutorCard key={data.tutor.id || index} data={data} />
+  
       ))}
     </div>
   );

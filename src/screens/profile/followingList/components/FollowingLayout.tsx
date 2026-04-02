@@ -23,6 +23,7 @@ const FollowingLayout: React.FC<FollowingLayoutProps> = ({ profileId, listType }
   useEffect(() => {
     if (selectedUser?.id) {
       dispatch(getProfileById(selectedUser.id));
+      console.log('Dispatching getProfileById for user ID:', selectedUser.id); // Debug log
     }
   }, [selectedUser?.id, dispatch]);
 
