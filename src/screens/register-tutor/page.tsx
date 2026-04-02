@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Image as ImageIcon, BookOpen, FileText, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+// ĐÃ THÊM: Briefcase, Paperclip cho 2 field mới
+import { User, Image as ImageIcon, BookOpen, FileText, Loader2, CheckCircle2, AlertCircle, Briefcase, Paperclip } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { registerTutorProfile, RegisterTutorRequest } from '@/lib/redux/features/profileSlice';
-// IMPORT THÊM ACTION LẤY MÔN HỌC TỪ tutorFindingSlice
 import { getSearchSubjects } from '@/lib/redux/features/tutorFindingSlice';
 import { refreshToken } from '@/lib/redux/features/authSlice';
 
@@ -13,68 +13,59 @@ const RegisterTutorForm = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   
-  // 1. Lấy trạng thái của form đăng ký từ profileSlice
   const { isTutorRegistering, tutorError } = useAppSelector((state) => state.profile);
-  
-  // 2. Lấy danh sách môn học thật từ tutorFindingSlice
   const { subjects, loadingSubjects } = useAppSelector((state) => state.tutorFinding);
 
-  // State cục bộ cho form
   const [formData, setFormData] = useState<RegisterTutorRequest>({
     name: '',
     introduction: '',
     avatar: '',
     subjectIds: [],
+    experience: '', // Mới thêm
+    cvUrl: '',      // Mới thêm
   });
   
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // 3. Tự động gọi API lấy danh sách môn học khi mở form (nếu chưa có)
   useEffect(() => {
     if (!subjects || subjects.length === 0) {
       dispatch(getSearchSubjects());
     }
   }, [dispatch, subjects]);
 
-  // Xử lý thay đổi các input text thông thường
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Xử lý chọn/bỏ chọn môn học
   const handleSubjectToggle = (subjectId: string) => {
     setFormData((prev) => {
       const isSelected = prev.subjectIds.includes(subjectId);
       if (isSelected) {
-        // Nếu đã chọn rồi thì bỏ ra khỏi mảng
         return { ...prev, subjectIds: prev.subjectIds.filter(id => id !== subjectId) };
       } else {
-        // Nếu chưa chọn thì thêm ID vào mảng
         return { ...prev, subjectIds: [...prev.subjectIds, subjectId] };
       }
     });
   };
 
-  // Submit Form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.introduction || formData.subjectIds.length === 0) {
-      alert("Vui lòng điền đầy đủ thông tin và chọn ít nhất 1 môn học!");
+    // ĐÃ CẬP NHẬT: Kiểm tra thêm trường experience nếu bạn muốn nó là bắt buộc
+    if (!formData.name || !formData.introduction || !formData.experience || formData.subjectIds.length === 0) {
+      alert("Vui lòng điền đầy đủ thông tin bắt buộc và chọn ít nhất 1 môn học!");
       return;
     }
 
     try {
-      // Dispatch API và chờ kết quả
       await dispatch(registerTutorProfile(formData)).unwrap();
-      await dispatch(refreshToken()).unwrap(); // Cập nhật token mới sau khi đăng ký thành công
+      await dispatch(refreshToken()).unwrap(); 
       
       setIsSuccess(true);
       
-      // Chuyển hướng sau khi đăng ký thành công
       setTimeout(() => {
-        router.push('/profile'); // Hoặc trang nào bạn muốn
+        router.push('/profile'); 
       }, 2000);
 
     } catch (error) {
@@ -82,7 +73,6 @@ const RegisterTutorForm = () => {
     }
   };
 
-  // --- UI Trạng thái thành công ---
   if (isSuccess) {
     return (
       <div className="max-w-xl mx-auto mt-20 p-10 bg-white rounded-3xl shadow-xl text-center animate-in zoom-in duration-500">
@@ -95,7 +85,6 @@ const RegisterTutorForm = () => {
     );
   }
 
-  // --- UI Form chính ---
   return (
     <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-3xl shadow-sm border border-gray-100 animate-in fade-in duration-500">
       
@@ -153,6 +142,37 @@ const RegisterTutorForm = () => {
           </div>
         </div>
 
+        {/* --- FIELD MỚI: Kinh nghiệm --- */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+            <Briefcase size={16} className="text-purple-600" /> Kinh nghiệm giảng dạy
+          </label>
+          <textarea
+            name="experience"
+            value={formData.experience}
+            onChange={handleInputChange}
+            placeholder="VD: 3 năm kinh nghiệm dạy kèm Toán cấp 3, từng làm trợ giảng tại trung tâm..."
+            rows={3}
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all resize-none"
+            required
+          />
+        </div>
+
+        {/* --- FIELD MỚI: Link CV --- */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+            <Paperclip size={16} className="text-purple-600" /> Link CV (Không bắt buộc)
+          </label>
+          <input
+            type="url"
+            name="cvUrl"
+            value={formData.cvUrl}
+            onChange={handleInputChange}
+            placeholder="Link Google Drive hoặc web CV của bạn (VD: TopCV, Notion)..."
+            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all"
+          />
+        </div>
+
         {/* Bài giới thiệu */}
         <div>
           <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
@@ -162,7 +182,7 @@ const RegisterTutorForm = () => {
             name="introduction"
             value={formData.introduction}
             onChange={handleInputChange}
-            placeholder="Hãy viết vài dòng giới thiệu về kinh nghiệm và phương pháp giảng dạy của bạn..."
+            placeholder="Hãy viết vài dòng giới thiệu về phương pháp giảng dạy, tính cách của bạn..."
             rows={4}
             className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all resize-none"
             required

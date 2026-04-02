@@ -157,7 +157,7 @@ export const fetchRepliesByCommentId = createAsyncThunk(
 export const searchUniversities = createAsyncThunk(
     'documents/searchUniversities',
     async (query: string) => {
-        return await documentService.searchUniversities(query);
+        return await documentService.searchUniversities(query, 1, 100);
     }
 );
 
