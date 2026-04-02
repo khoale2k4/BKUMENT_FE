@@ -4,7 +4,7 @@ import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp, Flag, MoreHori
 import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { useEffect, useState, useRef } from 'react';
-import { clearCurrentDocument, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments, rateDocument } from '@/lib/redux/features/documentSlice';
+import { clearCurrentDocument, fetchDocumentById, fetchRelatedDocuments, rateDocument } from '@/lib/redux/features/documentSlice';
 import { openConfirmModal, openReportModal, showNotification } from '@/lib/redux/features/modalSlice';
 import { deleteDocumentAsync } from '@/lib/redux/features/myDocumentSlice';
 import CommentSection from './commentSection/page';
@@ -126,7 +126,6 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     useEffect(() => {
         if (params.id) {
             dispatch(fetchDocumentById(params.id));
-            dispatch(fetchCommentsByDocId({ documentId: params.id, page: 0, size: 5 }));
             dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
             return () => {
                 dispatch(clearCurrentDocument());

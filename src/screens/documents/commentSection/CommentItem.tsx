@@ -5,7 +5,12 @@ import { formatDate } from "@/lib/utils/formatDate";
 import { Comment } from "@/lib/services/comment.service";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 import { useAppDispatch } from "@/lib/redux/hooks";
-import { fetchRepliesByCommentId } from "@/lib/redux/features/documentSlice"; // Import thêm
+import { fetchReplies } from "@/lib/redux/features/commentSlice";
+
+interface User {
+    name: string;
+    avatar: string;
+}
 
 interface CommentItemProps {
     comment: Comment;
@@ -38,14 +43,14 @@ export const CommentItem = memo(function CommentItem({
     const isLoadingReplies = comment.isLoadingReplies || false;
 
     const handleToggleReplies = () => {
-        if (!showReplies && replies.length === 0) {
-            dispatch(fetchRepliesByCommentId({ parentId: comment.id.toString(), page: 0, size: 5 }));
+        if (!showReplies && (replies.length === 0 || repliesPage === 0)) {
+            dispatch(fetchReplies({ parentId: comment.id.toString(), page: 0, size: 5 }));
         }
         setShowReplies(!showReplies);
     };
     
     const handleLoadMoreReplies = () => {
-        dispatch(fetchRepliesByCommentId({ parentId: comment.id.toString(), page: repliesPage + 1, size: 5 }));
+        dispatch(fetchReplies({ parentId: comment.id.toString(), page: repliesPage + 1, size: 5 }));
     }
 
     return (

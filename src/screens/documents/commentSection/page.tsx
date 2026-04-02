@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useCallback } from "react";
-import { fetchCommentsByDocId, submitCommentAsync } from "@/lib/redux/features/documentSlice";
+import { useState, useCallback, useEffect } from "react";
+import { fetchComments, submitComment, clearComments } from "@/lib/redux/features/commentSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { CommentInput } from "./CommentInput";
 import { CommentItem } from "./CommentItem";
@@ -9,7 +9,15 @@ import { CommentItem } from "./CommentItem";
 export default function CommentSection({ params }: { params: { id: string } }) {
     const dispatch = useAppDispatch();
 
-    const { comments, commentsStatus, commentsPage, commentsTotalPages } = useAppSelector((state) => state.documents);
+    const { comments, status, page, totalPages } = useAppSelector((state) => state.comments);
+
+    useEffect(() => {
+        dispatch(fetchComments({ resourceId: params.id, page: 0, size: 5 }));
+        
+        return () => {
+            dispatch(clearComments());
+        };
+    }, [dispatch, params.id]);
 
     const [replyingToId, setReplyingToId] = useState<string | number | null>(null);
 
@@ -19,7 +27,7 @@ export default function CommentSection({ params }: { params: { id: string } }) {
     };
 
     const handleSendMainComment = useCallback((text: string) => {
-        dispatch(submitCommentAsync({
+        dispatch(submitComment({
             resourceId: params.id,
             content: text,
             replyId: null
@@ -29,7 +37,7 @@ export default function CommentSection({ params }: { params: { id: string } }) {
     const handleSendReply = useCallback(async (parentId: string | number, text: string) => {
         const cleanText = text.replace(/^@\S+\s/, '');
 
-        await dispatch(submitCommentAsync({
+        await dispatch(submitComment({
             resourceId: params.id,
             content: cleanText,
             replyId: parentId.toString()
@@ -39,16 +47,16 @@ export default function CommentSection({ params }: { params: { id: string } }) {
     }, [dispatch, params.id]);
 
     const handleLoadMore = () => {
-        if (commentsStatus !== 'loading') {
-            dispatch(fetchCommentsByDocId({
-                documentId: params.id,
-                page: commentsPage + 1,
+        if (status !== 'loading') {
+            dispatch(fetchComments({
+                resourceId: params.id,
+                page: page + 1,
                 size: 5
             }));
         }
     };
 
-    if (commentsStatus === 'loading' && commentsPage === 0) {
+    if (status === 'loading' && page === 0) {
         return (
             <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
@@ -56,7 +64,7 @@ export default function CommentSection({ params }: { params: { id: string } }) {
         );
     }
 
-    if (commentsStatus === 'failed') {
+    if (status === 'failed') {
         return <div className="text-center py-8 text-red-500">Failed to load comments.</div>;
     }
 
@@ -86,14 +94,14 @@ export default function CommentSection({ params }: { params: { id: string } }) {
                 ))}
             </div>
 
-            {commentsPage < commentsTotalPages - 1 && (
+            {page < totalPages - 1 && (
                 <div className="mt-8 text-center">
                     <button
                         onClick={handleLoadMore}
-                        disabled={commentsStatus === 'loading'}
+                        disabled={status === 'loading'}
                         className="px-6 py-2 border border-gray-300 rounded-full text-sm font-medium text-gray-700 hover:border-gray-400 hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {commentsStatus === 'loading' ? 'Đang tải...' : 'Xem thêm bình luận'}
+                        {status === 'loading' ? 'Đang tải...' : 'Xem thêm bình luận'}
                     </button>
                 </div>
             )}

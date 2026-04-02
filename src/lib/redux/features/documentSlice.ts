@@ -1,7 +1,7 @@
 import { FileUploadItem } from '@/types/FileUpload';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import * as documentService from '@/lib/services/document.service';
-import * as commentService from '@/lib/services/comment.service';
+import * as articleService from '@/lib/services/article.service';
 import { showToast } from './toastSlice';
 import axios from 'axios';
 import { DocumentDetail } from '@/lib/services/document.service';
@@ -45,11 +45,6 @@ interface DocumentState {
 
     currentAuthor: UserInfo | null;
 
-    comments: commentService.Comment[];
-    commentsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
-    commentsPage: number;
-    commentsTotalPages: number;
-
     universities: University[];
     universitiesStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
@@ -75,11 +70,6 @@ const initialState: DocumentState = {
     relatedTotalPages: 0,
 
     currentAuthor: null,
-
-    comments: [],
-    commentsStatus: 'idle',
-    commentsPage: 0,
-    commentsTotalPages: 0,
 
     universities: [],
     universitiesStatus: 'idle',
@@ -129,20 +119,6 @@ export const rateDocument = createAsyncThunk(
     }
 );
 
-export const fetchCommentsByDocId = createAsyncThunk(
-    'documents/fetchComments',
-    async ({ documentId, page, size }: { documentId: string, page: number, size: number }) => {
-        const response = await commentService.getCommentsByDocId(documentId, page, size);
-
-        return {
-            items: response.content || response,
-
-            page: page,
-            totalPages: response.totalPages || 1
-        };
-    }
-);
-
 export const fetchRelatedDocuments = createAsyncThunk(
     'documents/fetchRelated',
     async ({ docId, page, size }: { docId: string, page: number; size: number }) => {
@@ -163,19 +139,6 @@ export const fetchRelatedDocuments = createAsyncThunk(
             })),
             page: page,
             totalPages: response.totalPages
-        };
-    }
-);
-
-export const fetchRepliesByCommentId = createAsyncThunk(
-    'documents/fetchReplies',
-    async ({ parentId, page, size }: { parentId: string, page: number, size: number }) => {
-        const response = await commentService.getCommentsByReplyId(parentId, page, size);
-        return {
-            parentId,
-            items: response.content || response,
-            page: page,
-            totalPages: response.totalPages || 1
         };
     }
 );
@@ -260,25 +223,6 @@ export const uploadFile = createAsyncThunk(
     }
 );
 
-export const submitCommentAsync = createAsyncThunk(
-    'documents/submitComment',
-    async (payload: commentService.CreateCommentPayload, { dispatch, rejectWithValue }) => {
-        try {
-            const newComment = await commentService.createComment(payload);
-
-            if (!payload.replyId) {
-                dispatch(fetchCommentsByDocId({ documentId: payload.resourceId, page: 0, size: 5 }));
-            } else {
-                dispatch(fetchRepliesByCommentId({ parentId: payload.replyId, page: 0, size: 5 }));
-            }
-
-            return { newComment, replyId: payload.replyId };
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Lỗi khi gửi bình luận');
-        }
-    }
-);
-
 export const saveFilesMetadata = createAsyncThunk(
     'documents/saveFilesMetadata',
     async (courseIdFromUrl: string | undefined, { getState, dispatch, rejectWithValue }) => {
@@ -333,7 +277,6 @@ const documentSlice = createSlice({
         clearCurrentDocument: (state) => {
             state.currentDocument = null;
             state.currentAuthor = null;
-            state.comments = [];
             state.detailStatus = 'idle';
             state.relatedDocuments = [];
             state.relatedStatus = 'idle';
@@ -379,81 +322,6 @@ const documentSlice = createSlice({
             })
             .addCase(fetchDocumentById.rejected, (state) => {
                 state.detailStatus = 'failed';
-            });
-
-        builder
-            .addCase(fetchRepliesByCommentId.pending, (state, action) => {
-                const { parentId, page } = action.meta.arg;
-                const parentIndex = state.comments.findIndex(c => c.id.toString() === parentId.toString());
-
-                if (parentIndex !== -1) {
-                    if (page === 0) {
-                        state.comments[parentIndex].isLoadingReplies = true;
-                    }
-                }
-            });
-
-        builder
-            .addCase(fetchRepliesByCommentId.fulfilled, (state, action) => {
-                const { parentId, items, page, totalPages } = action.payload;
-                const parentIndex = state.comments.findIndex(c => c.id.toString() === parentId.toString());
-
-                if (parentIndex !== -1) {
-                    state.comments[parentIndex].isLoadingReplies = false;
-                    state.comments[parentIndex].repliesPage = page;
-                    state.comments[parentIndex].repliesTotalPages = totalPages;
-
-                    if (page === 0) {
-                        state.comments[parentIndex].replies = items;
-                    } else {
-                        const oldReplies = state.comments[parentIndex].replies || [];
-                        state.comments[parentIndex].replies = [...oldReplies, ...items];
-                    }
-                }
-            });
-
-        builder
-            .addCase(fetchRepliesByCommentId.rejected, (state, action) => {
-                const { parentId } = action.meta.arg;
-                const parentIndex = state.comments.findIndex(c => c.id.toString() === parentId.toString());
-                if (parentIndex !== -1) {
-                    state.comments[parentIndex].isLoadingReplies = false;
-                }
-            });
-
-        builder
-            .addCase(fetchCommentsByDocId.pending, (state, action) => {
-                if (action.meta.arg.page === 0) {
-                    state.commentsStatus = 'loading';
-                }
-            })
-            .addCase(fetchCommentsByDocId.fulfilled, (state, action) => {
-                state.commentsStatus = 'succeeded';
-
-                if (action.payload.page === 0) {
-                    state.comments = action.payload.items;
-                } else {
-                    state.comments = [...state.comments, ...action.payload.items];
-                }
-
-                state.commentsPage = action.payload.page;
-                state.commentsTotalPages = action.payload.totalPages;
-            })
-            .addCase(fetchCommentsByDocId.rejected, (state) => {
-                state.commentsStatus = 'failed';
-            });
-
-        builder
-            .addCase(submitCommentAsync.fulfilled, (state, action) => {
-                const { replyId } = action.payload;
-
-                if (replyId) {
-                    const parentIndex = state.comments.findIndex(c => c.id.toString() === replyId.toString());
-                    if (parentIndex !== -1) {
-                        state.comments[parentIndex].numberOfChildComment =
-                            (state.comments[parentIndex].numberOfChildComment || 0) + 1;
-                    }
-                }
             });
 
         builder

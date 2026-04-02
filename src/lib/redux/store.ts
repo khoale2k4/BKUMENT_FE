@@ -13,6 +13,8 @@ import tutorFindingReducer from './features/tutorFindingSlice';
 import myDocumentReducer from './features/myDocumentSlice';
 import myBlogReducer from './features/myBlogSlice';
 import modalReducer from './features/modalSlice';
+import commentReducer from './features/commentSlice';
+
 export const makeStore = () => {
     return configureStore({
         reducer: {
@@ -29,7 +31,8 @@ export const makeStore = () => {
             tutorFinding: tutorFindingReducer,
             modal: modalReducer,
             myDocuments: myDocumentReducer,
-            myBlogs: myBlogReducer
+            myBlogs: myBlogReducer,
+            comments: commentReducer
         },
     });
 };

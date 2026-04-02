@@ -16,6 +16,7 @@ import { IconDots, IconTrash, IconFlag, IconShare } from '@tabler/icons-react';
 import { AppRoute } from '@/lib/appRoutes';
 import { useState, useRef } from 'react';
 import StarRating from '@/components/ui/StarRating';
+import CommentSection from '../documents/commentSection/page';
 
 import parse, { HTMLReactParserOptions, Element } from 'html-react-parser';
 
@@ -236,6 +237,8 @@ export default function BlogDetailPage(params: PageProps) {
                         ))}
                     </div>
                 </div>
+                
+                <CommentSection params={{ id: params.params.id }} />
             </article>
         </div>
     );
