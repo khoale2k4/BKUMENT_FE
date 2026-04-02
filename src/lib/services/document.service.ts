@@ -116,6 +116,14 @@ export const getMyDocuments = async (page: number, size: number): Promise<any> =
 };
 
 /**
+ * Lấy danh sách tài liệu nổi bật
+ */
+export const getTopDocuments = async (page: number, size: number): Promise<any> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.TOP_DOCUMENTS(page, size));
+    return response.data.result;
+};
+
+/**
  * Xóa tài liệu theo ID
  */
 export const deleteDocument = async (id: string): Promise<void> => {

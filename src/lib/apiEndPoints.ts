@@ -84,6 +84,8 @@ export const API_ENDPOINTS = {
     SEARCH_UNIVERSITIES: (query: string, page: number, size: number) => buildUrl(`${PROFILE}/search?q=${query}&page=${page}&size=${size}`),
     MY_DOCUMENTS: (page: number, size: number) =>
       buildUrl(`${DOCUMENT}/my-documents?page=${page}&size=${size}`),
+    TOP_DOCUMENTS: (page: number, size: number) =>
+      buildUrl(`${DOCUMENT}/top-documents?page=${page}&size=${size}`),
     DELETE: (id: string) => buildUrl(`${DOCUMENT}/${id}`),
   },
 

@@ -54,6 +54,9 @@ export const fetchFeed = createAsyncThunk(
     let data;
     if (category === "Documents") {
       data = await articleService.searchDocuments(page, state.pageSize);
+      if (data.content.length === 0) {
+        data = await articleService.getTopDocuments(page, state.pageSize);
+      }
     } else {
       data = await articleService.searchBlogs(page, state.pageSize);
     }
