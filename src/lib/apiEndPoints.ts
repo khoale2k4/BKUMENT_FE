@@ -98,6 +98,8 @@ export const API_ENDPOINTS = {
     UPLOAD_NEW_BLOG: buildUrl(`${BLOG}`),
     MY_BLOGS: (page: number, size: number) =>
       buildUrl(`${BLOG}/my-blogs?page=${page}&size=${size}`),
+    TOP_BLOGS: (page: number, size: number) =>
+      buildUrl(`${BLOG}/top-blog?page=${page}&size=${size}`),
     DELETE: (id: string) => buildUrl(`${BLOG}/${id}`),
   },
 

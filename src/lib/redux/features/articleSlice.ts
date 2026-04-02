@@ -58,7 +58,7 @@ export const fetchFeed = createAsyncThunk(
         data = await articleService.getTopDocuments(page, state.pageSize);
       }
     } else {
-      data = await articleService.searchBlogs(page, state.pageSize);
+      data = await articleService.getTopBlogs(page, state.pageSize);
     }
 
     const items = data.content;

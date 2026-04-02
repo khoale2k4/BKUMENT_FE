@@ -68,6 +68,18 @@ export const searchBlogs = async (page: number, size: number): Promise<SearchRes
 };
 
 /**
+ * Search top blogs với pagination
+ */
+export const getTopBlogs = async (page: number, size: number): Promise<SearchResponse> => {
+    const response = await httpClient.get(API_ENDPOINTS.BLOGS.TOP_BLOGS(page, size));
+
+    return {
+        content: response.data.result.content,
+        totalPages: response.data.result.totalPages || 10,
+    };
+};
+
+/**
  * Search content by keyword với pagination
  */
 export const searchContent = async (query: string, page: number, size: number) => {
