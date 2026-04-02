@@ -1,5 +1,4 @@
-"use client";
-
+import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -20,6 +19,7 @@ interface ChatListSidebarProps {
 }
 
 const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
+    const { t, i18n } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
     const { conversations, activeConversationId, pendingTargetUserId } = useSelector((state: RootState) => state.chat);
 
@@ -53,7 +53,7 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
 
 
                 } catch (error) {
-                    console.error("Lỗi khi tạo cuộc trò chuyện từ Profile:", error);
+                    console.error(t('chat.sidebar.errorCreateProfile', 'Error creating conversation from Profile.'), error);
                     dispatch(setPendingTargetUserId(null));
                 } finally {
                     setIsCreating(false);
@@ -80,8 +80,8 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
                 setHasMore(true);
                 setSearchValue("");
             } catch (error) {
-                console.error("Lỗi khi tạo cuộc trò chuyện:", error);
-                alert("Không thể tạo cuộc trò chuyện với ID này. Có thể ID không tồn tại.");
+                console.error(t('chat.sidebar.errorCreate', 'Could not create conversation.'), error);
+                alert(t('chat.sidebar.errorCreate', 'Could not create conversation with this ID. The ID may not exist.'));
             } finally {
                 setIsCreating(false);
             }
@@ -115,14 +115,14 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
         <div className={`transition-all duration-300 ease-in-out bg-white h-full border-l border-gray-200 overflow-hidden ${isOpen ? "w-80 opacity-100" : "w-0 opacity-0 border-l-0"}`}>
             <div className="w-80 flex flex-col h-full">
                 <div className="p-4 shrink-0">
-                    <h2 className="text-2xl font-bold mb-4">Chats</h2>
+                    <h2 className="text-2xl font-bold mb-4">{t('chat.sidebar.title', 'Chats')}</h2>
                     <div className="relative">
                         <svg className="w-5 h-5 absolute left-3 top-2.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                         <input
                             type="text"
-                            placeholder="Tìm cuộc trò chuyện ..."
+                            placeholder={t('chat.sidebar.searchPlaceholder', 'Tìm cuộc trò chuyện ...')}
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             onKeyDown={handleSearchKeyDown}
@@ -136,7 +136,7 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
                     {conversations && conversations.length > 0 ? (
                         <>
                             {conversations.map((chat: any) => {
-                                const { name, avatar } = getChatDisplayInfo(chat, currentUserId);
+                                const { name, avatar } = getChatDisplayInfo(chat, currentUserId, t);
                                 const isActive = chat.id === activeConversationId;
 
                                 const isUnread = chat.isRead === false;
@@ -157,8 +157,8 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
                                             </h3>
 
                                             <p className={`text-sm truncate pr-4 ${isUnread ? 'font-semibold text-black' : 'text-gray-500'}`}>
-                                                {chat.lastMessage && chat.lastMessage.includes('http') && chat.lastMessage.includes('asset') ? "Hình ảnh" : chat.lastMessage || "Chưa có tin nhắn"}
-                                                {chat.lastMessageTime && ` · ${formatTimestamp(chat.lastMessageTime).split(' ')[0]}`}
+                                                {chat.lastMessage && chat.lastMessage.includes('http') && chat.lastMessage.includes('asset') ? t('chat.sidebar.image', 'Image') : chat.lastMessage || t('chat.sidebar.noMessages', 'No messages')}
+                                                {chat.lastMessageTime && ` · ${formatTimestamp(chat.lastMessageTime, i18n.language === 'en' ? 'en-US' : 'vi-VN').split(' ')[0]}`}
                                             </p>
 
                                             {isUnread && (
@@ -182,9 +182,9 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                                 </svg>
                             </div>
-                            <h3 className="text-gray-900 font-medium mb-1">Chưa có tin nhắn</h3>
+                            <h3 className="text-gray-900 font-medium mb-1">{t('chat.sidebar.noMessages', 'No messages')}</h3>
                             <p className="text-sm text-gray-500">
-                                Nhập ID vào ô tìm kiếm ở trên để bắt đầu trò chuyện.
+                                {t('chat.sidebar.startChatHint', 'Nhập ID vào ô tìm kiếm ở trên để bắt đầu trò chuyện.')}
                             </p>
                         </div>
                     )}

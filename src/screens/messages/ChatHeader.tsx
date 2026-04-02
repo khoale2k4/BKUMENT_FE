@@ -1,5 +1,4 @@
-"use client";
-
+import { useTranslation } from "react-i18next";
 import React, { useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/lib/redux/store";
@@ -15,8 +14,9 @@ interface ChatHeaderProps {
 }
 
 const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderProps) => {
+    const { t } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
-    const { name, avatar } = getChatDisplayInfo(activeChat, currentUserId);
+    const { name, avatar } = getChatDisplayInfo(activeChat, currentUserId, t);
     const participantsCount = activeChat.participants?.length || 0;
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,7 +26,7 @@ const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderPr
         if (true || activeChat.type === 'GROUP') {
             fileInputRef.current?.click();
         } else {
-            alert("Bạn chỉ có thể đổi ảnh đại diện cho Nhóm trò chuyện!");
+            alert(t('chat.header.changeAvatarOnlyGroup', 'Bạn chỉ có thể đổi ảnh đại diện cho Nhóm trò chuyện!'));
         }
     };
 
@@ -35,7 +35,7 @@ const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderPr
         if (!file) return;
 
         if (file.size > 5 * 1024 * 1024) {
-            alert("Dung lượng ảnh quá lớn. Vui lòng chọn ảnh dưới 5MB.");
+            alert(t('chat.header.imageTooLarge', 'Dung lượng ảnh quá lớn. Vui lòng chọn ảnh dưới 5MB.'));
             return;
         }
 
@@ -46,9 +46,9 @@ const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderPr
                 file: file 
             })).unwrap();
             
-            alert("Cập nhật ảnh đại diện thành công!");
+            alert(t('chat.header.updateAvatarSuccess', 'Cập nhật ảnh đại diện thành công!'));
         } catch (error) {
-            alert("Cập nhật ảnh thất bại. Vui lòng thử lại sau.");
+            alert(t('chat.header.updateAvatarFail', 'Cập nhật ảnh thất bại. Vui lòng thử lại sau.'));
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -62,7 +62,7 @@ const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderPr
                 <div 
                     className={`relative ${activeChat.type === 'GROUP' ? 'cursor-pointer hover:opacity-80' : ''}`}
                     onClick={handleImageClick}
-                    title={activeChat.type === 'GROUP' ? "Nhấn để đổi ảnh nhóm" : ""}
+                    title={activeChat.type === 'GROUP' ? t('chat.header.changeGroupAvatarHint', 'Nhấn để đổi ảnh nhóm') : ""}
                 >
                     <AuthenticatedImage src={avatar} alt={name} className={`w-12 h-12 rounded-full object-cover transition-opacity ${isUploading ? 'opacity-40' : ''}`} />
                     
@@ -84,7 +84,7 @@ const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderPr
                 <div>
                     <h2 className="font-bold text-xl text-gray-900">{name}</h2>
                     <p className="text-sm text-gray-500 underline cursor-pointer">
-                        {activeChat.type === 'GROUP' ? `${participantsCount} thành viên` : 'Xem hồ sơ'}
+                        {activeChat.type === 'GROUP' ? t('chat.header.members', '{{count}} thành viên', { count: participantsCount }) : t('chat.header.viewProfile', 'Xem hồ sơ')}
                     </p>
                 </div>
             </div>
@@ -92,7 +92,7 @@ const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderPr
             <button 
                 onClick={onToggleSidebar}
                 className="p-2 rounded-full hover:bg-gray-100 text-gray-600 transition-colors"
-                title="Đóng/Mở danh sách chat"
+                title={t('chat.header.toggleSidebar', 'Đóng/Mở danh sách chat')}
             >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>

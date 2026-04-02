@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
@@ -12,6 +13,7 @@ import AccountSetupForm from "./components/AccountSetupForm";
 import SocialAuthButtons from "./components/SocialAuthButtons";
 
 export default function RegisterPage() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
   
@@ -69,7 +71,11 @@ export default function RegisterPage() {
     ) {
       setStep(2);
     } else {
-      dispatch(showToast({ type: "error", title: "Missing Info", message: "Vui lòng điền đầy đủ thông tin cá nhân và chọn trường học." }));
+      dispatch(showToast({ 
+        type: "error", 
+        title: t('auth.register.missingInfoTitle', 'Missing Info'), 
+        message: t('auth.register.missingInfoMsg', 'Please fill in all personal info and select a university.') 
+      }));
     }
   };
 
@@ -79,7 +85,11 @@ export default function RegisterPage() {
     e.preventDefault();
 
     if (formData.password !== formData.confirmPassword) {
-      dispatch(showToast({ type: "error", title: "Validation Error", message: "Passwords do not match!" }));
+      dispatch(showToast({ 
+        type: "error", 
+        title: t('auth.register.passwordMismatchTitle', 'Validation Error'), 
+        message: t('auth.register.passwordMismatchMsg', 'Passwords do not match!') 
+      }));
       return;
     }
 
@@ -101,27 +111,35 @@ export default function RegisterPage() {
 
     try {
       await dispatch(registerUser(payload as any)).unwrap(); 
-      dispatch(showToast({ type: "success", title: "Success!", message: "Account created. Redirecting to login..." }));
+      dispatch(showToast({ 
+        type: "success", 
+        title: t('auth.register.successTitle', 'Success!'), 
+        message: t('auth.register.successMsg', 'Account created. Redirecting to login...') 
+      }));
       setTimeout(() => router.push(AppRoute.login), 1500);
     } catch (errorMsg) {
       console.error("Register error:", errorMsg);
-      dispatch(showToast({ type: "error", title: "Registration Failed", message: (errorMsg as string) || "Could not create account" }));
+      dispatch(showToast({ 
+        type: "error", 
+        title: t('auth.register.failTitle', 'Registration Failed'), 
+        message: (errorMsg as string) || t('auth.register.failMsg', 'Could not create account') 
+      }));
     }
   };
 
   return (
     <div className="min-h-screen flex bg-white font-sans">
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-12 lg:p-20 overflow-y-auto">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-lg">
           
           <div className="mb-8">
             <h1 className="text-4xl font-bold mb-3 text-gray-900 font-serif tracking-tight">
-              Create Account
+              {t('auth.register.title', 'Create Account')}
             </h1>
             <div className="flex items-center gap-2 mt-4">
-              <span className={`text-sm font-bold transition-colors ${step === 1 ? 'text-[#3F5D38]' : 'text-gray-400'}`}>01. Personal Info</span>
+              <span className={`text-sm font-bold transition-colors ${step === 1 ? 'text-[#3F5D38]' : 'text-gray-400'}`}>01. {t('auth.register.personalInfo', 'Personal Info')}</span>
               <span className="w-8 h-px bg-gray-300"></span>
-              <span className={`text-sm font-bold transition-colors ${step === 2 ? 'text-[#3F5D38]' : 'text-gray-400'}`}>02. Account Setup</span>
+              <span className={`text-sm font-bold transition-colors ${step === 2 ? 'text-[#3F5D38]' : 'text-gray-400'}`}>02. {t('auth.register.accountSetup', 'Account Setup')}</span>
             </div>
           </div>
 
@@ -148,9 +166,9 @@ export default function RegisterPage() {
           <SocialAuthButtons />
 
           <p className="mt-8 text-center text-sm font-semibold text-gray-600">
-            Already have an account?{" "}
+            {t('auth.register.alreadyHave', 'Already have an account?')}{" "}
             <Link href={AppRoute.login} className="text-[#3F5D38] hover:text-[#2d4228] hover:underline">
-              Sign In
+              {t('auth.register.signIn', 'Sign In')}
             </Link>
           </p>
         </div>

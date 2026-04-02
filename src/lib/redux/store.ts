@@ -10,6 +10,8 @@ import toastReducer from './features/toastSlice';
 import tutorCourseReducer from './features/tutorCourseSlice';
 import profileReducer from './features/profileSlice';
 import tutorFindingReducer from './features/tutorFindingSlice';
+import myDocumentReducer from './features/myDocumentSlice';
+import myBlogReducer from './features/myBlogSlice';
 import modalReducer from './features/modalSlice';
 export const makeStore = () => {
     return configureStore({
@@ -25,7 +27,9 @@ export const makeStore = () => {
             tutorCourse: tutorCourseReducer, 
             profile: profileReducer,
             tutorFinding: tutorFindingReducer,
-            modal: modalReducer
+            modal: modalReducer,
+            myDocuments: myDocumentReducer,
+            myBlogs: myBlogReducer
         },
     });
 };

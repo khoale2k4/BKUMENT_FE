@@ -81,6 +81,267 @@
   "noCancelledClasses": "Danh sách lớp học đã hủy trống.",
   "exploreCoursesNow": "Khám phá các khóa học ngay",
   "page": "Trang",
-  "of": "trong số"
+  "of": "trong số",
 
+  "auth": {
+    "login": {
+      "title": "Chào mừng trở lại!",
+      "subtitle": "Nhập thông tin xác thực để truy cập tài khoản của bạn",
+      "usernameLabel": "Tên đăng nhập / Email",
+      "usernamePlaceholder": "Nhập tên đăng nhập",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu",
+      "forgot": "Quên mật khẩu?",
+      "agreeTerms": "Tôi đồng ý với",
+      "termsPolicy": "điều khoản & chính sách",
+      "loginBtn": "Đăng nhập",
+      "loggingIn": "Đang đăng nhập...",
+      "or": "Hoặc",
+      "google": "Đăng nhập với Google",
+      "apple": "Đăng nhập với Apple",
+      "noAccount": "Chưa có tài khoản?",
+      "signUp": "Đăng ký",
+      "successTitle": "Thành công!",
+      "successMsg": "Bạn đã đăng nhập thành công!",
+      "failTitle": "Đăng nhập thất bại",
+      "failMsg": "Tài khoản hoặc mật khẩu không hợp lệ!"
+    },
+    "register": {
+      "title": "Tạo tài khoản",
+      "personalInfo": "Thông tin cá nhân",
+      "accountSetup": "Thiết lập tài khoản",
+      "firstNameLabel": "Tên",
+      "firstNamePlaceholder": "VD: An",
+      "lastNameLabel": "Họ",
+      "lastNamePlaceholder": "VD: Nguyễn",
+      "emailLabel": "Địa chỉ Email",
+      "emailPlaceholder": "an.nguyen@example.com",
+      "phoneLabel": "Số điện thoại",
+      "phonePlaceholder": "09...",
+      "dobLabel": "Ngày sinh",
+      "universityLabel": "Trường Đại học",
+      "selectUniversity": "-- Chọn trường Đại học --",
+      "loadingUniversities": "Đang tải danh sách...",
+      "addressLabel": "Địa chỉ",
+      "addressPlaceholder": "VD: 123 Đường ABC, Quận 1, TP.HCM",
+      "bioLabel": "Giới thiệu",
+      "optional": "(Tùy chọn)",
+      "bioPlaceholder": "Kể cho chúng tôi một chút về bản thân bạn...",
+      "next": "Bước tiếp theo",
+      "usernameLabel": "Tên đăng nhập",
+      "usernamePlaceholder": "Chọn tên đăng nhập",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu",
+      "confirmPasswordLabel": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+      "agreeTerms": "Tôi đồng ý với",
+      "termsPolicy": "điều khoản & chính sách",
+      "back": "Quay lại",
+      "createAccount": "Tạo tài khoản",
+      "signingUp": "Đang đăng ký...",
+      "alreadyHave": "Đã có tài khoản?",
+      "signIn": "Đăng nhập",
+      "missingInfoTitle": "Thiếu thông tin",
+      "missingInfoMsg": "Vui lòng điền đầy đủ thông tin cá nhân và chọn trường học.",
+      "passwordMismatchTitle": "Lỗi xác thực",
+      "passwordMismatchMsg": "Mật khẩu không khớp!",
+      "successTitle": "Thành công!",
+      "successMsg": "Tài khoản đã được tạo. Đang chuyển hướng đến trang đăng nhập...",
+      "failTitle": "Đăng ký thất bại",
+      "failMsg": "Không thể tạo tài khoản",
+      "or": "Hoặc",
+      "google": "Google",
+      "apple": "Apple"
+    }
+  },
+
+  "blogs": {
+    "detail": {
+      "back": "Quay lại",
+      "updatedJustNow": "Vừa cập nhật",
+      "loading": "Đang tải",
+      "share": "Chia sẻ",
+      "views": "lượt xem",
+      "tags": "Thẻ",
+      "noContent": "Chưa có nội dung",
+      "imageAlt": "Ảnh trong bài viết"
+    },
+    "write": {
+      "header": {
+        "visibility": "Chế độ xem",
+        "public": "Công khai",
+        "private": "Riêng tư",
+        "publish": "Xuất bản",
+        "publishing": "Đang đăng...",
+        "successTitle": "Thành công!",
+        "successMsg": "Đăng bài viết thành công!",
+        "failTitle": "Thất bại!",
+        "failMsg": "Đăng bài viết không thành công!"
+      },
+      "cover": {
+        "add": "Thêm ảnh bìa",
+        "uploading": "Đang tải ảnh lên...",
+        "failed": "Tải ảnh thất bại",
+        "remove": "Xóa ảnh bìa"
+      },
+      "titlePlaceholder": "Tiêu đề bài viết",
+      "editorPlaceholder": "Hãy kể câu chuyện của bạn...",
+      "toolbar": {
+        "fontFamily": "Kiểu chữ",
+        "fontLabel": "Phông chữ",
+        "defaultFont": "Mặc định",
+        "serif": "Serif",
+        "monospace": "Monospace",
+        "cursive": "Cursive"
+      }
+    }
+  },
+
+  "documents": {
+    "detail": {
+      "category": "Tài liệu",
+      "download": "Tải xuống",
+      "share": "Chia sẻ",
+      "report": "Báo cáo vi phạm",
+      "description": "Mô tả",
+      "noDescription": "Chưa có mô tả.",
+      "views": "Lượt xem",
+      "downloads": "Lượt tải",
+      "related": "Tài liệu liên quan",
+      "viewMore": "Xem thêm",
+      "noRelated": "Không có tài liệu liên quan nào.",
+      "notFound": "Không tìm thấy tài liệu.",
+      "noViewer": "Định dạng này không hỗ trợ xem trước. Vui lòng tải về.",
+      "noDoc": "Không có tài liệu",
+      "shareSuccess": "Đã sao chép đường dẫn bài viết!",
+      "shareError": "Không thể sao chép đường dẫn lúc này.",
+      "downloadFail": "Tải file thất bại, vui lòng thử lại."
+    },
+    "upload": {
+      "title": "Tải lên tài liệu",
+      "next": "Tiếp theo",
+      "back": "Quay lại",
+      "cancel": "Hủy bỏ",
+      "submit": "Tải lên ngay",
+      "success": "Tải lên thành công!",
+      "fail": "Tải lên thất bại",
+      "step1": {
+        "title": "Chọn tệp tin",
+        "dropzone": "Kéo thả tệp tin vào đây hoặc click để chọn",
+        "support": "Hỗ trợ PDF, DOCX, PPTX (Tối đa 50MB)",
+        "limit": "Tối đa 10 tệp tin một lúc"
+      },
+      "step2": {
+        "title": "Thông tin tài liệu",
+        "fileTitle": "Tiêu đề",
+        "fileDescription": "Mô tả",
+        "course": "Môn học",
+        "university": "Trường học",
+        "placeholderTitle": "Nhập tiêu đề tài liệu...",
+        "placeholderDesc": "Mô tả ngắn gọn về nội dung tài liệu...",
+        "placeholderCourse": "Chọn môn học...",
+        "placeholderUni": "Chọn trường học..."
+      }
+    }
+  },
+
+  "home": {
+    "tabs": {
+      "following": "Bài viết",
+      "documents": "Tài liệu",
+      "people": "Có thể biết"
+    },
+    "search": {
+      "results": "Kết quả cho \"{{query}}\"",
+      "found": "Tìm thấy {{count}} kết quả",
+      "clear": "Xóa tìm kiếm",
+      "fail": "Tìm kiếm thất bại. Vui lòng thử lại."
+    },
+    "empty": {
+      "following": {
+        "title": "Chưa có nội dung",
+        "desc": "Hãy theo dõi thêm tác giả để xem bài viết mới."
+      },
+      "recommended": {
+        "title": "Chưa có đề xuất",
+        "desc": "Chúng tôi sẽ gợi ý nội dung phù hợp hơn sớm thôi."
+      },
+      "documents": {
+        "title": "Chưa có tài liệu",
+        "desc": "Hiện chưa có tài liệu nào được chia sẻ."
+      },
+      "people": {
+        "title": "Không có gợi ý nào",
+        "desc": "Hiện chưa có gợi ý kết nối nào dành cho bạn."
+      }
+    },
+    "error": {
+      "title": "Oops! Đã xảy ra lỗi",
+      "desc": "Chúng tôi không thể tải dữ liệu. Vui lòng thử lại sau.",
+      "retry": "Thử lại",
+      "loadPeopleFail": "Không thể tải danh sách người dùng."
+    },
+    "people": {
+      "title": "Những người bạn có thể biết",
+      "desc": "Khám phá và kết nối với những người dùng khác.",
+      "followers": "người theo dõi",
+      "follow": "Theo dõi",
+      "following": "Đã theo dõi",
+      "followSuccess": "Bạn đã theo dõi {{name}}!",
+      "followFail": "Theo dõi thất bại. Vui lòng thử lại."
+    },
+    "sidebar": {
+      "recommended": "Chủ đề đề xuất"
+    },
+    "contentCard": {
+      "minRead": "Khoảng {{count}} phút đọc"
+    }
+  },
+
+  "time": {
+    "justNow": "Vừa xong",
+    "secondsAgo": "{{count}} giây trước",
+    "minutesAgo": "{{count}} phút trước",
+    "hoursAgo": "{{count}} giờ trước",
+    "daysAgo": "{{count}} ngày trước",
+    "weeksAgo": "{{count}} tuần trước",
+    "monthsAgo": "{{count}} tháng trước",
+    "yearsAgo": "{{count}} năm trước"
+  },
+
+  "chat": {
+    "sidebar": {
+      "title": "Trò chuyện",
+      "searchPlaceholder": "Tìm cuộc trò chuyện...",
+      "image": "Hình ảnh",
+      "noMessages": "Chưa có tin nhắn",
+      "noConversations": "Chưa có cuộc trò chuyện nào",
+      "startChatHint": "Nhập ID vào ô tìm kiếm ở trên để bắt đầu trò chuyện.",
+      "errorCreate": "Không thể tạo cuộc trò chuyện với ID này. Có thể ID không tồn tại.",
+      "errorCreateProfile": "Lỗi khi tạo cuộc trò chuyện từ Trang cá nhân."
+    },
+    "header": {
+      "groupChat": "Nhóm trò chuyện",
+      "changeGroupAvatarHint": "Nhấn để đổi ảnh nhóm",
+      "changeAvatarOnlyGroup": "Bạn chỉ có thể đổi ảnh đại diện cho Nhóm trò chuyện!",
+      "imageTooLarge": "Dung lượng ảnh quá lớn. Vui lòng chọn ảnh dưới 5MB.",
+      "updateAvatarSuccess": "Cập nhật ảnh đại diện thành công!",
+      "updateAvatarFail": "Cập nhật ảnh thất bại. Vui lòng thử lại sau.",
+      "members": "{{count}} thành viên",
+      "viewProfile": "Xem hồ sơ",
+      "toggleSidebar": "Đóng/Mở danh sách chat"
+    },
+    "main": {
+      "noActiveChatTitle": "Không có gì cả...",
+      "noActiveChatDesc": "Hãy chọn một cuộc trò chuyện để gửi tin nhắn.",
+      "noMessagesTitle": "Chưa có tin nhắn nào",
+      "noMessagesDesc": "Hãy là người đầu tiên gửi tin nhắn.",
+      "unknownUser": "Người dùng không xác định"
+    },
+    "input": {
+      "placeholder": "Aa",
+      "imageFormatError": "Vui lòng chọn định dạng ảnh!",
+      "sendImageFail": "Gửi ảnh thất bại!"
+    }
+  }
 }

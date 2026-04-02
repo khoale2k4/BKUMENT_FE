@@ -1,4 +1,4 @@
-'use client';
+import { useTranslation } from 'react-i18next';
 import { RichTextEditor } from '@mantine/tiptap';
 import { IconPhoto, IconTypography } from '@tabler/icons-react';
 import { Menu, Loader } from '@mantine/core';
@@ -13,6 +13,7 @@ interface Props {
 }
 
 export default function EditorToolbar({ editor, onImageUpload, isUploadingImage }: Props) {
+    const { t } = useTranslation();
     if (!editor) return null;
 
     return (
@@ -31,16 +32,16 @@ export default function EditorToolbar({ editor, onImageUpload, isUploadingImage 
             <RichTextEditor.ControlsGroup>
                 <Menu trigger="hover" shadow="md" width={200} zIndex={100}>
                     <Menu.Target>
-                        <RichTextEditor.Control aria-label="Font Family">
+                        <RichTextEditor.Control aria-label={t('blogs.write.toolbar.fontFamily', 'Font Family')}>
                             <IconTypography stroke={1.5} size={18} />
                         </RichTextEditor.Control>
                     </Menu.Target>
                     <Menu.Dropdown>
-                        <Menu.Label>Phông chữ</Menu.Label>
-                        <Menu.Item onClick={() => editor.chain().focus().unsetFontFamily().run()} style={{ fontFamily: 'Inter, sans-serif' }}>Mặc định</Menu.Item>
-                        <Menu.Item onClick={() => editor.chain().focus().setFontFamily('Serif').run()} style={{ fontFamily: 'Serif' }}>Serif</Menu.Item>
-                        <Menu.Item onClick={() => editor.chain().focus().setFontFamily('Monospace').run()} style={{ fontFamily: 'Monospace' }}>Monospace</Menu.Item>
-                        <Menu.Item onClick={() => editor.chain().focus().setFontFamily('Cursive').run()} style={{ fontFamily: 'Cursive' }}>Cursive</Menu.Item>
+                        <Menu.Label>{t('blogs.write.toolbar.fontLabel', 'Font')}</Menu.Label>
+                        <Menu.Item onClick={() => editor.chain().focus().unsetFontFamily().run()} style={{ fontFamily: 'Inter, sans-serif' }}>{t('blogs.write.toolbar.defaultFont', 'Default')}</Menu.Item>
+                        <Menu.Item onClick={() => editor.chain().focus().setFontFamily('Serif').run()} style={{ fontFamily: 'Serif' }}>{t('blogs.write.toolbar.serif', 'Serif')}</Menu.Item>
+                        <Menu.Item onClick={() => editor.chain().focus().setFontFamily('Monospace').run()} style={{ fontFamily: 'Monospace' }}>{t('blogs.write.toolbar.monospace', 'Monospace')}</Menu.Item>
+                        <Menu.Item onClick={() => editor.chain().focus().setFontFamily('Cursive').run()} style={{ fontFamily: 'Cursive' }}>{t('blogs.write.toolbar.cursive', 'Cursive')}</Menu.Item>
                     </Menu.Dropdown>
                 </Menu>
             </RichTextEditor.ControlsGroup>

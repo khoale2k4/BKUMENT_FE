@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { FileText, User, Calendar } from 'lucide-react';
 
@@ -13,6 +14,7 @@ interface RelatedDocumentProps {
 }
 
 export default function RelatedDocumentCard({ data }: RelatedDocumentProps) {
+    const { i18n } = useTranslation();
     return (
         <div
             onClick={data.onClick}
@@ -41,7 +43,7 @@ export default function RelatedDocumentCard({ data }: RelatedDocumentProps) {
                     </div>
                     <div className="flex items-center gap-1">
                         <Calendar size={12} />
-                        <span>{new Date(data.createdAt).toLocaleDateString('vi-VN')}</span>
+                        <span>{new Date(data.createdAt).toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')}</span>
                     </div>
                 </div>
             </div>

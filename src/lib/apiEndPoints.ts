@@ -82,6 +82,9 @@ export const API_ENDPOINTS = {
     // http://143.198.80.199:8888/api/v1/profile/universities/search?query=HC&page=1&size=10
 
     SEARCH_UNIVERSITIES: (query: string, page: number, size: number) => buildUrl(`${PROFILE}/search?q=${query}&page=${page}&size=${size}`),
+    MY_DOCUMENTS: (page: number, size: number) =>
+      buildUrl(`${DOCUMENT}/my-documents?page=${page}&size=${size}`),
+    DELETE: (id: string) => buildUrl(`${DOCUMENT}/${id}`),
   },
 
   BLOGS: {
@@ -91,6 +94,9 @@ export const API_ENDPOINTS = {
     GET_DETAIL: (id: string | number) => buildUrl(`${BLOG}/search?q=${id}`),
 
     UPLOAD_NEW_BLOG: buildUrl(`${BLOG}`),
+    MY_BLOGS: (page: number, size: number) =>
+      buildUrl(`${BLOG}/my-blogs?page=${page}&size=${size}`),
+    DELETE: (id: string) => buildUrl(`${BLOG}/${id}`),
   },
 
   RESOURCE: {

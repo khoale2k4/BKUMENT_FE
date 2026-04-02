@@ -59,16 +59,22 @@ export const submitPost = async (post: BlogPost): Promise<any> => {
     return response.data.result;
 };
 
-/**
- * Fetch blog post theo ID
- */
 export const fetchPostById = async (blogId: string) => {
     const response = await httpClient.get(API_ENDPOINTS.BLOGS.GET_DETAIL(blogId));
-
-    // if (!response.ok) {
-    //     throw new Error('Fetch failed');
-    // }
-
-    // const data = await response.json();
     return response.data.result.content[0];
+};
+
+/**
+ * Lấy danh sách blog của người dùng hiện tại
+ */
+export const getMyBlogs = async (page: number, size: number): Promise<any> => {
+    const response = await httpClient.get(API_ENDPOINTS.BLOGS.MY_BLOGS(page, size));
+    return response.data.result;
+};
+
+/**
+ * Xóa blog theo ID
+ */
+export const deleteBlog = async (id: string): Promise<void> => {
+    await httpClient.delete(API_ENDPOINTS.BLOGS.DELETE(id));
 };

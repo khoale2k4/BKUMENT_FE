@@ -81,6 +81,267 @@
   "noCancelledClasses": "The cancelled classes list is empty.",
   "exploreCoursesNow": "Explore courses now",
   "page": "Page",
-  "of": "of"
+  "of": "of",
 
+  "auth": {
+    "login": {
+      "title": "Welcome back!",
+      "subtitle": "Enter your Credentials to access your account",
+      "usernameLabel": "Username / Email",
+      "usernamePlaceholder": "Enter your username",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgot": "Forgot password?",
+      "agreeTerms": "I agree to the",
+      "termsPolicy": "terms & policy",
+      "loginBtn": "Login",
+      "loggingIn": "Logging in...",
+      "or": "Or",
+      "google": "Log in with Google",
+      "apple": "Log in with Apple",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign Up",
+      "successTitle": "Success!",
+      "successMsg": "You have logged in successfully!",
+      "failTitle": "Login Failed",
+      "failMsg": "Invalid account or password!"
+    },
+    "register": {
+      "title": "Create Account",
+      "personalInfo": "Personal Info",
+      "accountSetup": "Account Setup",
+      "firstNameLabel": "First Name",
+      "firstNamePlaceholder": "e.g. John",
+      "lastNameLabel": "Last Name",
+      "lastNamePlaceholder": "e.g. Doe",
+      "emailLabel": "Email Address",
+      "emailPlaceholder": "john@example.com",
+      "phoneLabel": "Phone Number",
+      "phonePlaceholder": "+84...",
+      "dobLabel": "Date of Birth",
+      "universityLabel": "University",
+      "selectUniversity": "-- Select University --",
+      "loadingUniversities": "Loading list...",
+      "addressLabel": "Address",
+      "addressPlaceholder": "123 Street, City, Country",
+      "bioLabel": "Bio",
+      "optional": "(Optional)",
+      "bioPlaceholder": "Tell us a little bit about yourself...",
+      "next": "Next Step",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Choose a username",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Re-enter your password",
+      "agreeTerms": "I agree to the",
+      "termsPolicy": "terms & policy",
+      "back": "Back",
+      "createAccount": "Create Account",
+      "signingUp": "Signing up...",
+      "alreadyHave": "Already have an account?",
+      "signIn": "Sign In",
+      "missingInfoTitle": "Missing Info",
+      "missingInfoMsg": "Please fill in all personal info and select a university.",
+      "passwordMismatchTitle": "Validation Error",
+      "passwordMismatchMsg": "Passwords do not match!",
+      "successTitle": "Success!",
+      "successMsg": "Account created. Redirecting to login...",
+      "failTitle": "Registration Failed",
+      "failMsg": "Could not create account",
+      "or": "Or",
+      "google": "Google",
+      "apple": "Apple"
+    }
+  },
+
+  "blogs": {
+    "detail": {
+      "back": "Back",
+      "updatedJustNow": "Updated just now",
+      "loading": "Loading",
+      "share": "Share",
+      "views": "views",
+      "tags": "Tags",
+      "noContent": "No content available",
+      "imageAlt": "Post content image"
+    },
+    "write": {
+      "header": {
+        "visibility": "Visibility",
+        "public": "Public",
+        "private": "Private",
+        "publish": "Publish",
+        "publishing": "Publishing...",
+        "successTitle": "Success!",
+        "successMsg": "Post published successfully!",
+        "failTitle": "Failed!",
+        "failMsg": "Post publication failed!"
+      },
+      "cover": {
+        "add": "Add cover image",
+        "uploading": "Uploading image...",
+        "failed": "Upload failed",
+        "remove": "Remove cover image"
+      },
+      "titlePlaceholder": "Post title",
+      "editorPlaceholder": "Tell your story...",
+      "toolbar": {
+        "fontFamily": "Font Family",
+        "fontLabel": "Font",
+        "defaultFont": "Default",
+        "serif": "Serif",
+        "monospace": "Monospace",
+        "cursive": "Cursive"
+      }
+    }
+  },
+
+  "documents": {
+    "detail": {
+      "category": "Documents",
+      "download": "Download",
+      "share": "Share",
+      "report": "Report Violation",
+      "description": "Description",
+      "noDescription": "No description provided.",
+      "views": "Views",
+      "downloads": "Downloads",
+      "related": "Related Documents",
+      "viewMore": "View more",
+      "noRelated": "No related documents found.",
+      "notFound": "Document not found.",
+      "noViewer": "This format does not support preview. Please download to view.",
+      "noDoc": "No document content.",
+      "shareSuccess": "Link copied to clipboard!",
+      "shareError": "Could not copy link at this time.",
+      "downloadFail": "Download failed, please try again."
+    },
+    "upload": {
+      "title": "Upload Documents",
+      "next": "Next Step",
+      "back": "Back",
+      "cancel": "Cancel",
+      "submit": "Upload now",
+      "success": "Upload successful!",
+      "fail": "Upload failed",
+      "step1": {
+        "title": "Upload Files",
+        "dropzone": "Drag & drop files here or click to browse",
+        "support": "Support PDF, DOCX, PPTX (Max 50MB)",
+        "limit": "Maximum 10 files at once"
+      },
+      "step2": {
+        "title": "Document Details",
+        "fileTitle": "Title",
+        "fileDescription": "Description",
+        "course": "Course",
+        "university": "University",
+        "placeholderTitle": "Enter document title...",
+        "placeholderDesc": "Briefly describe the document contents...",
+        "placeholderCourse": "Select course...",
+        "placeholderUni": "Select university..."
+      }
+    }
+  },
+
+  "home": {
+    "tabs": {
+      "following": "Articles",
+      "documents": "Documents",
+      "people": "People"
+    },
+    "search": {
+      "results": "Results for \"{{query}}\"",
+      "found": "Found {{count}} results",
+      "clear": "Clear search",
+      "fail": "Search failed. Please try again."
+    },
+    "empty": {
+      "following": {
+        "title": "No content yet",
+        "desc": "Follow more authors to see new articles."
+      },
+      "recommended": {
+        "title": "No recommendations",
+        "desc": "We will suggest relevant content soon."
+      },
+      "documents": {
+        "title": "No documents",
+        "desc": "No documents shared yet."
+      },
+      "people": {
+        "title": "No suggestions",
+        "desc": "No connection suggestions available at the moment."
+      }
+    },
+    "error": {
+      "title": "Oops! Something went wrong",
+      "desc": "We couldn't load the feed. Please try again later.",
+      "retry": "Try again",
+      "loadPeopleFail": "Could not load people list."
+    },
+    "people": {
+      "title": "People you may know",
+      "desc": "Discover and connect with other users.",
+      "followers": "followers",
+      "follow": "Follow",
+      "following": "Following",
+      "followSuccess": "You are now following {{name}}!",
+      "followFail": "Follow failed. Please try again."
+    },
+    "sidebar": {
+      "recommended": "Recommended topics"
+    },
+    "contentCard": {
+      "minRead": "{{count}} min read"
+    }
+  },
+
+  "time": {
+    "justNow": "Just now",
+    "secondsAgo": "{{count}} seconds ago",
+    "minutesAgo": "{{count}} minutes ago",
+    "hoursAgo": "{{count}} hours ago",
+    "daysAgo": "{{count}} days ago",
+    "weeksAgo": "{{count}} weeks ago",
+    "monthsAgo": "{{count}} months ago",
+    "yearsAgo": "{{count}} years ago"
+  },
+
+  "chat": {
+    "sidebar": {
+      "title": "Chats",
+      "searchPlaceholder": "Search conversations...",
+      "image": "Image",
+      "noMessages": "No messages",
+      "noConversations": "No conversations yet",
+      "startChatHint": "Enter an ID in the search box above to start a conversation.",
+      "errorCreate": "Could not create conversation with this ID. The ID may not exist.",
+      "errorCreateProfile": "Error creating conversation from Profile."
+    },
+    "header": {
+      "groupChat": "Group Chat",
+      "changeGroupAvatarHint": "Click to change group avatar",
+      "changeAvatarOnlyGroup": "You can only change the avatar for Group Chats!",
+      "imageTooLarge": "Image is too large. Please select an image under 5MB.",
+      "updateAvatarSuccess": "Avatar updated successfully!",
+      "updateAvatarFail": "Avatar update failed. Please try again later.",
+      "members": "{{count}} members",
+      "viewProfile": "View Profile",
+      "toggleSidebar": "Toggle chat list"
+    },
+    "main": {
+      "noActiveChatTitle": "Looking empty here...",
+      "noActiveChatDesc": "Select a conversation to start messaging.",
+      "noMessagesTitle": "No messages yet",
+      "noMessagesDesc": "Be the first to send a message.",
+      "unknownUser": "Unknown"
+    },
+    "input": {
+      "placeholder": "Aa",
+      "imageFormatError": "Please select an image format!",
+      "sendImageFail": "Failed to send image!"
+    }
+  }
 }

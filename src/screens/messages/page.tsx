@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { fetchConversations, fetchMessagesByConversationId } from "@/lib/redux/features/chatSlice";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { Conversation } from "@/lib/services/chat.service";
@@ -11,15 +12,15 @@ import { formatTimestamp } from "@/lib/utils/formatTimestamp";
 import ChatInput from "./ChatInput";
 import ChatListSidebar from "./ChatListSidebar";
 
-export const getChatDisplayInfo = (chat: Conversation, currentUserId: string) => {
+export const getChatDisplayInfo = (chat: Conversation, currentUserId: string, t: any) => {
     if (chat.type === 'GROUP') {
         return {
-            name: chat.name || "Nhóm trò chuyện",
+            name: chat.name || t('chat.header.groupChat', 'Group Chat'),
             avatar: chat.conversationAvatar || "https://ui-avatars.com/api/?name=Group&background=random"
         };
     }
     const otherUser = chat.participants.find(p => p.userId !== currentUserId) || chat.participants[0];
-    if (!otherUser) return { name: "Unknown", avatar: "" };
+    if (!otherUser) return { name: t('chat.main.unknownUser', 'Unknown'), avatar: "" };
 
     return {
         name: `${otherUser.lastName} ${otherUser.firstName}`.trim() || otherUser.username,
@@ -28,6 +29,7 @@ export const getChatDisplayInfo = (chat: Conversation, currentUserId: string) =>
 };
 
 const MessagesPage = () => {
+    const { t, i18n } = useTranslation();
     const dispatch = useDispatch<AppDispatch>();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -170,8 +172,8 @@ const MessagesPage = () => {
                         <div className="bg-blue-50 p-6 rounded-full mb-4">
                             <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-2">Không có gì cả...</h3>
-                        <p className="text-gray-500">Hãy chọn một cuộc trò chuyện để gửi tin nhắn.</p>
+                        <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('chat.main.noActiveChatTitle', 'Looking empty here...')}</h3>
+                        <p className="text-gray-500">{t('chat.main.noActiveChatDesc', 'Select a conversation to start messaging.')}</p>
                     </div>
                 ) : (
                     <>
@@ -203,8 +205,8 @@ const MessagesPage = () => {
                                     <div className="bg-blue-50 p-6 rounded-full mb-4">
                                         <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                                     </div>
-                                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Chưa có tin nhắn nào</h3>
-                                    <p className="text-gray-500">Hãy là người đầu tiên gửi tin nhắn.</p>
+                                    <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('chat.main.noMessagesTitle', 'No messages yet')}</h3>
+                                    <p className="text-gray-500">{t('chat.main.noMessagesDesc', 'Be the first to send a message.')}</p>
                                 </div>
                             ) : (
                                 groupedMessages.map((group, index) => {
@@ -227,7 +229,7 @@ const MessagesPage = () => {
                                         <React.Fragment key={group.id}>
                                             {showTime && (
                                                 <div className="text-center text-xs font-medium text-gray-400 my-4 uppercase tracking-wide">
-                                                    {formatTimestamp(group.timestamp)}
+                                                    {formatTimestamp(group.timestamp, i18n.language === 'en' ? 'en-US' : 'vi-VN')}
                                                 </div>
                                             )}
                                             <MessageGroup

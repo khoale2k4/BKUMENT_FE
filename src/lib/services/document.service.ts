@@ -106,3 +106,18 @@ export const searchCourses = async (query: string): Promise<{ id: string; name: 
     const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.COURSES(query));
     return response.data.result.data;
 };
+
+/**
+ * Lấy danh sách tài liệu của người dùng hiện tại
+ */
+export const getMyDocuments = async (page: number, size: number): Promise<any> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.MY_DOCUMENTS(page, size));
+    return response.data.result;
+};
+
+/**
+ * Xóa tài liệu theo ID
+ */
+export const deleteDocument = async (id: string): Promise<void> => {
+    await httpClient.delete(API_ENDPOINTS.DOCUMENTS.DELETE(id));
+};

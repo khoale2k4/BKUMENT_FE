@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import Link from "next/link";
 import { Input } from "@/components/ui/TextInput";
 import { Button } from "@/components/ui/button";
@@ -13,13 +14,15 @@ interface AccountSetupFormProps {
 }
 
 export default function AccountSetupForm({ formData, handleChange, onPrev, onSubmit, isLoading, inputClassName }: AccountSetupFormProps) {
+  const { t } = useTranslation();
+  
   return (
     <form onSubmit={onSubmit} className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-500">
       <Input
-        label="Username"
+        label={t('auth.register.usernameLabel', 'Username')}
         name="username"
         type="text"
-        placeholder="Choose a username"
+        placeholder={t('auth.register.usernamePlaceholder', 'Choose a username')}
         value={formData.username}
         onChange={handleChange}
         required
@@ -27,10 +30,10 @@ export default function AccountSetupForm({ formData, handleChange, onPrev, onSub
       />
 
       <Input
-        label="Password"
+        label={t('auth.register.passwordLabel', 'Password')}
         name="password"
         type="password"
-        placeholder="Enter your password"
+        placeholder={t('auth.register.passwordPlaceholder', 'Enter your password')}
         value={formData.password}
         onChange={handleChange}
         required
@@ -39,10 +42,10 @@ export default function AccountSetupForm({ formData, handleChange, onPrev, onSub
 
       {/* THÊM MỚI: Confirm Password */}
       <Input
-        label="Confirm Password"
+        label={t('auth.register.confirmPasswordLabel', 'Confirm Password')}
         name="confirmPassword"
         type="password"
-        placeholder="Re-enter your password"
+        placeholder={t('auth.register.confirmPasswordPlaceholder', 'Re-enter your password')}
         value={formData.confirmPassword}
         onChange={handleChange}
         required
@@ -60,20 +63,23 @@ export default function AccountSetupForm({ formData, handleChange, onPrev, onSub
           required
         />
         <label htmlFor="terms" className="text-xs font-semibold text-gray-900 cursor-pointer">
-          I agree to the <Link href="#" className="underline text-[#3F5D38] hover:text-[#2d4228]">terms & policy</Link>
+          {t('auth.register.agreeTerms', 'I agree to the')}{" "}
+          <Link href="#" className="underline text-[#3F5D38] hover:text-[#2d4228]">
+            {t('auth.register.termsPolicy', 'terms & policy')}
+          </Link>
         </label>
       </div>
 
       <div className="flex gap-3 pt-4">
         <Button type="button" variant="outline" className="w-1/3 py-3 rounded-xl" onClick={onPrev}>
-          Back
+          {t('auth.register.back', 'Back')}
         </Button>
         <Button 
           type="submit" 
           disabled={isLoading || !formData.agreeTerms} 
           className="bg-[#3F5D38] hover:bg-[#2d4228] text-white w-2/3 py-3 rounded-xl disabled:opacity-70"
         >
-          {isLoading ? "Signing up..." : "Create Account"}
+          {isLoading ? t('auth.register.signingUp', 'Signing up...') : t('auth.register.createAccount', 'Create Account')}
         </Button>
       </div>
     </form>

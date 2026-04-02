@@ -1,10 +1,12 @@
 'use client';
-import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp, Flag } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp, Flag, MoreHorizontal, Trash2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { clearCurrentDocument, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments } from '@/lib/redux/features/documentSlice';
-import { openReportModal, showNotification } from '@/lib/redux/features/modalSlice';
+import { openConfirmModal, openReportModal, showNotification } from '@/lib/redux/features/modalSlice';
+import { deleteDocumentAsync } from '@/lib/redux/features/myDocumentSlice';
 import CommentSection from './commentSection/page';
 import { getAccessToken } from '@/lib/utils/token';
 import Pagination from '@/components/ui/Pagination';
@@ -17,6 +19,7 @@ import { DescriptionWithShowMore } from './DescriptionWithShowMore/page';
 import httpClient from '@/lib/services/http';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { showToast } from '@/lib/redux/features/toastSlice';
+import { clsx } from 'clsx';
 
 const PDFViewer = dynamic(() => import('./pdfViewer/page'), { ssr: false, });
 const WordViewer = dynamic(() => import('./wordViewer/page'), { ssr: false });
@@ -26,8 +29,10 @@ const Skeleton = ({ className }: { className: string }) => (
 );
 
 export default function DocumentDetailPage({ params }: { params: { id: string } }) {
+    const { t, i18n } = useTranslation();
     const dispatch = useAppDispatch();
     const { currentDocument, currentAuthor, detailStatus, relatedDocuments, relatedStatus, relatedPage, relatedTotalPages } = useAppSelector((state) => state.documents);
+    const currentUser = useAppSelector(state => state.profile.user);
     const [token, setToken] = useState<string | null>(() => getAccessToken());
     const router = useRouter();
 
@@ -35,7 +40,6 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
         if (!currentDocument) return;
 
         try {
-            console.log(currentDocument.downloadUrl);
             const response = await httpClient.get(currentDocument.downloadUrl, {
                 responseType: 'blob',
             });
@@ -53,7 +57,11 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             window.URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Tải file thất bại:", error);
-            alert("Không thể tải file, vui lòng thử lại.");
+            dispatch(showToast({
+                type: 'error',
+                title: 'Lỗi',
+                message: t('documents.detail.downloadFail', 'Download failed, please try again.')
+            }));
         }
     };
 
@@ -66,29 +74,44 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     const handleShare = async () => {
         try {
             await navigator.clipboard.writeText(window.location.href);
-            
             dispatch(showToast({
                 type: 'success', 
-                title: 'Thành công', 
-                message: 'Đã sao chép đường dẫn bài viết!' 
+                title: t('auth.login.success'), 
+                message: t('documents.detail.shareSuccess', 'Link copied to clipboard!') 
             }));
         } catch (error) {
             console.error("Lỗi khi copy:", error);
             dispatch(showToast({
                 type: 'error', 
-                title: 'Lỗi', 
-                message: 'Không thể sao chép đường dẫn lúc này.' 
+                title: t('auth.login.error'), 
+                message: t('documents.detail.shareError', 'Could not copy link at this time.') 
             }));
         }
     };
 
+    const handleDelete = () => {
+        if (!currentDocument) return;
+        dispatch(openConfirmModal({
+            title: "Xóa tài liệu",
+            message: `Bạn có chắc chắn muốn xóa "${currentDocument.title}"? Hành động này không thể hoàn tác.`,
+            confirmText: "Xóa",
+            cancelText: "Hủy",
+            onConfirm: async () => {
+                try {
+                    await dispatch(deleteDocumentAsync(currentDocument.id)).unwrap();
+                    router.push(AppRoute.home);
+                } catch (error) {
+                    console.error("Xóa thất bại:", error);
+                }
+            }
+        }));
+    };
+
     useEffect(() => {
         if (params.id) {
-            if (params.id) {
-                dispatch(fetchDocumentById(params.id));
-                dispatch(fetchCommentsByDocId({ documentId: params.id, page: 0, size: 5 }));
-                dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
-            }
+            dispatch(fetchDocumentById(params.id));
+            dispatch(fetchCommentsByDocId({ documentId: params.id, page: 0, size: 5 }));
+            dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
             return () => {
                 dispatch(clearCurrentDocument());
             };
@@ -108,7 +131,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             );
         }
 
-        if (!currentDocument.viewUrl) return <div className="p-8 text-center text-gray-500">Không có tài liệu</div>;
+        if (!currentDocument.viewUrl) return <div className="p-8 text-center text-gray-500">{t('documents.detail.noDoc', 'No document content.')}</div>;
 
         const fileExtension = currentDocument.documentType || 'application/pdf';
 
@@ -122,7 +145,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
 
         return (
             <div className="flex items-center justify-center h-full text-gray-500 p-8">
-                Định dạng này không hỗ trợ xem trước. Vui lòng tải về.
+                {t('documents.detail.noViewer', 'This format does not support preview. Please download to view.')}
             </div>
         );
     };
@@ -130,19 +153,20 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     if (detailStatus === 'failed') {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center text-gray-500">Không tìm thấy tài liệu.</div>
+                <div className="text-center text-gray-500">{t('documents.detail.notFound', 'Document not found.')}</div>
             </div>
         );
     }
 
     const isDocLoading = detailStatus === 'loading' || !currentDocument;
+    const isOwner = currentDocument?.author?.id === currentUser?.id;
 
     return (
         <main className="min-h-screen bg-white pb-20">
             <div className="max-w-4xl mx-auto px-4 pt-10 pb-6">
                 <div className="flex items-center gap-2 mb-4">
                     <span className="bg-blue-50 text-blue-600 text-xs px-2.5 py-0.5 rounded-full font-medium">
-                        Documents
+                        {t('documents.detail.category', 'Documents')}
                     </span>
                     <span className="text-gray-400 text-xs">•</span>
                     {isDocLoading ? (
@@ -162,7 +186,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-gray-100 pb-8">
                     <div className="flex items-center gap-3 justify-center sm:justify-start">
-                        {currentDocument?.author === null ? (
+                        {currentDocument?.author === null || !currentDocument?.author ? (
                             <>
                                 <Skeleton className="w-12 h-12 rounded-full" />
                                 <div className="space-y-2">
@@ -173,18 +197,12 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                         ) : (
                             <>
                                 <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-100 shrink-0">
-                                    {!currentDocument?.author && <img src={currentDocument?.author?.avatarUrl} alt={currentAuthor?.user} className="w-full h-full object-cover" />}
-                                    {currentDocument?.author && <AuthenticatedImage src={currentDocument?.author?.avatarUrl} alt={currentAuthor?.user} className="w-full h-full object-cover" />}
+                                    <AuthenticatedImage src={currentDocument.author.avatarUrl} alt={currentDocument.author.name} className="w-full h-full object-cover" />
                                 </div>
                                 <div>
-                                    <div className="font-semibold text-gray-900">{currentDocument?.author.name}</div>
+                                    <div className="font-semibold text-gray-900">{currentDocument.author.name}</div>
                                     <div className="text-xs text-gray-500">
-                                        {/* {currentDocument?.course
-                                            ? `Học ${currentDocument.course} tại ${currentDocument.university}`
-                                            : `Học tại ${currentDocument?.university}`
-                                        }
-                                        {" - "} */}
-                                        {currentDocument?.createdAt && new Date(currentDocument.createdAt).toLocaleDateString("vi-VN")}
+                                        {currentDocument?.createdAt && new Date(currentDocument.createdAt).toLocaleDateString(i18n.language === 'vi' ? "vi-VN" : "en-US")}
                                     </div>
                                 </div>
                             </>
@@ -194,36 +212,32 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                     <div className="flex items-center justify-center gap-3">
                         <button
                             disabled={isDocLoading || !currentDocument?.downloadable}
-                            onClick={() => handleDownload()}
-                            className={`
-                                flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition
-                                ${!isDocLoading && currentDocument?.downloadable
+                            onClick={handleDownload}
+                            className={clsx(
+                                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition",
+                                !isDocLoading && currentDocument?.downloadable
                                     ? "bg-black text-white hover:opacity-80 cursor-pointer shadow-sm"
                                     : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                                }
-                            `}
+                            )}
                         >
                             <Download size={18} />
-                            <span>Download</span>
+                            <span>{t('documents.detail.download', 'Download')}</span>
                         </button>
-                        <button className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer" title="Chia sẻ" onClick={() => handleShare()}>
-                            <Share2 size={20} />
-                        </button>
-
-                        <button
-                            onClick={() => handleReport()}
-                            className="p-2 text-gray-400 hover:text-[#8B2C1F] hover:bg-red-50 rounded-full transition cursor-pointer"
-                            title="Báo cáo vi phạm"
-                        >
-                            <Flag size={20} />
-                        </button>
+                        
+                        <DocumentActionsMenu 
+                            onShare={handleShare}
+                            onReport={handleReport}
+                            onDelete={handleDelete}
+                            isOwner={isOwner}
+                            disabled={isDocLoading}
+                        />
                     </div>
                 </div>
             </div>
 
             <div className="max-w-4xl mx-auto px-4">
                 <div className="mb-8">
-                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-2">Description</h3>
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-2">{t('documents.detail.description', 'Description')}</h3>
                     {isDocLoading ? (
                         <div className="space-y-2">
                             <Skeleton className="h-4 w-full" />
@@ -248,11 +262,11 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                         <>
                             <div className="flex items-center gap-2">
                                 <Eye size={18} />
-                                <span>{currentDocument?.downloadCount?.toLocaleString()} Views</span>
+                                <span>{currentDocument?.downloadCount?.toLocaleString()} {t('documents.detail.views', 'Views')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Download size={18} />
-                                <span>{currentDocument?.downloadCount?.toLocaleString()} Downloads</span>
+                                <span>{currentDocument?.downloadCount?.toLocaleString()} {t('documents.detail.downloads', 'Downloads')}</span>
                             </div>
                         </>
                     )}
@@ -260,7 +274,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             </div>
 
             <div className="max-w-4xl mx-auto px-4 mb-16 border-t border-gray-100 pt-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">Tài liệu liên quan</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-6">{t('documents.detail.related', 'Related Documents')}</h3>
 
                 {relatedStatus === 'loading' ? (
                     <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
@@ -288,12 +302,12 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                                 className="min-w-[100px] flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-50 rounded-xl border border-dashed border-gray-300 transition"
                                 onClick={() => onRelatedPageChange(relatedPage + 2)}
                             >
-                                <span className="text-sm font-medium text-gray-500">Xem thêm</span>
+                                <span className="text-sm font-medium text-gray-500">{t('documents.detail.viewMore', 'View more')}</span>
                             </div>
                         </div>
                     </div>
                 ) : (
-                    <div className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">Không có tài liệu liên quan nào.</div>
+                    <div className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">{t('documents.detail.noRelated', 'No related documents found.')}</div>
                 )}
             </div>
 
@@ -301,5 +315,75 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                 <CommentSection params={params} />
             </div>
         </main>
+    );
+}
+
+function DocumentActionsMenu({ onShare, onReport, onDelete, isOwner, disabled }: { 
+    onShare: () => void, 
+    onReport: () => void, 
+    onDelete: () => void, 
+    isOwner: boolean,
+    disabled: boolean
+}) {
+    const [isOpen, setIsOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
+
+    if (disabled) return <div className="w-10 h-10 bg-gray-100 animate-pulse rounded-full" />;
+
+    return (
+        <div className="relative" ref={menuRef}>
+            <button 
+                onClick={() => setIsOpen(!isOpen)}
+                className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer"
+                title="Thêm"
+            >
+                <MoreHorizontal size={20} />
+            </button>
+
+            {isOpen && (
+                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+                    <button
+                        onClick={() => { setIsOpen(false); onShare(); }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        <Share2 size={16} />
+                        Chia sẻ
+                    </button>
+                    
+                    <button
+                        onClick={() => { setIsOpen(false); onReport(); }}
+                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                        <Flag size={16} />
+                        Báo cáo
+                    </button>
+
+                    {isOwner && (
+                        <>
+                            <div className="h-px bg-gray-100 my-1 mx-2" />
+                            <button
+                                onClick={() => { setIsOpen(false); onDelete(); }}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
+                            >
+                                <Trash2 size={16} />
+                                Xóa tài liệu
+                            </button>
+                        </>
+                    )}
+                </div>
+            )}
+        </div>
     );
 }

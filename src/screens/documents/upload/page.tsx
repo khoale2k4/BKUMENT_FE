@@ -1,5 +1,6 @@
-'use client'
+"use client";
 
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import { useParams } from 'next/navigation';
 import ActiveStep from './steps/ActiveStep';
@@ -19,6 +20,7 @@ import {
 import FileDescription from './steps/Step2/FileDescription';
 
 const FileUpload = () => {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const params = useParams();
     const courseId = params?.course_id as string | undefined;
@@ -99,11 +101,11 @@ const FileUpload = () => {
     return (
         <div className="flex flex-col items-center w-full p-8 bg-white h-full">
             <div className="w-3/4 flex flex-row mb-8">
-                <ActiveStep isActice={activeStep >= 1} title={'Đăng tải'} description={'Tải tải liệu lên'} step={1} />
+                <ActiveStep isActice={activeStep >= 1} title={t('documents.upload.step1.title', 'Upload Files')} description={''} step={1} />
                 <div className={`flex-grow h-0.5 mx-4 my-auto ${activeStep > 1 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-                <ActiveStep isActice={activeStep >= 2} title={'Chi tiết'} description={'Mô tả tài liệu'} step={2} />
+                <ActiveStep isActice={activeStep >= 2} title={t('documents.upload.step2.title', 'Document Details')} description={''} step={2} />
                 <div className={`flex-grow h-0.5 mx-4 my-auto ${activeStep > 2 ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-                <ActiveStep isActice={activeStep >= 3} title={'Hoàn tất'} description={'Đăng tải hoàn tất'} step={3} />
+                <ActiveStep isActice={activeStep >= 3} title={t('blogs.write.header.successTitle', 'Success!')} description={''} step={3} />
             </div>
 
             <div className="w-1/2 text-center text-sm font-medium text-gray-500">
@@ -128,21 +130,21 @@ const FileUpload = () => {
                         onClick={handlePrevStep}
                         disabled={activeStep === 1 || uploadStatus === 'saving'}
                     >
-                        Previous
+                        {t('documents.upload.back', 'Back')}
                     </button>
                     <button
                         className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed"
                         disabled={isNextDisabled()}
                         onClick={handleNextStep}
                     >
-                        {activeStep === 2 ? (uploadStatus === 'saving' ? 'Saving...' : 'Save') : 'Next'}
+                        {activeStep === 2 ? (uploadStatus === 'saving' ? t('blogs.write.header.publishing', 'Saving...') : t('documents.upload.submit', 'Upload now')) : t('documents.upload.next', 'Next Step')}
                     </button>
                 </div>}
                 {activeStep === 3 && <button
                     className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700"
                     onClick={handleRestart}
                 >
-                    Upload more Documents
+                    {t('documents.upload.title', 'Upload Documents')}
                 </button>}
             </div>
         </div>
