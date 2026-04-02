@@ -129,3 +129,38 @@ export const getTopDocuments = async (page: number, size: number): Promise<any> 
 export const deleteDocument = async (id: string): Promise<void> => {
     await httpClient.delete(API_ENDPOINTS.DOCUMENTS.DELETE(id));
 };
+
+/**
+ * Láy điểm đánh giá trung bình
+ */
+export const getAverageRating = async (resourceId: string): Promise<number> => {
+    try {
+        const response = await httpClient.get(API_ENDPOINTS.REPORT.GET_AVERAGE_RATING(resourceId));
+        const result = response.data.result;
+        return typeof result === 'object' ? (result.averageScore || result.score || 0) : (result || 0);
+    } catch (error) {
+        console.error("Lỗi khi lấy đánh giá trung bình:", error);
+        return 0;
+    }
+};
+
+/**
+ * Lấy đánh giá của bản thân
+ */
+export const getMyRating = async (resourceId: string): Promise<number> => {
+    try {
+        const response = await httpClient.get(API_ENDPOINTS.REPORT.GET_MY_RATING(resourceId));
+        const result = response.data.result;
+        return typeof result === 'object' ? (result.score || 0) : (result || 0);
+    } catch (error) {
+        console.error("Lỗi khi lấy đánh giá bản thân:", error);
+        return 0;
+    }
+};
+
+/**
+ * Gửi đánh giá mới
+ */
+export const submitRating = async (resourceId: string, score: number): Promise<void> => {
+    await httpClient.post(API_ENDPOINTS.REPORT.SUBMIT_RATING, { resourceId, score });
+};

@@ -4,7 +4,7 @@ import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp, Flag, MoreHori
 import dynamic from 'next/dynamic';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { useEffect, useState, useRef } from 'react';
-import { clearCurrentDocument, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments } from '@/lib/redux/features/documentSlice';
+import { clearCurrentDocument, fetchCommentsByDocId, fetchDocumentById, fetchRelatedDocuments, rateDocument } from '@/lib/redux/features/documentSlice';
 import { openConfirmModal, openReportModal, showNotification } from '@/lib/redux/features/modalSlice';
 import { deleteDocumentAsync } from '@/lib/redux/features/myDocumentSlice';
 import CommentSection from './commentSection/page';
@@ -20,6 +20,7 @@ import httpClient from '@/lib/services/http';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { showToast } from '@/lib/redux/features/toastSlice';
 import { clsx } from 'clsx';
+import StarRating from '@/components/ui/StarRating';
 
 const PDFViewer = dynamic(() => import('./pdfViewer/page'), { ssr: false, });
 const WordViewer = dynamic(() => import('./wordViewer/page'), { ssr: false });
@@ -31,10 +32,25 @@ const Skeleton = ({ className }: { className: string }) => (
 export default function DocumentDetailPage({ params }: { params: { id: string } }) {
     const { t, i18n } = useTranslation();
     const dispatch = useAppDispatch();
-    const { currentDocument, currentAuthor, detailStatus, relatedDocuments, relatedStatus, relatedPage, relatedTotalPages } = useAppSelector((state) => state.documents);
+    const { 
+        currentDocument, 
+        currentAuthor, 
+        detailStatus, 
+        relatedDocuments, 
+        relatedStatus, 
+        relatedPage, 
+        relatedTotalPages,
+        averageRating,
+        myRating
+    } = useAppSelector((state) => state.documents);
     const currentUser = useAppSelector(state => state.profile.user);
     const [token, setToken] = useState<string | null>(() => getAccessToken());
     const router = useRouter();
+
+    const handleRate = (rating: number) => {
+        if (!currentDocument) return;
+        dispatch(rateDocument({ resourceId: params.id, rating }));
+    };
 
     const handleDownload = async () => {
         if (!currentDocument) return;
@@ -179,9 +195,20 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                 {isDocLoading ? (
                     <Skeleton className="h-10 w-3/4 mb-6" />
                 ) : (
-                    <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6 leading-tight text-center md:text-left">
-                        {currentDocument?.title}
-                    </h1>
+                    <div className="flex flex-col gap-2 mb-6">
+                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight text-center md:text-left">
+                            {currentDocument?.title}
+                        </h1>
+                        <div className="flex justify-center md:justify-start">
+                            <StarRating 
+                                rating={myRating} 
+                                averageRating={averageRating} 
+                                onRate={handleRate}
+                                readonly={!!myRating && myRating > 0}
+                                size="md"
+                            />
+                        </div>
+                    </div>
                 )}
 
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-gray-100 pb-8">

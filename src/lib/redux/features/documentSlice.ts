@@ -58,6 +58,9 @@ interface DocumentState {
 
     topics: Topic[];
     topicsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+    
+    averageRating: number | null;
+    myRating: number | null;
 
     upload: UploadState;
 }
@@ -87,6 +90,9 @@ const initialState: DocumentState = {
     topics: [],
     topicsStatus: 'idle',
 
+    averageRating: null,
+    myRating: null,
+
     upload: {
         files: [],
         activeStep: 1,
@@ -96,10 +102,30 @@ const initialState: DocumentState = {
 
 export const fetchDocumentById = createAsyncThunk(
     'documents/fetchDetail',
-    async (id: string) => {
+    async (id: string, { dispatch }) => {
         const response = await documentService.getDocumentById(id);
-        console.log(response);
+        dispatch(fetchRatingData(id));
         return response;
+    }
+);
+
+export const fetchRatingData = createAsyncThunk(
+    'documents/fetchRating',
+    async (resourceId: string) => {
+        const [average, myRating] = await Promise.all([
+            documentService.getAverageRating(resourceId).catch(() => 0),
+            documentService.getMyRating(resourceId).catch(() => 0)
+        ]);
+        return { average, myRating };
+    }
+);
+
+export const rateDocument = createAsyncThunk(
+    'documents/rate',
+    async ({ resourceId, rating }: { resourceId: string, rating: number }, { dispatch }) => {
+        await documentService.submitRating(resourceId, rating);
+        dispatch(fetchRatingData(resourceId));
+        return rating;
     }
 );
 
@@ -485,6 +511,15 @@ const documentSlice = createSlice({
 
         builder.addCase(saveFilesMetadata.rejected, (state) => {
             state.upload.uploadStatus = 'error';
+        });
+
+        builder.addCase(fetchRatingData.fulfilled, (state, action) => {
+            state.averageRating = action.payload.average;
+            state.myRating = action.payload.myRating;
+        });
+
+        builder.addCase(rateDocument.fulfilled, (state, action) => {
+            state.myRating = action.payload;
         });
     },
 });

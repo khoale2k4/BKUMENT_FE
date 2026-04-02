@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 // 1. Import Redux hooks
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { useEffect } from 'react';
-import { fetchPost } from '@/lib/redux/features/blogSlice';
+import { fetchPost, rateBlog } from '@/lib/redux/features/blogSlice';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { openConfirmModal, openReportModal } from '@/lib/redux/features/modalSlice';
 import { deleteBlogAsync } from '@/lib/redux/features/myBlogSlice';
@@ -15,6 +15,7 @@ import { showToast } from '@/lib/redux/features/toastSlice';
 import { IconDots, IconTrash, IconFlag, IconShare } from '@tabler/icons-react';
 import { AppRoute } from '@/lib/appRoutes';
 import { useState, useRef } from 'react';
+import StarRating from '@/components/ui/StarRating';
 
 import parse, { HTMLReactParserOptions, Element } from 'html-react-parser';
 
@@ -30,11 +31,27 @@ export default function BlogDetailPage(params: PageProps) {
     const router = useRouter();
     const dispatch = useAppDispatch();
 
-    const { id, title, contentHTML, coverImage, visibility, author, createdAt, status } = useAppSelector(
+    const { 
+        id, 
+        title, 
+        contentHTML, 
+        coverImage, 
+        visibility, 
+        author, 
+        createdAt, 
+        status, 
+        averageRating, 
+        myRating 
+    } = useAppSelector(
         (state) => state.blogs
     );
     const currentUser = useAppSelector(state => state.profile.user);
     const isOwner = currentUser?.id === author?.id;
+
+    const handleRate = (rating: number) => {
+        if (!id) return;
+        dispatch(rateBlog({ resourceId: id, rating }));
+    };
 
     const parseOptions: HTMLReactParserOptions = {
         replace(domNode) {
@@ -140,9 +157,18 @@ export default function BlogDetailPage(params: PageProps) {
                     </span>
                 </div>
 
-                <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-8">
+                <h1 className="text-3xl md:text-5xl font-extrabold text-black tracking-tight leading-[1.1] mb-6">
                     {title}
                 </h1>
+                <div className="mb-8">
+                    <StarRating 
+                        rating={myRating} 
+                        averageRating={averageRating} 
+                        onRate={handleRate}
+                        readonly={!!myRating && myRating > 0}
+                        size="lg"
+                    />
+                </div>
 
                 <div className="flex items-center justify-between border-t border-b border-gray-100 py-4 mb-8">
                     <div className="flex items-center gap-3">

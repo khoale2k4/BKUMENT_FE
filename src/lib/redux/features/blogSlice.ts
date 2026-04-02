@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import * as blogService from '@/lib/services/blog.service';
+import * as documentService from '@/lib/services/document.service';
 
 interface Author {
     id: string,
@@ -18,6 +19,9 @@ interface BlogState {
     assetIds: string[];
     error: string | null;
     createdAt: string | null;
+
+    averageRating: number | null;
+    myRating: number | null;
 }
 
 const initialState: BlogState = {
@@ -29,6 +33,8 @@ const initialState: BlogState = {
     error: null,
     assetIds: [] as string[],
     createdAt: null,
+    averageRating: null,
+    myRating: null,
 };
 
 export const uploadImage = createAsyncThunk(
@@ -69,10 +75,32 @@ export const submitPost = createAsyncThunk(
     }
 );
 
+export const fetchRatingData = createAsyncThunk(
+    'blog/fetchRating',
+    async (resourceId: string) => {
+        const [average, myRating] = await Promise.all([
+            documentService.getAverageRating(resourceId).catch(() => 0),
+            documentService.getMyRating(resourceId).catch(() => 0)
+        ]);
+        return { average, myRating };
+    }
+);
+
+export const rateBlog = createAsyncThunk(
+    'blog/rate',
+    async ({ resourceId, rating }: { resourceId: string, rating: number }, { dispatch }) => {
+        await documentService.submitRating(resourceId, rating);
+        dispatch(fetchRatingData(resourceId));
+        return rating;
+    }
+);
+
 export const fetchPost = createAsyncThunk(
     'blog/fetchPost',
-    async (blogId: string) => {
-        return await blogService.fetchPostById(blogId);
+    async (blogId: string, { dispatch }) => {
+        const response = await blogService.fetchPostById(blogId);
+        dispatch(fetchRatingData(blogId));
+        return response;
     }
 );
 
@@ -123,7 +151,16 @@ export const blogSlice = createSlice({
             })
             .addCase(fetchPost.pending, (state) => {
                 state.status = 'getting';
-            })
+            });
+
+        builder.addCase(fetchRatingData.fulfilled, (state, action) => {
+            state.averageRating = action.payload.average;
+            state.myRating = action.payload.myRating;
+        });
+
+        builder.addCase(rateBlog.fulfilled, (state, action) => {
+            state.myRating = action.payload;
+        });
     }
 });
 
