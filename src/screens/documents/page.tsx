@@ -230,11 +230,6 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                                     <div className="font-semibold text-gray-900">{currentDocument.author.name}</div>
                                     <div className="text-[13px] text-gray-500 font-medium flex items-center gap-2">
                                         <span>{currentDocument?.createdAt ? formatDate(new Date(currentDocument.createdAt).toISOString()) : ''}</span>
-                                        <span className="text-gray-300">•</span>
-                                        <div className="flex items-center gap-1.5">
-                                            <Eye size={15} strokeWidth={2} />
-                                            <span>{currentDocument?.views || 0}</span>
-                                        </div>
                                     </div>
                                 </div>
                             </>
@@ -294,7 +289,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                         <>
                             <div className="flex items-center gap-2">
                                 <Eye size={18} />
-                                <span>{currentDocument?.downloadCount?.toLocaleString()} {t('documents.detail.views', 'Views')}</span>
+                                <span>{currentDocument?.views?.toLocaleString()} {t('documents.detail.views', 'Views')}</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Download size={18} />

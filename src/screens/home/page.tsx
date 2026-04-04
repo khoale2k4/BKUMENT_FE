@@ -142,6 +142,12 @@ export default function HomePage() {
         router.push(`${AppRoute.profile}/${person.id}`);
     };
 
+    const getOnClick = (tab: string) => {
+        if (tab === 'Following') return onBlogClick;
+        if (tab === 'Documents') return onDocumentClick;
+        if (tab === 'People') return onPersonClick;
+    }
+
     const onFollow = async (person: PersonMayKnow) => {
         if (followingIds.includes(person.id) || followingLoading.has(person.id)) return;
 
@@ -367,7 +373,7 @@ export default function HomePage() {
                                                     data={{
                                                         ...content,
                                                         token: token,
-                                                        onClick: () => onDocumentClick(content.id),
+                                                        onClick: () => getOnClick(activeTab)?.(content.id),
                                                         views: content.views || 0,
                                                     }}
                                                 />

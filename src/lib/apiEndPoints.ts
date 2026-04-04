@@ -81,7 +81,7 @@ export const API_ENDPOINTS = {
 
     // http://143.198.80.199:8888/api/v1/profile/universities/search?query=HC&page=1&size=10
 
-    SEARCH_UNIVERSITIES: (query: string, page: number, size: number) => buildUrl(`${PROFILE}/search?q=${query}&page=${page}&size=${size}`),
+    SEARCH_UNIVERSITIES: (query: string, page: number, size: number) => buildUrl(`${PROFILE}/universities/search?q=${query}&page=${page}&size=${size}`),
     MY_DOCUMENTS: (page: number, size: number) =>
       buildUrl(`${DOCUMENT}/my-documents?page=${page}&size=${size}`),
     TOP_DOCUMENTS: (page: number, size: number) =>
