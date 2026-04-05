@@ -18,6 +18,7 @@ const httpClient: AxiosInstance = axios.create({
 httpClient.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
         const token = getAccessToken();
+        console.log('quang lay token ở http client:', token); // Debug log
 
         if (token && config.headers) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -45,8 +46,8 @@ httpClient.interceptors.response.use(
                 const currentPath = window.location.pathname + window.location.search;
                 // if (!currentPath.includes('/login')) {
                 //     localStorage.setItem('redirectUrl', currentPath);
-                //     sessionStorage.removeItem('accessToken');
-                //     sessionStorage.removeItem('currentRole');
+                //     localStorage.removeItem('accessToken');
+                //     localStorage.removeItem('currentRole');
                 //     window.location.href = '/login';
                 // }
             }

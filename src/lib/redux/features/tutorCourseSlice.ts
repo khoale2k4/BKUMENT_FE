@@ -2,8 +2,9 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 // Adjust the import path for RootState to match your project structure
 import { RootState } from "@/lib/redux/store";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
-import * as courseService from '@/lib/services/course.service';
+import * as courseService from "@/lib/services/course.service";
 import httpClient from "@/lib/services/http";
+import { showToast } from "./toastSlice";
 // --- Interfaces ---
 
 export interface Schedule {
@@ -130,7 +131,10 @@ export interface CreateNotificationRequest {
 // 1. Get all classes for the tutor
 export const getAllTeachingClasses = createAsyncThunk(
   "tutorCourse/getAllTeachingClasses",
-  async ({ page, size }: { page: number; size: number }, { rejectWithValue }) => {
+  async (
+    { page, size }: { page: number; size: number },
+    { rejectWithValue },
+  ) => {
     try {
       const data = await courseService.getAllTeachingClasses(page, size);
       if (data.code !== 1000) throw new Error(data.message);
@@ -169,7 +173,10 @@ export const createClass = createAsyncThunk(
 export const updateClass = createAsyncThunk(
   "tutorCourse/updateClass",
   async (
-    { classId, courseData }: { classId: string; courseData: CreateClassRequest },
+    {
+      classId,
+      courseData,
+    }: { classId: string; courseData: CreateClassRequest },
     { rejectWithValue },
   ) => {
     try {
@@ -186,7 +193,8 @@ export const cancelClass = createAsyncThunk(
   async (classId: string, { rejectWithValue }) => {
     try {
       const data = await courseService.cancelClass(classId);
-      if (data.code !== 1000) throw new Error(data.message || "Failed to cancel class");
+      if (data.code !== 1000)
+        throw new Error(data.message || "Failed to cancel class");
       return classId;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -221,7 +229,10 @@ export const getMemberPendingInCourse = createAsyncThunk(
 // 7. Get classes by tutorId
 export const getClassesByTutorId = createAsyncThunk(
   "tutorClasses/getClassesByTutorId",
-  async ( { tutorId, page, size }: { tutorId: string; page: number; size: number }, { rejectWithValue }) => {
+  async (
+    { tutorId, page, size }: { tutorId: string; page: number; size: number },
+    { rejectWithValue },
+  ) => {
     try {
       return await courseService.getClassesByTutorId(tutorId, page, size);
     } catch (error: any) {
@@ -235,10 +246,33 @@ export const approveMember = createAsyncThunk(
   "tutorCourse/approveMember",
   async (
     { enrollmentId, isApproved }: { enrollmentId: string; isApproved: boolean },
-    { rejectWithValue },
+    { dispatch, rejectWithValue },
   ) => {
     try {
-      const result = await courseService.approveMember(enrollmentId, isApproved);
+      const result = await courseService.approveMember(
+        enrollmentId,
+        isApproved,
+      );
+      if (isApproved == true) {
+        // Thông báo thành công khi duyệt thành viên
+        console.log("Member approved successfully:", result);
+        dispatch(
+          showToast({
+            type: "success",
+            title: "Thành công!",
+            message: "Đã chấp nhận yêu cầu tham gia!",
+          }),
+        );
+      } else {
+        dispatch(
+          showToast({
+            type: "success",
+            title: "Thành công!",
+            message: "Đã từ chối yêu cầu tham gia!",
+          }),
+        );
+      }
+
       return { enrollmentId, isApproved, result };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -265,7 +299,10 @@ export const getClassNotifications = createAsyncThunk(
 export const createClassNotification = createAsyncThunk(
   "tutorCourse/createClassNotification",
   async (
-    { classId, payload }: { classId: string; payload: CreateNotificationRequest },
+    {
+      classId,
+      payload,
+    }: { classId: string; payload: CreateNotificationRequest },
     { rejectWithValue },
   ) => {
     try {
@@ -290,8 +327,6 @@ export const getClassDocuments = createAsyncThunk(
     }
   },
 );
-
-
 
 const tutorCourseSlice = createSlice({
   name: "tutorCourse",
@@ -340,7 +375,10 @@ const tutorCourseSlice = createSlice({
       .addCase(getMySubjects.fulfilled, (state, action) => {
         state.loading = false;
         // Xử lý cả trường hợp trả về trực tiếp mảng hoặc object chứa thuộc tính data/content từ phân trang
-        state.subjects = (action.payload as any)?.data || (action.payload as any)?.content || (Array.isArray(action.payload) ? action.payload : []);
+        state.subjects =
+          (action.payload as any)?.data ||
+          (action.payload as any)?.content ||
+          (Array.isArray(action.payload) ? action.payload : []);
       })
       .addCase(getMySubjects.rejected, (state, action) => {
         state.loading = false;
@@ -413,7 +451,10 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getClassDocuments.fulfilled, (state, action) => {
         state.loadingDocuments = false;
-        state.classDocuments = action.payload?.data || action.payload?.content || (Array.isArray(action.payload) ? action.payload : []);
+        state.classDocuments =
+          action.payload?.data ||
+          action.payload?.content ||
+          (Array.isArray(action.payload) ? action.payload : []);
         state.documentsCurrentPage = action.payload?.currentPage || 1;
         state.documentsTotalPages = action.payload?.totalPages || 1;
       })
@@ -456,18 +497,20 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getClassesByTutorId.fulfilled, (state, action) => {
         state.loadingViewedClasses = false;
-        
+
         // CÁCH SỬA LỖI TẠI ĐÂY: Ép kiểu payload thành any để TypeScript không báo lỗi thuộc tính 'data'
         const payload = action.payload as any;
-        
-        state.viewedTutorClasses = Array.isArray(payload) ? payload : (payload?.data || payload?.content || []);
+
+        state.viewedTutorClasses = Array.isArray(payload)
+          ? payload
+          : payload?.data || payload?.content || [];
         // gán đề phân trang
         if (!Array.isArray(payload)) {
           state.totalPages = payload?.totalPages || 1;
           state.currentPage = payload?.currentPage ?? (payload?.number || 0); // Hỗ trợ cả Spring Boot (number)
         } else {
           // Fallback nếu API chỉ trả về mảng chay mà không có data phân trang
-          state.totalPages = Math.ceil(payload.length / 5); 
+          state.totalPages = Math.ceil(payload.length / 5);
         }
       })
       .addCase(getClassesByTutorId.rejected, (state, action) => {
@@ -499,7 +542,7 @@ const tutorCourseSlice = createSlice({
       .addCase(createClassNotification.fulfilled, (state, action) => {
         state.creatingNotification = false;
 
-        // UX Cực tốt: Thay vì phải gọi lại API lấy list, 
+        // UX Cực tốt: Thay vì phải gọi lại API lấy list,
         // ta đẩy luôn thông báo mới vừa tạo lên ĐẦU danh sách hiện tại.
         // Giúp UI cập nhật ngay lập tức mà không bị giật lag.
         state.notifications.unshift(action.payload);
