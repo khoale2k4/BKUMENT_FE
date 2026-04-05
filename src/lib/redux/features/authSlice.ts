@@ -1,7 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as authService from "@/lib/services/auth.service";
-import { RegisterPayload } from "@/lib/services/auth.service";
+import {
+  RegisterPayload,
+  sendForgotPasswordEmail,
+  sendVerifyResetToken,
+  sendResetPassword,
+  ResetPasswordPayload,
+} from "@/lib/services/auth.service";
 import httpClient from "@/lib/services/http";
 import { get } from "http";
 // --- Helper to get token from sessionStorage (Safe for Next.js SSR) ---
@@ -76,9 +82,12 @@ export interface University {
 const initialToken = getStoredToken();
 const initialRoles = initialToken ? getRolesFromToken(initialToken) : [];
 const storedRole = getStoredCurrentRole();
-const initialCurrentRole = (storedRole && initialRoles.includes(storedRole)) 
-  ? storedRole 
-  : (initialRoles.length > 0 ? determineDefaultRole(initialRoles) : "USER");
+const initialCurrentRole =
+  storedRole && initialRoles.includes(storedRole)
+    ? storedRole
+    : initialRoles.length > 0
+      ? determineDefaultRole(initialRoles)
+      : "USER";
 
 const initialState: AuthState = {
   isAuthenticated: !!getStoredToken(), // Auto-set to true if token exists
@@ -167,7 +176,54 @@ export const getUniversities = createAsyncThunk(
     }
   },
 );
-// --- Slice ---
+
+export const forgotPasswordWithEmail = createAsyncThunk(
+  "auth/forgotPasswordWithEmail",
+  async (email: string, { rejectWithValue }) => {
+    try {
+      // Gọi đúng hàm API đã được đổi tên
+      const response = await sendForgotPasswordEmail(email);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.message || "Lỗi khi gửi yêu cầu đặt lại mật khẩu",
+      );
+    }
+  },
+);
+
+export const verifyResetToken = createAsyncThunk(
+  "auth/verifyResetToken",
+  async (token: string, { rejectWithValue }) => {
+    try {
+      const response = await sendVerifyResetToken(token);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.message || "Lỗi khi xác minh token đặt lại mật khẩu",
+      );
+    }
+  },
+);
+
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async (
+    payload: ResetPasswordPayload, // Nhận vào { email, otp, newPassword } từ UI
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await sendResetPassword(payload);
+      return response;
+    } catch (error: any) {
+      // Bắt lỗi chuẩn từ Backend trả về
+      return rejectWithValue(
+        error.response?.data?.message || error.message || "Lỗi khi đặt lại mật khẩu mới"
+      );
+    }
+  },
+);
 
 export const authSlice = createSlice({
   name: "auth",

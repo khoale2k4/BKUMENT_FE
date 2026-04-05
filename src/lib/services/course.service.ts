@@ -38,8 +38,8 @@ export const getMemberPendingInCourse = async (courseId: string) => {
     return response.data.result;
 };
 
-export const getClassesByTutorId = async (tutorId: string): Promise<CourseItem[]> => {
-    const response = await httpClient.get(API_ENDPOINTS.LMS.GET_CLASSES_BY_TUTORID(tutorId));
+export const getClassesByTutorId = async (tutorId: string, page: number, size: number): Promise<CourseItem[]> => {
+    const response = await httpClient.get(API_ENDPOINTS.LMS.GET_CLASSES_BY_TUTORID(tutorId, page, size));
     return response.data.result;
 };
 
@@ -76,6 +76,8 @@ export const searchTutors = async (filters: SearchFilters) => {
     const response = await httpClient.get(API_ENDPOINTS.LMS.SEARCH_CLASSES, { 
         params: filters // httpClient tự động loại bỏ các field undefined và nối thành ?keyword=...&subjectName=...
     });
+    console.log("API Response for search tutors:", response.data.result); // Debug log
+    
     return response.data.result;
 };
 

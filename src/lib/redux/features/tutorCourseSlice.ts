@@ -221,9 +221,9 @@ export const getMemberPendingInCourse = createAsyncThunk(
 // 7. Get classes by tutorId
 export const getClassesByTutorId = createAsyncThunk(
   "tutorClasses/getClassesByTutorId",
-  async (tutorId: string, { rejectWithValue }) => {
+  async ( { tutorId, page, size }: { tutorId: string; page: number; size: number }, { rejectWithValue }) => {
     try {
-      return await courseService.getClassesByTutorId(tutorId);
+      return await courseService.getClassesByTutorId(tutorId, page, size);
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -461,6 +461,14 @@ const tutorCourseSlice = createSlice({
         const payload = action.payload as any;
         
         state.viewedTutorClasses = Array.isArray(payload) ? payload : (payload?.data || payload?.content || []);
+        // gán đề phân trang
+        if (!Array.isArray(payload)) {
+          state.totalPages = payload?.totalPages || 1;
+          state.currentPage = payload?.currentPage ?? (payload?.number || 0); // Hỗ trợ cả Spring Boot (number)
+        } else {
+          // Fallback nếu API chỉ trả về mảng chay mà không có data phân trang
+          state.totalPages = Math.ceil(payload.length / 5); 
+        }
       })
       .addCase(getClassesByTutorId.rejected, (state, action) => {
         state.loadingViewedClasses = false;

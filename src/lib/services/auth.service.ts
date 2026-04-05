@@ -1,6 +1,7 @@
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import { setAccessToken, removeAccessToken } from "@/lib/utils/token";
 import httpClient from "./http";
+import axios from "axios"; // Import thẳng từ thư viện gốc
 interface LoginCredentials {
   username: string;
   password: string;
@@ -30,9 +31,12 @@ interface LoginResponse {
   };
 }
 
-
-
-
+// Thêm interface này để TypeScript gợi ý code cho chuẩn
+export interface ResetPasswordPayload {
+  email: string;
+  otp: string;
+  newPassword: string;
+}
 /**
  * Login user và tự động lưu token
  */
@@ -129,8 +133,36 @@ export const refreshToken = async () => {
 };
 
 // Sửa getUniversities thành fetchUniversities
-export const fetchUniversities = async (): Promise<{ id: number; name: string }[]> => {
+export const fetchUniversities = async (): Promise<
+  { id: number; name: string }[]
+> => {
   const response = await fetch(API_ENDPOINTS.ACCOUNT.GET_UNIVERSITIES(1, 200));
   const data = await response.json();
   return data.result.data;
-};  
+};
+
+export const sendForgotPasswordEmail = async (email: string): Promise<any> => {
+  const response = await httpClient.post(
+    API_ENDPOINTS.AUTH.FORGOT_PASSWORD_WITH_EMAIL(email),
+  );
+  return response.data.result;
+};
+
+export const sendVerifyResetToken = async (token: string): Promise<any> => {
+  const response = await httpClient.post(
+    API_ENDPOINTS.AUTH.VERIFY_RESET_TOKEN(token),
+  );
+  return response.data.result;
+};
+
+export const sendResetPassword = async (
+  payload: ResetPasswordPayload,
+): Promise<any> => {
+  // Dùng axios thuần thì sẽ không bị dính bất kỳ interceptor nào cài trong httpClient
+  const response = await axios.post(
+    API_ENDPOINTS.AUTH.RESET_PASSWORD, // Đảm bảo cái này là URL đầy đủ (có http://)
+    payload,
+  );
+
+  return response.data.result;
+};

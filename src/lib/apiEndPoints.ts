@@ -3,7 +3,7 @@ import { UNDERSCORE_GLOBAL_ERROR_ROUTE } from "next/dist/shared/lib/entry-consta
 import { RegisterTutorRequest } from "./redux/features/profileSlice";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "http://143.198.80.199:8888/api/v1";
 
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_SOCKET_URL || "http://143.198.80.199:8099";
@@ -32,6 +32,12 @@ export const API_ENDPOINTS = {
     LOGOUT: buildUrl(`${IDENTITY}/auth/logout`),
     PROFILE: buildUrl(`${IDENTITY}/api/auth/me`),
     REFRESH_TOKEN: buildUrl(`${IDENTITY}/auth/refresh`),
+    FORGOT_PASSWORD_WITH_EMAIL: (email: string) => buildUrl(`${IDENTITY}/auth/forgot-password?email=${email}`),
+
+    RESET_PASSWORD: buildUrl(`${IDENTITY}/auth/reset-password`),
+    //http://143.198.80.199:8888/api/v1/identity/auth/forgot-password?email=lythanhnhatquangthongnhat2004%40gmail.com 
+    VERIFY_RESET_TOKEN: (token: string) => buildUrl(`${IDENTITY}/auth/verify-email?token=${token}`),
+
   },
 
   ACCOUNT: {
@@ -188,8 +194,8 @@ export const API_ENDPOINTS = {
     GET_MEMBER_PENDING: (id: string) =>
       buildUrl(`${LMS}/classes/${id}/enrollments/pending`),
 
-    GET_CLASSES_BY_TUTORID: (id: string) =>
-      buildUrl(`${LMS}/classes/tutors/${id}`),
+    GET_CLASSES_BY_TUTORID: (id: string, page: number, size: number) =>
+      buildUrl(`${LMS}/classes/tutors/${id}?page=${page}&size=${size}`),
 
     APPROVE_ENROLLMENT: (id: string, approved: boolean) =>
       buildUrl(`${LMS}/enrollments/${id}/approval?approved=${approved}`),
