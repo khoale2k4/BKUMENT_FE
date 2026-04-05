@@ -10,11 +10,11 @@ import {
 } from "@/lib/services/auth.service";
 import httpClient from "@/lib/services/http";
 import { get } from "http";
-// --- Helper to get token from sessionStorage (Safe for Next.js SSR) ---
+// --- Helper to get token from localStorage (Safe for Next.js SSR) ---
 import { fetchUniversities } from "../../services/auth.service";
 const getStoredToken = () => {
   if (typeof window !== "undefined") {
-    return sessionStorage.getItem("accessToken");
+    return localStorage.getItem("accessToken");
   }
   return null;
 };
@@ -46,7 +46,7 @@ const getRolesFromToken = (token: string): string[] => {
 
 const getStoredCurrentRole = () => {
   if (typeof window !== "undefined") {
-    return sessionStorage.getItem("currentRole");
+    return localStorage.getItem("currentRole");
   }
   return null;
 };
@@ -244,9 +244,9 @@ export const authSlice = createSlice({
       state.status = "idle";
       state.error = null;
 
-      sessionStorage.setItem("accessToken", action.payload.token);
-      sessionStorage.setItem("currentRole", state.currentRole);
-      sessionStorage.setItem(
+      localStorage.setItem("accessToken", action.payload.token);
+      localStorage.setItem("currentRole", state.currentRole);
+      localStorage.setItem(
         "user",
         JSON.stringify({
           name: action.payload.name,
@@ -256,9 +256,9 @@ export const authSlice = createSlice({
     },
     initializeAuth: (state) => {
       if (typeof window !== "undefined") {
-        const token = sessionStorage.getItem("accessToken");
-        const savedUser = sessionStorage.getItem("user");
-        const savedRole = sessionStorage.getItem("currentRole");
+        const token = localStorage.getItem("accessToken");
+        const savedUser = localStorage.getItem("user");
+        const savedRole = localStorage.getItem("currentRole");
 
         if (token) {
           state.isAuthenticated = true;
@@ -271,7 +271,7 @@ export const authSlice = createSlice({
           } else {
             // Nếu session lưu bậy bạ, reset về mặc định an toàn
             state.currentRole = determineDefaultRole(state.roles);
-            sessionStorage.setItem("currentRole", state.currentRole);
+            localStorage.setItem("currentRole", state.currentRole);
           }
 
           if (savedUser) {
@@ -289,7 +289,7 @@ export const authSlice = createSlice({
       if (allowedToSwitch && state.roles.includes(targetRole)) {
         state.currentRole = targetRole;
         if (typeof window !== "undefined") {
-          sessionStorage.setItem("currentRole", targetRole);
+          localStorage.setItem("currentRole", targetRole);
         }
       } else {
         console.warn(
@@ -306,8 +306,8 @@ export const authSlice = createSlice({
       state.status = "idle";
 
       if (typeof window !== "undefined") {
-        sessionStorage.removeItem("accessToken");
-        sessionStorage.removeItem("currentRole");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("currentRole");
         const currentPath = window.location.pathname + window.location.search;
         if (!currentPath.includes("/login")) {
           localStorage.setItem("redirectUrl", currentPath);
@@ -336,8 +336,8 @@ export const authSlice = createSlice({
           state.currentRole = determineDefaultRole(state.roles);
 
           if (typeof window !== "undefined") {
-            sessionStorage.setItem("accessToken", token);
-            sessionStorage.setItem("currentRole", state.currentRole); // Phải lưu currentRole vào session
+            localStorage.setItem("accessToken", token);
+            localStorage.setItem("currentRole", state.currentRole); // Phải lưu currentRole vào session
 
             const redirectUrl = localStorage.getItem("redirectUrl");
             if (redirectUrl) {
@@ -381,8 +381,8 @@ export const authSlice = createSlice({
         state.roles = [];
         state.currentRole = null;
         if (typeof window !== "undefined") {
-          sessionStorage.removeItem("accessToken");
-          sessionStorage.removeItem("currentRole");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("currentRole");
           const currentPath = window.location.pathname + window.location.search;
           if (!currentPath.includes("/login")) {
             localStorage.setItem("redirectUrl", currentPath);
@@ -399,8 +399,8 @@ export const authSlice = createSlice({
         state.roles = [];
         state.currentRole = null;
         if (typeof window !== "undefined") {
-          sessionStorage.removeItem("accessToken");
-          sessionStorage.removeItem("currentRole");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("currentRole");
           const currentPath = window.location.pathname + window.location.search;
           if (!currentPath.includes("/login")) {
             localStorage.setItem("redirectUrl", currentPath);
@@ -423,11 +423,11 @@ export const authSlice = createSlice({
           // Nếu mất quyền TUTOR, tự động đẩy về USER.
           if (state.currentRole && !state.roles.includes(state.currentRole)) {
             state.currentRole = "USER";
-            sessionStorage.setItem("currentRole", "USER");
+            localStorage.setItem("currentRole", "USER");
           }
 
           // Cập nhật session storage
-          sessionStorage.setItem("accessToken", newToken);
+          localStorage.setItem("accessToken", newToken);
         }
       })
       .addCase(refreshToken.rejected, (state) => {
@@ -441,8 +441,8 @@ export const authSlice = createSlice({
         state.status = "idle";
 
         if (typeof window !== "undefined") {
-          sessionStorage.removeItem("accessToken");
-          sessionStorage.removeItem("currentRole");
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("currentRole");
           const currentPath = window.location.pathname + window.location.search;
           if (!currentPath.includes("/login")) {
             localStorage.setItem("redirectUrl", currentPath);
