@@ -7,6 +7,8 @@ import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { getClassesByTutorId } from '@/lib/redux/features/tutorCourseSlice';
 
 import CourseCard from '../../profile/tabs/MyClass/CourseCard'; 
+// Nhớ import Component Pagination của bạn nhé
+import Pagination from '@/components/ui/Pagination'; 
 
 const TutorDetailPage = () => {
   const params = useParams();
@@ -14,15 +16,35 @@ const TutorDetailPage = () => {
   const tutorId = params.id as string;
   const dispatch = useAppDispatch();
   
-  // LẤY DỮ LIỆU TỪ viewedTutorClasses
-  const { viewedTutorClasses, loadingViewedClasses, error } = useAppSelector(state => state.tutorCourse);
+  // LẤY DỮ LIỆU VÀ STATE PHÂN TRANG TỪ REDUX
+  const { 
+    viewedTutorClasses, 
+    loadingViewedClasses, 
+    error,
+    currentPage, // <-- Thêm currentPage
+    totalPages   // <-- Thêm totalPages
+  } = useAppSelector(state => state.tutorCourse);
 
+  console.log(" totalPages in TutorDetailPage:", totalPages);
+
+  // GỌI API LẦN ĐẦU KHI VÀO TRANG
   useEffect(() => {
     if (tutorId) {
-      dispatch(getClassesByTutorId(tutorId));
+      // Mặc định gọi trang 0 (do Backend hệ 0-based) và hiển thị 5 item mỗi trang
+      dispatch(getClassesByTutorId({tutorId, page: 0, size: 5}));
       console.log("Fetching classes for tutor ID:", tutorId);
     }
   }, [dispatch, tutorId]);
+
+  // HÀM XỬ LÝ CHUYỂN TRANG
+  const handlePageChange = (newPage: number) => {
+    // newPage từ component Pagination là hệ 1-based (1, 2, 3...)
+    // Chuyển lại thành hệ 0-based (newPage - 1) để gửi xuống Backend
+      dispatch(getClassesByTutorId({tutorId, page: newPage -1 , size: 5}));
+
+    // Cuộn mượt mà lên trên cùng sau khi chuyển trang
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // UI Loading
   if (loadingViewedClasses) {
@@ -60,11 +82,11 @@ const TutorDetailPage = () => {
           Các khóa học của Gia sư
         </h1>
         <p className="text-gray-500">
-          Hiện đang có <span className="font-bold text-orange-500">{viewedTutorClasses.length}</span> khóa học đang được mở.
+          Hiện đang có <span className="font-bold text-orange-500">{viewedTutorClasses.length}</span> khóa học đang được mở trên trang này.
         </p>
       </div>
       
-      {/* Danh sách Khóa học (Hiển thị dạng flex cột có khoảng cách) */}
+      {/* Danh sách Khóa học */}
       {viewedTutorClasses.length === 0 ? (
         <div className="text-center py-20 border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50 text-gray-500">
           <p className="text-lg font-bold mb-2 text-gray-700">Gia sư này hiện chưa có khóa học nào.</p>
@@ -74,6 +96,17 @@ const TutorDetailPage = () => {
           {viewedTutorClasses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}
+        </div>
+      )}
+
+      {/* COMPONENT PHÂN TRANG */}
+      {totalPages >= 1 && (
+        <div className="mt-10 flex justify-center">
+          <Pagination
+            currentPage={currentPage +1 } // Chuyển từ 0-based của Redux sang 1-based cho Component UI
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
         </div>
       )}
 

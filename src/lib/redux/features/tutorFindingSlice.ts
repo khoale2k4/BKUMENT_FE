@@ -69,6 +69,7 @@ interface TutorInfo {
 export interface TutorData {
   tutor: TutorInfo;
   matchingClasses: Course[];
+  totalMatchingClasses?: number;
 }
 
 // Interface cho State của Slice này
@@ -97,6 +98,7 @@ interface TutorFindingState {
   enrollSuccess: boolean;
   currentPage: number;
   totalPages: number;
+  totalCourses: number; // Thêm tổng số khóa học vào state để hiển thị trên UI
 }
 
 const initialState: TutorFindingState = {
@@ -129,6 +131,7 @@ const initialState: TutorFindingState = {
   enrollSuccess: false,
   currentPage: 1,
   totalPages: 1,
+  totalCourses: 0,
 };
 
 // --- Async Thunks ---
@@ -390,6 +393,17 @@ const tutorFindingSlice = createSlice({
       .addCase(searchTutors.fulfilled, (state, action) => {
         state.loading = false;
         state.tutors = action.payload.data || []; // Gán data.result trả về vào list tutors
+        // Lấy mảng data trả về từ API
+        const rawData = action.payload.data || []; 
+
+        // Map qua từng gia sư và đếm số lượng matchingClasses
+        state.tutors = rawData.map((item: any) => {
+          const matchCount = item.matchingClasses?.length || 0;
+          return {
+            ...item,
+            totalMatchingClasses: matchCount, // Lưu lại con số vừa đếm được
+          };
+        });
         state.currentPage = action.payload.currentPage || 1;
         state.totalPages = action.payload.totalPages || 1;
       })

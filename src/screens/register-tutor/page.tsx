@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { registerTutorProfile, RegisterTutorRequest } from '@/lib/redux/features/profileSlice';
 import { getSearchSubjects } from '@/lib/redux/features/tutorFindingSlice';
 import { refreshToken } from '@/lib/redux/features/authSlice';
-
+import { showToast } from '@/lib/redux/features/toastSlice'; // Thay đổi đường dẫn nếu cần
 const RegisterTutorForm = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -49,26 +49,70 @@ const RegisterTutorForm = () => {
     });
   };
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+    
+  //   // ĐÃ CẬP NHẬT: Kiểm tra thêm trường experience nếu bạn muốn nó là bắt buộc
+  //   if (!formData.name || !formData.introduction || !formData.experience || formData.subjectIds.length === 0) {
+  //     alert("Vui lòng điền đầy đủ thông tin bắt buộc và chọn ít nhất 1 môn học!");
+  //     return;
+  //   }
+
+  //   try {
+  //     await dispatch(registerTutorProfile(formData)).unwrap();
+  //     await dispatch(refreshToken()).unwrap(); 
+      
+  //     setIsSuccess(true);
+      
+  //     setTimeout(() => {
+  //       router.push('/profile'); 
+  //     }, 2000);
+
+  //   } catch (error) {
+  //     console.error("Đăng ký thất bại:", error);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // ĐÃ CẬP NHẬT: Kiểm tra thêm trường experience nếu bạn muốn nó là bắt buộc
+    // Đã thay thế alert mặc định bằng Toast thông báo lỗi
     if (!formData.name || !formData.introduction || !formData.experience || formData.subjectIds.length === 0) {
-      alert("Vui lòng điền đầy đủ thông tin bắt buộc và chọn ít nhất 1 môn học!");
+      dispatch(showToast({ 
+        type: "error", 
+        title: "Thiếu thông tin!", 
+        message: "Vui lòng điền đầy đủ thông tin bắt buộc và chọn ít nhất 1 môn học." 
+      }));
       return;
     }
 
     try {
       await dispatch(registerTutorProfile(formData)).unwrap();
-      await dispatch(refreshToken()).unwrap(); 
+      // await dispatch(refreshToken()).unwrap(); 
       
+      // Bắn Toast thành công
+      dispatch(showToast({ 
+        type: "success", 
+        title: "Thành công!", 
+        message: "Đã gửi hồ sơ đăng ký gia sư thành công!" 
+      }));
+
       setIsSuccess(true);
       
       setTimeout(() => {
         router.push('/profile'); 
       }, 2000);
 
-    } catch (error) {
+    } catch (error: any) {
+      // Bắn Toast báo lỗi dựa trên message từ Backend trả về (nếu có)
+      const errorMessage = error?.message || typeof error === 'string' ? error : "Đã có lỗi xảy ra, vui lòng thử lại sau.";
+      
+      dispatch(showToast({ 
+        type: "error", 
+        title: "Đăng ký thất bại!", 
+        message: errorMessage
+      }));
+      
       console.error("Đăng ký thất bại:", error);
     }
   };

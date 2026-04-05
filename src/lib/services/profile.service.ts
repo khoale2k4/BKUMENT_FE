@@ -8,7 +8,7 @@ import {
 } from "../redux/features/profileSlice";
 import { API_ENDPOINTS } from "../apiEndPoints";
 import httpClient from "./http";
-
+import { showToast } from "../redux/features/toastSlice";
 const BASE_URL = "http://localhost:8888/api/v1";
 
 // Hàm helper để lấy token
@@ -90,6 +90,10 @@ export const registerTutor = async (
   );
   if (response.data.code !== 1000)
     throw new Error(response.data.message || "Failed to register tutor");
+
+  // if(response.data.code === 3008) {
+  //     dispatch(showToast({ type: "info", title: "Success!", message: response.data.message || "Tutor registration successful, pending approval." }));
+  // }
   console.log("API Response for register tutor:", response.data);
   return response.data.result as TutorProfile;
 };
