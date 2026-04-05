@@ -74,6 +74,14 @@ export const getMyBlogs = async (page: number, size: number): Promise<any> => {
 };
 
 /**
+ * Lấy danh sách tài liệu của người dùng theo id
+ */
+export const getUserBlogs = async (userId: string, page: number, size: number): Promise<any> => {
+    const response = await httpClient.get(API_ENDPOINTS.BLOGS.USER_BLOGS(userId, page, size));
+    return response.data.result;
+};
+
+/**
  * Xóa blog theo ID
  */
 export const deleteBlog = async (id: string): Promise<void> => {

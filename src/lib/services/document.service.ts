@@ -117,6 +117,14 @@ export const getMyDocuments = async (page: number, size: number): Promise<any> =
 };
 
 /**
+ * Lấy danh sách tài liệu của người dùng theo id
+ */
+export const getUserDocuments = async (userId: string, page: number, size: number): Promise<any> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.USER_DOCUMENTS(userId, page, size));
+    return response.data.result;
+};
+
+/**
  * Lấy danh sách tài liệu nổi bật
  */
 export const getTopDocuments = async (page: number, size: number): Promise<any> => {

@@ -90,6 +90,8 @@ export const API_ENDPOINTS = {
     SEARCH_UNIVERSITIES: (query: string, page: number, size: number) => buildUrl(`${PROFILE}/universities/search?q=${query}&page=${page}&size=${size}`),
     MY_DOCUMENTS: (page: number, size: number) =>
       buildUrl(`${DOCUMENT}/my-documents?page=${page}&size=${size}`),
+    USER_DOCUMENTS: (userId: string, page: number, size: number) =>
+      buildUrl(`${DOCUMENT}/user/${userId}?page=${page}&size=${size}`),
     TOP_DOCUMENTS: (page: number, size: number) =>
       buildUrl(`${DOCUMENT}/top-documents?page=${page}&size=${size}`),
     DELETE: (id: string) => buildUrl(`${DOCUMENT}/${id}`),
@@ -104,6 +106,8 @@ export const API_ENDPOINTS = {
     UPLOAD_NEW_BLOG: buildUrl(`${BLOG}`),
     MY_BLOGS: (page: number, size: number) =>
       buildUrl(`${BLOG}/my-blogs?page=${page}&size=${size}`),
+    USER_BLOGS: (userId: string, page: number, size: number) =>
+      buildUrl(`${BLOG}/user/${userId}?page=${page}&size=${size}`),
     TOP_BLOGS: (page: number, size: number) =>
       buildUrl(`${BLOG}/top-blog?page=${page}&size=${size}`),
     DELETE: (id: string) => buildUrl(`${BLOG}/${id}`),
