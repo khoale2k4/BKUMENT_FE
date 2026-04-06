@@ -6,7 +6,7 @@ import { uploadConversationAvatarAsync } from "@/lib/redux/features/chatSlice";
 import { getChatDisplayInfo } from "./page";
 import { Conversation } from "@/lib/services/chat.service";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
-
+import { useRouter } from "next/navigation"; // <-- 1. THÊM IMPORT NÀY
 interface ChatHeaderProps {
     activeChat: Conversation;
     onToggleSidebar: () => void;
@@ -18,6 +18,7 @@ const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderPr
     const dispatch = useDispatch<AppDispatch>();
     const { name, avatar } = getChatDisplayInfo(activeChat, currentUserId, t);
     const participantsCount = activeChat.participants?.length || 0;
+    const router = useRouter(); // <-- 2. KHỞI TẠO ROUTER Ở ĐÂY
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isUploading, setIsUploading] = useState(false);
@@ -55,6 +56,27 @@ const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderPr
         }
     };
 
+const handleViewProfile = () => {
+        if (activeChat.type === 'GROUP') {
+            alert(t('chat.header.noGroupProfile', 'Nhóm trò chuyện không có trang cá nhân!'));
+            return;
+        } else {
+            // Tìm thành viên trong cuộc trò chuyện mà KHÔNG PHẢI là chính mình
+            const otherParticipant = activeChat.participants?.find(
+                (p: any) => p.userId !== currentUserId && p.id !== currentUserId
+            );
+
+            // Lấy ID của người đó (tùy thuộc vào cấu trúc backend của bạn trả về userId hay id)
+            const targetId = otherParticipant?.userId || otherParticipant?.userId;
+
+            if (targetId) {
+                router.push(`/people/${targetId}`);
+            } else {
+                alert("Không tìm thấy thông tin người dùng này.");
+            }
+        }
+    };
+
     return (
         <div className="flex items-center justify-between p-4 border-b border-gray-200 shrink-0">
             <div className="flex items-center gap-3">
@@ -83,7 +105,7 @@ const ChatHeader = ({ activeChat, onToggleSidebar, currentUserId }: ChatHeaderPr
 
                 <div>
                     <h2 className="font-bold text-xl text-gray-900">{name}</h2>
-                    <p className="text-sm text-gray-500 underline cursor-pointer">
+                    <p className="text-sm text-gray-500 underline cursor-pointer" onClick={handleViewProfile}>
                         {activeChat.type === 'GROUP' ? t('chat.header.members', '{{count}} thành viên', { count: participantsCount }) : t('chat.header.viewProfile', 'Xem hồ sơ')}
                     </p>
                 </div>

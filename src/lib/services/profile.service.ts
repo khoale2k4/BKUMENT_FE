@@ -9,11 +9,10 @@ import {
 import { API_ENDPOINTS } from "../apiEndPoints";
 import httpClient from "./http";
 import { showToast } from "../redux/features/toastSlice";
-const BASE_URL = "http://localhost:8888/api/v1";
 
 // Hàm helper để lấy token
 const getAuthHeaders = () => {
-  const token = sessionStorage.getItem("accessToken");
+  const token = localStorage.getItem("accessToken");
   return {
     "Content-Type": "application/json",
     ...(token && { Authorization: `Bearer ${token}` }),

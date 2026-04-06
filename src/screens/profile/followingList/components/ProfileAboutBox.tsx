@@ -8,7 +8,7 @@ interface ProfileAboutBoxProps {
 
 const ProfileAboutBox: React.FC<ProfileAboutBoxProps> = ({ profile }) => {
   return (
-    <div className="max-w-[900px] mx-auto px-6 sm:px-10 mt-6 pb-10">
+    <div className="max-w-5xl mx-auto px-6 sm:px-10 mt-6 pb-10">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Cột trái: Giới thiệu ngắn */}
