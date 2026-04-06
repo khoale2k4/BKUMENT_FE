@@ -113,7 +113,7 @@ export const logout = async (token: string): Promise<any> => {
 
 export const refreshToken = async () => {
   // Lấy token cũ (nếu API của bạn yêu cầu gửi token cũ lên)
-  const oldToken = sessionStorage.getItem("accessToken");
+  const oldToken = localStorage.getItem("accessToken");
 
   const response = await fetch(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {
     method: "POST", // Hoặc GET tùy backend

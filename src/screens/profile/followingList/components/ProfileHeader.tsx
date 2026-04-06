@@ -109,6 +109,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ profile }) => {
     router.push('/messages'); 
   };
 
+  const handleViewProfile = () => {
+    router.push(`/people/${profile.id}`);
+  }
+
 
 const renderFollowButton = () => {
     // Trạng thái 1: LÀ BẠN BÈ (Cả 2 cùng follow nhau) -> Hiển thị Dropdown "Bạn bè"
@@ -206,7 +210,7 @@ const renderFollowButton = () => {
       {/* Ảnh bìa (Cover) */}
       <div className="h-[150px] lg:h-[200px] w-full bg-gradient-to-r from-blue-100 to-indigo-50 relative"></div>
 
-      <div className="max-w-[900px] mx-auto px-6 sm:px-10">
+      <div className="max-w-5xl mx-auto px-6 sm:px-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-gray-200">
           
           {/* Cụm Avatar và Tên */}
@@ -241,6 +245,15 @@ const renderFollowButton = () => {
             {/* Gọi hàm render nút Follow ở đây */}
             {renderFollowButton()}
             
+          </div>
+
+          <div className="flex gap-2 pb-1 sm:pb-3 shrink-0">
+            <button 
+              onClick={handleViewProfile} 
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors text-sm"
+            >
+              <MessageCircle size={16} /> {"Xem trang cá nhân"}
+            </button>
           </div>
         </div>
 

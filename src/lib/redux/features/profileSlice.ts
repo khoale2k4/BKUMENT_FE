@@ -138,11 +138,7 @@ const initialState: ProfileState = {
   isAvatarUploading: false,
 };
 
-// --- 2. Async Thunks ---
 
-// ==================== USER THUNKS ====================
-
-// Feature 1: Get My Profile (User)
 export const getMyProfile = createAsyncThunk(
   "profile/getMyProfile",
   async (_, { rejectWithValue }) => {
@@ -159,7 +155,6 @@ export const getMyProfile = createAsyncThunk(
   },
 );
 
-// Feature 2: Edit My Profile (User)
 export const updateMyProfile = createAsyncThunk(
   "profile/updateMyProfile",
   async (updateData: UpdateProfileRequest, { rejectWithValue }) => {
@@ -176,7 +171,6 @@ export const updateMyProfile = createAsyncThunk(
   },
 );
 
-
 export const getFollowingByProfileId = createAsyncThunk(
   "profile/getFollowingByProfileId",
   async ({ profileId, page = 1, size = 10 }: { profileId: string; page?: number; size?: number }, { rejectWithValue }) => {
@@ -188,7 +182,6 @@ export const getFollowingByProfileId = createAsyncThunk(
   },
 );
 
-// === THÊM MỚI: Thunk Lấy danh sách Followers ===
 export const getFollowersByProfileId = createAsyncThunk(
   "profile/getFollowersByProfileId",
   async (
@@ -215,7 +208,7 @@ export const getProfileById = createAsyncThunk(
       const state = getState() as RootState;
       let token = state.auth?.token;
       if (!token && typeof window !== "undefined") {
-        token = sessionStorage.getItem("accessToken");
+        token = localStorage.getItem("accessToken");
       }
 
       console.log(`Fetching profile for ID: ${profileId} with token: ${token}`);
@@ -245,7 +238,6 @@ export const getProfileById = createAsyncThunk(
   },
 );
 
-// Feature 2.5: Upload Avatar (User)
 export const uploadAvatar = createAsyncThunk(
   "profile/uploadAvatar",
   async (file: File, { rejectWithValue }) => {
@@ -260,7 +252,6 @@ export const uploadAvatar = createAsyncThunk(
 
 // ==================== TUTOR THUNKS ====================
 
-// Feature 3: Get My Tutor Profile (Tutor)
 export const getMyTutorProfile = createAsyncThunk(
   "profile/getMyTutorProfile",
   async (_, { getState, rejectWithValue }) => {
@@ -272,7 +263,6 @@ export const getMyTutorProfile = createAsyncThunk(
   },
 );
 
-// Feature 4: Register / Create Tutor Profile (Tutor)
 export const registerTutorProfile = createAsyncThunk(
   "profile/registerTutorProfile",
   async (payload: RegisterTutorRequest, { getState, rejectWithValue }) => {
@@ -284,33 +274,16 @@ export const registerTutorProfile = createAsyncThunk(
   },
 );
 
-// Update tutor profile
 export const updateTutorProfile = createAsyncThunk(
   "profile/updateTutorProfile",
   async (updateData: UpdateTutorRequest, { getState, rejectWithValue }) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      // const response = await fetch(API_ENDPOINTS.ACCOUNT.UPDATE_TUTOR_INFO, {
-      //   method: "PATCH",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     ...(token && { Authorization: `Bearer ${token}` }),
-      //   },
-      //   body: JSON.stringify(updateData),
-      // });
-
-      // const data = await response.json();
-      // return data.result as TutorProfile;
       return await profileService.updateTutor(updateData);
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
   },
 );
-
-//
 
 // --- 3. Slice ---
 

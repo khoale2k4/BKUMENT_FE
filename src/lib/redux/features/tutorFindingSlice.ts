@@ -217,7 +217,7 @@ export const getAllStudyingClasses = createAsyncThunk(
   ) => {
     try {
       // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
+      // const token = state.auth.token || localStorage.getItem("accessToken");
 
       // // Chèn page và size vào URL
       // const response = await fetch(
@@ -250,7 +250,7 @@ export const getClassDetailsById = createAsyncThunk(
   async (classId: string, { getState, rejectWithValue }) => {
     try {
       // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
+      // const token = state.auth.token || localStorage.getItem("accessToken");
 
       // const response = await fetch(
       //   `http://localhost:8888/api/v1/lms/classes/${classId}`, // Sử dụng classId được truyền vào
@@ -284,7 +284,7 @@ export const enrollInClass = createAsyncThunk(
   async (classId: string, { getState, rejectWithValue }) => {
     try {
       // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
+      // const token = state.auth.token || localStorage.getItem("accessToken");
 
       // if (!token) {
       //   return rejectWithValue("Vui lòng đăng nhập để đăng ký lớp học.");

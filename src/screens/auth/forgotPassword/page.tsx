@@ -58,6 +58,7 @@ export default function ForgotPasswordPage() {
         otp: token,
         newPassword: newPassword
       };
+      
 
       // Gọi API Reset Password cuối cùng
       await dispatch(resetPassword(payload)).unwrap();

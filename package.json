@@ -14,6 +14,7 @@
     "@mantine/hooks": "^8.3.10",
     "@mantine/tiptap": "^8.3.10",
     "@reduxjs/toolkit": "^2.11.0",
+    "@sentry/nextjs": "^10.47.0",
     "@tabler/icons-react": "^3.36.0",
     "@tiptap/extension-font-family": "^3.14.0",
     "@tiptap/extension-highlight": "^3.14.0",

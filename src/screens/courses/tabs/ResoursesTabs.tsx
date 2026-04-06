@@ -23,7 +23,7 @@ const ResourcesTab = () => {
     documentsCurrentPage = 1,
     documentsTotalPages = 1
   } = useAppSelector((state) => state.tutorCourse || {});
-  const token = typeof window !== 'undefined' ? sessionStorage.getItem('accessToken') : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
 
   const userStatus = currentCourse?.userStatus || 'NONE';
   const isOwner = userStatus === 'OWNER';
