@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as courseService from "@/lib/services/course.service";
 import httpClient from "@/lib/services/http";
 import { showToast } from "./toastSlice";
+import { uploadAvatarImage } from "@/lib/services/user.service";
 // --- Interfaces ---
 
 export interface Schedule {
@@ -44,6 +45,7 @@ export interface CreateClassRequest {
   name: string;
   description: string;
   startDate: string;
+  coverImageUrl: string;
   endDate: string;
   topicId: string;
   schedules: Schedule[];
@@ -76,6 +78,7 @@ interface TutorCourseState {
   documentsTotalPages: number;
   loadingDocuments: boolean;
   documentsError: string | null;
+  isCoverUploading: boolean;
 }
 
 const initialState: TutorCourseState = {
@@ -90,6 +93,7 @@ const initialState: TutorCourseState = {
     name: "",
     description: "",
     startDate: "",
+    coverImageUrl: "",
     endDate: "",
     topicId: "",
     schedules: [],
@@ -110,6 +114,7 @@ const initialState: TutorCourseState = {
   documentsTotalPages: 1,
   loadingDocuments: false,
   documentsError: null,
+  isCoverUploading: false,
 };
 
 // --- Interfaces --- (Thêm vào phần đầu file)
@@ -127,6 +132,17 @@ export interface CreateNotificationRequest {
   title: string;
   message: string;
 }
+
+export const uploadCoverImage = createAsyncThunk(
+  "tutorCourse/uploadCoverImage",
+  async (file: File, { rejectWithValue }) => {
+    try {
+      return await uploadAvatarImage(file);
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to upload cover image");
+    }
+  },
+);
 
 // 1. Get all classes for the tutor
 export const getAllTeachingClasses = createAsyncThunk(
@@ -550,6 +566,20 @@ const tutorCourseSlice = createSlice({
       .addCase(createClassNotification.rejected, (state, action) => {
         state.creatingNotification = false;
         state.notificationError = action.payload as string;
+      });
+
+    // --- Handle uploadCoverImage ---
+    builder
+      .addCase(uploadCoverImage.pending, (state) => {
+        state.isCoverUploading = true;
+        state.error = null;
+      })
+      .addCase(uploadCoverImage.fulfilled, (state) => {
+        state.isCoverUploading = false;
+      })
+      .addCase(uploadCoverImage.rejected, (state, action) => {
+        state.isCoverUploading = false;
+        state.error = action.payload as string;
       });
   },
 });

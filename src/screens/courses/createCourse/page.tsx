@@ -12,8 +12,8 @@ import DescriptionSection from './components/DecriptionSection'
 
 const CreateCoursePage = () => {
   const {
-    formData, loading, submitting, subjects, availableTopics, selectedSubjectId,
-    handleInputChange, handleSubjectChange, handleAddSchedule, handleRemoveSchedule, handleUpdateSchedule, handleSubmit, router
+    formData, loading, submitting, subjects, availableTopics, selectedSubjectId, isCoverUploading,
+    handleInputChange, handleSubjectChange, handleAddSchedule, handleRemoveSchedule, handleUpdateSchedule, handleCoverImageChange, handleSubmit, router
   } = useCourseForm();
 
   return (
@@ -34,6 +34,9 @@ const CreateCoursePage = () => {
           name={formData.name}
           startDate={formData.startDate}
           endDate={formData.endDate}
+          coverImageUrl={formData.coverImageUrl}
+          isUploading={isCoverUploading}
+          onUpload={handleCoverImageChange}
           onChange={handleInputChange}
         />
 
