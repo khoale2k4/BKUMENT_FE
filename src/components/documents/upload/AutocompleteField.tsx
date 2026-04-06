@@ -32,6 +32,7 @@ function AutocompleteField<T>({
     dropdownRef,
     className = ""
 }: AutocompleteFieldProps<T>) {
+    console.log(items);
     return (
         <div className={`grid grid-cols-1 md:grid-cols-12 gap-4 items-center ${className}`}>
             <label className="md:col-span-3 text-base font-bold text-black">{label}:</label>
@@ -55,7 +56,10 @@ function AutocompleteField<T>({
                         {items.map((item, index) => (
                             <div
                                 key={index}
-                                onClick={() => onSelect(item)}
+                                onMouseDown={(e) => {
+                                    e.preventDefault(); 
+                                    onSelect(item);
+                                }}
                                 className="px-4 py-2.5 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0 text-left"
                             >
                                 {renderItem(item)}

@@ -153,9 +153,7 @@ export const searchUniversities = createAsyncThunk(
 export const searchCourses = createAsyncThunk(
     'documents/searchCourses',
     async (query: string) => {
-        const response = await documentService.searchCourses(query);
-        console.log(response);
-        return response;
+        return await documentService.searchCourses(query);
     }
 );
 
