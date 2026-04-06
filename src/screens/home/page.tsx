@@ -139,7 +139,7 @@ export default function HomePage() {
     };
 
     const onPersonClick = (person: PersonMayKnow) => {
-        router.push(`${AppRoute.profile}/${person.id}`);
+        router.push(`people/${person.id}`);
     };
 
     const getOnClick = (tab: string) => {

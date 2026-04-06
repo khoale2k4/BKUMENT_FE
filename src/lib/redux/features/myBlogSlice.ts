@@ -3,23 +3,34 @@ import * as blogService from '@/lib/services/blog.service';
 import { showToast } from './toastSlice';
 
 interface MyBlogState {
+    // --- KHU VỰC CŨ (Giữ nguyên để không hỏng code người khác) ---
     items: any[];
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
     currentPage: number;
     totalPages: number;
     totalElements: number;
+
+    // --- KHU VỰC MỚI CỦA BẠN (Thêm vào để dùng cho trang Profile người khác) ---
+    viewedItems: any[];
+    viewedStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 const initialState: MyBlogState = {
+    // --- KHU VỰC CŨ ---
     items: [],
     status: 'idle',
     error: null,
     currentPage: 0,
     totalPages: 0,
     totalElements: 0,
+
+    // --- KHU VỰC MỚI CỦA BẠN ---
+    viewedItems: [],
+    viewedStatus: 'idle',
 };
 
+// --- THUNK CŨ ---
 export const fetchMyBlogs = createAsyncThunk(
     'myBlogs/fetchAll',
     async ({ page, size }: { page: number; size: number }, { rejectWithValue }) => {
@@ -37,20 +48,25 @@ export const deleteBlogAsync = createAsyncThunk(
     async (id: string, { dispatch, rejectWithValue }) => {
         try {
             await blogService.deleteBlog(id);
-            dispatch(showToast({
-                type: 'success',
-                title: 'Thành công',
-                message: 'Đã xóa bài viết!'
-            }));
+            dispatch(showToast({ type: 'success', title: 'Thành công', message: 'Đã xóa bài viết!' }));
             return id;
         } catch (error: any) {
             const message = error.response?.data?.message || 'Xóa bài viết thất bại';
-            dispatch(showToast({
-                type: 'error',
-                title: 'Lỗi',
-                message
-            }));
+            dispatch(showToast({ type: 'error', title: 'Lỗi', message }));
             return rejectWithValue(message);
+        }
+    }
+);
+
+// --- THUNK MỚI CỦA BẠN ---
+export const getUserBlogsById = createAsyncThunk(
+    'myBlogs/fetchByUserId',
+    async ({ userId, page, size }: { userId: string; page: number; size: number }, { rejectWithValue }) => {
+        try {
+            const response = await blogService.getUserBlogs(userId, page, size);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch user blogs');
         }
     }
 );
@@ -63,10 +79,16 @@ const myBlogSlice = createSlice({
             state.items = [];
             state.status = 'idle';
             state.currentPage = 0;
+        },
+        // --- REDUCER MỚI DÀNH CHO BẠN ---
+        resetViewedUserBlogs: (state) => {
+            state.viewedItems = [];
+            state.viewedStatus = 'idle';
         }
     },
     extraReducers: (builder) => {
         builder
+            // --- CÁC CASE CŨ (GIỮ NGUYÊN) ---
             .addCase(fetchMyBlogs.pending, (state) => {
                 state.status = 'loading';
             })
@@ -84,9 +106,22 @@ const myBlogSlice = createSlice({
             .addCase(deleteBlogAsync.fulfilled, (state, action) => {
                 state.items = state.items.filter(item => item.id !== action.payload);
                 state.totalElements -= 1;
+            })
+
+            // --- CÁC CASE MỚI CỦA BẠN ---
+            .addCase(getUserBlogsById.pending, (state) => {
+                state.viewedStatus = 'loading';
+            })
+            .addCase(getUserBlogsById.fulfilled, (state, action) => {
+                state.viewedStatus = 'succeeded';
+                state.viewedItems = action.payload.content || [];
+                // Bạn có thể thêm viewedCurrentPage, viewedTotalPages vào interface nếu cần phân trang ở trang người khác
+            })
+            .addCase(getUserBlogsById.rejected, (state, action) => {
+                state.viewedStatus = 'failed';
             });
     },
 });
 
-export const { resetMyBlogs } = myBlogSlice.actions;
+export const { resetMyBlogs, resetViewedUserBlogs } = myBlogSlice.actions;
 export default myBlogSlice.reducer;

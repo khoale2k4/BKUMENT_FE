@@ -5,6 +5,7 @@ import { Search, Loader2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { getFollowingByProfileId, getFollowersByProfileId, UserProfile } from '@/lib/redux/features/profileSlice';
 import FollowingSidebarItem from './FollowingSidebarItem';
+import { getUserBlogsById } from '@/lib/redux/features/myBlogSlice';
 
 interface FollowingSidebarProps {
   profileId: string;
@@ -46,6 +47,7 @@ const FollowingSidebar: React.FC<FollowingSidebarProps> = ({ profileId, listType
   useEffect(() => {
     if (currentData?.data && currentData.data.length > 0 && !selectedUserId) {
       onSelectUser(currentData.data[0]);
+      console.log('Auto-selecting user:', currentData.data[0].id); // Debug log
     }
   }, [currentData, selectedUserId, onSelectUser]);
 
