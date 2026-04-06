@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-// ĐÃ THÊM: Briefcase, Paperclip cho 2 field mới
-import { User, Image as ImageIcon, BookOpen, FileText, Loader2, CheckCircle2, AlertCircle, Briefcase, Paperclip } from 'lucide-react';
+import { User, Image as ImageIcon, BookOpen, FileText, Loader2, CheckCircle2, AlertCircle, Briefcase, Paperclip, Camera, Upload } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { registerTutorProfile, RegisterTutorRequest } from '@/lib/redux/features/profileSlice';
+import { registerTutorProfile, RegisterTutorRequest, uploadFile } from '@/lib/redux/features/profileSlice';
 import { getSearchSubjects } from '@/lib/redux/features/tutorFindingSlice';
 import { refreshToken } from '@/lib/redux/features/authSlice';
-import { showToast } from '@/lib/redux/features/toastSlice'; // Thay đổi đường dẫn nếu cần
+import { showToast } from '@/lib/redux/features/toastSlice';
+import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 const RegisterTutorForm = () => {
   const dispatch = useAppDispatch();
   const router = useRouter();
-  
-  const { isTutorRegistering, tutorError } = useAppSelector((state) => state.profile);
+
+  const { isTutorRegistering, tutorError, isResourceUploading } = useAppSelector((state) => state.profile);
   const { subjects, loadingSubjects } = useAppSelector((state) => state.tutorFinding);
 
   const [formData, setFormData] = useState<RegisterTutorRequest>({
@@ -21,11 +21,16 @@ const RegisterTutorForm = () => {
     introduction: '',
     avatar: '',
     subjectIds: [],
-    experience: '', // Mới thêm
-    cvUrl: '',      // Mới thêm
+    experience: '',
+    cvUrl: '',
   });
-  
+
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isAvatarUploadingLocal, setIsAvatarUploadingLocal] = useState(false);
+  const [isCvUploadingLocal, setIsCvUploadingLocal] = useState(false);
+
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const cvInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!subjects || subjects.length === 0) {
@@ -49,9 +54,49 @@ const RegisterTutorForm = () => {
     });
   };
 
+  const handleAvatarClick = () => {
+    avatarInputRef.current?.click();
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsAvatarUploadingLocal(true);
+      try {
+        const url = await dispatch(uploadFile(file)).unwrap();
+        setFormData((prev) => ({ ...prev, avatar: url }));
+        dispatch(showToast({ type: 'success', title: 'Thành công', message: 'Đã tải ảnh đại diện lên!' }));
+      } catch (err) {
+        dispatch(showToast({ type: 'error', title: 'Lỗi', message: 'Tải ảnh đại diện thất bại' }));
+      } finally {
+        setIsAvatarUploadingLocal(false);
+      }
+    }
+  };
+
+  const handleCvClick = () => {
+    cvInputRef.current?.click();
+  };
+
+  const handleCvChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setIsCvUploadingLocal(true);
+      try {
+        const url = await dispatch(uploadFile(file)).unwrap();
+        setFormData((prev) => ({ ...prev, cvUrl: url }));
+        dispatch(showToast({ type: 'success', title: 'Thành công', message: 'Đã tải CV lên!' }));
+      } catch (err) {
+        dispatch(showToast({ type: 'error', title: 'Lỗi', message: 'Tải CV thất bại' }));
+      } finally {
+        setIsCvUploadingLocal(false);
+      }
+    }
+  };
+
   // const handleSubmit = async (e: React.FormEvent) => {
   //   e.preventDefault();
-    
+
   //   // ĐÃ CẬP NHẬT: Kiểm tra thêm trường experience nếu bạn muốn nó là bắt buộc
   //   if (!formData.name || !formData.introduction || !formData.experience || formData.subjectIds.length === 0) {
   //     alert("Vui lòng điền đầy đủ thông tin bắt buộc và chọn ít nhất 1 môn học!");
@@ -61,9 +106,9 @@ const RegisterTutorForm = () => {
   //   try {
   //     await dispatch(registerTutorProfile(formData)).unwrap();
   //     await dispatch(refreshToken()).unwrap(); 
-      
+
   //     setIsSuccess(true);
-      
+
   //     setTimeout(() => {
   //       router.push('/profile'); 
   //     }, 2000);
@@ -75,13 +120,13 @@ const RegisterTutorForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Đã thay thế alert mặc định bằng Toast thông báo lỗi
     if (!formData.name || !formData.introduction || !formData.experience || formData.subjectIds.length === 0) {
-      dispatch(showToast({ 
-        type: "error", 
-        title: "Thiếu thông tin!", 
-        message: "Vui lòng điền đầy đủ thông tin bắt buộc và chọn ít nhất 1 môn học." 
+      dispatch(showToast({
+        type: "error",
+        title: "Thiếu thông tin!",
+        message: "Vui lòng điền đầy đủ thông tin bắt buộc và chọn ít nhất 1 môn học."
       }));
       return;
     }
@@ -89,30 +134,30 @@ const RegisterTutorForm = () => {
     try {
       await dispatch(registerTutorProfile(formData)).unwrap();
       // await dispatch(refreshToken()).unwrap(); 
-      
+
       // Bắn Toast thành công
-      dispatch(showToast({ 
-        type: "success", 
-        title: "Thành công!", 
-        message: "Đã gửi hồ sơ đăng ký gia sư thành công!" 
+      dispatch(showToast({
+        type: "success",
+        title: "Thành công!",
+        message: "Đã gửi hồ sơ đăng ký gia sư thành công!"
       }));
 
       setIsSuccess(true);
-      
+
       setTimeout(() => {
-        router.push('/profile'); 
+        router.push('/profile');
       }, 2000);
 
     } catch (error: any) {
       // Bắn Toast báo lỗi dựa trên message từ Backend trả về (nếu có)
       const errorMessage = error?.message || typeof error === 'string' ? error : "Đã có lỗi xảy ra, vui lòng thử lại sau.";
-      
-      dispatch(showToast({ 
-        type: "error", 
-        title: "Đăng ký thất bại!", 
+
+      dispatch(showToast({
+        type: "error",
+        title: "Đăng ký thất bại!",
         message: errorMessage
       }));
-      
+
       console.error("Đăng ký thất bại:", error);
     }
   };
@@ -131,7 +176,7 @@ const RegisterTutorForm = () => {
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-8 bg-white rounded-3xl shadow-sm border border-gray-100 animate-in fade-in duration-500">
-      
+
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-2 font-serif tracking-tight">Trở thành Gia sư</h2>
         <p className="text-gray-500">Chia sẻ kiến thức của bạn và tạo thu nhập ngay hôm nay.</p>
@@ -145,7 +190,7 @@ const RegisterTutorForm = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        
+
         {/* Tên hiển thị */}
         <div>
           <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
@@ -165,28 +210,66 @@ const RegisterTutorForm = () => {
         {/* Ảnh đại diện */}
         <div>
           <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
-            <ImageIcon size={16} className="text-purple-600" /> Link ảnh đại diện (URL)
+            <ImageIcon size={16} className="text-purple-600" /> Ảnh đại diện của bạn
           </label>
-          <div className="flex gap-4 items-center">
-            <div className="w-12 h-12 shrink-0 rounded-full bg-gray-100 border border-gray-200 overflow-hidden">
+          <div className="flex gap-6 items-center">
+            <div
+              onClick={handleAvatarClick}
+              className="relative group w-20 h-20 shrink-0 rounded-2xl bg-gray-50 border-2 border-dashed border-gray-200 overflow-hidden cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-all"
+            >
               {formData.avatar ? (
-                <img src={formData.avatar} alt="Preview" className="w-full h-full object-cover" />
+                <AuthenticatedImage
+                  src={formData.avatar}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                  onError={(e: any) => {
+                    e.currentTarget.src = "https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg";
+                  }}
+                />
               ) : (
-                <User className="w-full h-full p-3 text-gray-300" />
+                <div className="w-full h-full flex flex-col items-center justify-center text-gray-400 group-hover:text-purple-500">
+                  <Camera size={24} />
+                  <span className="text-[10px] font-bold mt-1">UPLOAD</span>
+                </div>
+              )}
+
+              {/* Overlay on hover */}
+              {formData.avatar && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera className="text-white w-6 h-6" />
+                </div>
+              )}
+
+              {/* Loading State */}
+              {isAvatarUploadingLocal && (
+                <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
+                  <Loader2 className="animate-spin text-purple-600 w-6 h-6" />
+                </div>
               )}
             </div>
+
+            <div className="flex-grow space-y-2">
+              <input
+                type="url"
+                name="avatar"
+                value={formData.avatar}
+                onChange={handleInputChange}
+                placeholder="Dán link ảnh hoặc click ô bên cạnh để upload"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all text-sm"
+              />
+              <p className="text-[11px] text-gray-400 italic">* Khuyên dùng ảnh vuông, dung lượng dưới 2MB.</p>
+            </div>
+
             <input
-              type="url"
-              name="avatar"
-              value={formData.avatar}
-              onChange={handleInputChange}
-              placeholder="https://example.com/avatar.jpg"
-              className="flex-grow px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all"
+              type="file"
+              ref={avatarInputRef}
+              onChange={handleAvatarChange}
+              className="hidden"
+              accept="image/*"
             />
           </div>
         </div>
 
-        {/* --- FIELD MỚI: Kinh nghiệm --- */}
         <div>
           <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
             <Briefcase size={16} className="text-purple-600" /> Kinh nghiệm giảng dạy
@@ -202,22 +285,38 @@ const RegisterTutorForm = () => {
           />
         </div>
 
-        {/* --- FIELD MỚI: Link CV --- */}
         <div>
           <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
-            <Paperclip size={16} className="text-purple-600" /> Link CV (Không bắt buộc)
+            <Paperclip size={16} className="text-purple-600" /> Link CV / Chứng chỉ (Không bắt buộc)
           </label>
-          <input
-            type="url"
-            name="cvUrl"
-            value={formData.cvUrl}
-            onChange={handleInputChange}
-            placeholder="Link Google Drive hoặc web CV của bạn (VD: TopCV, Notion)..."
-            className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all"
-          />
+          <div className="flex gap-3">
+            <input
+              type="url"
+              name="cvUrl"
+              value={formData.cvUrl}
+              onChange={handleInputChange}
+              placeholder="Dán link (Google Drive, Notion...) hoặc upload file"
+              className="flex-grow px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-purple-400 focus:border-transparent outline-none transition-all"
+            />
+            <button
+              type="button"
+              onClick={handleCvClick}
+              disabled={isCvUploadingLocal}
+              className="px-4 bg-purple-50 text-purple-600 border border-purple-200 rounded-xl hover:bg-purple-100 transition-colors flex items-center gap-2 font-semibold text-sm disabled:opacity-50"
+            >
+              {isCvUploadingLocal ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+              Upload
+            </button>
+            <input
+              type="file"
+              ref={cvInputRef}
+              onChange={handleCvChange}
+              className="hidden"
+              accept=".pdf,.doc,.docx,image/*"
+            />
+          </div>
         </div>
 
-        {/* Bài giới thiệu */}
         <div>
           <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
             <FileText size={16} className="text-purple-600" /> Giới thiệu bản thân
@@ -233,12 +332,11 @@ const RegisterTutorForm = () => {
           />
         </div>
 
-        {/* Chọn môn học (Multi Select từ API) */}
         <div>
           <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3">
             <BookOpen size={16} className="text-purple-600" /> Các môn học bạn có thể dạy
           </label>
-          
+
           {loadingSubjects ? (
             <div className="flex items-center gap-2 text-sm text-gray-500 py-2">
               <Loader2 className="animate-spin" size={16} /> Đang tải danh sách môn học...
@@ -252,11 +350,10 @@ const RegisterTutorForm = () => {
                     type="button"
                     key={subject.id}
                     onClick={() => handleSubjectToggle(subject.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${
-                      isSelected 
-                        ? 'bg-purple-600 border-purple-600 text-white shadow-md transform scale-105' 
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 border ${isSelected
+                        ? 'bg-purple-600 border-purple-600 text-white shadow-md transform scale-105'
                         : 'bg-white border-gray-200 text-gray-600 hover:border-purple-300 hover:bg-purple-50'
-                    }`}
+                      }`}
                   >
                     {subject.name}
                   </button>
@@ -270,7 +367,6 @@ const RegisterTutorForm = () => {
           )}
         </div>
 
-        {/* Nút Submit */}
         <div className="pt-6 border-t border-gray-100">
           <button
             type="submit"

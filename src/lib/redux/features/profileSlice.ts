@@ -109,6 +109,7 @@ interface ProfileState {
 
   // Upload state
   isAvatarUploading: boolean;
+  isResourceUploading: boolean;
 }
 
 const initialState: ProfileState = {
@@ -136,6 +137,7 @@ const initialState: ProfileState = {
   viewedProfileError: null,
 
   isAvatarUploading: false,
+  isResourceUploading: false,
 };
 
 
@@ -246,6 +248,18 @@ export const uploadAvatar = createAsyncThunk(
       return avatarUrl;
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to upload avatar");
+    }
+  },
+);
+
+export const uploadFile = createAsyncThunk(
+  "profile/uploadFile",
+  async (file: File, { rejectWithValue }) => {
+    try {
+      const fileUrl = await uploadAvatarImage(file);
+      return fileUrl;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to upload file");
     }
   },
 );
@@ -400,6 +414,20 @@ const profileSlice = createSlice({
       })
       .addCase(uploadAvatar.rejected, (state, action) => {
         state.isAvatarUploading = false;
+        state.error = action.payload as string;
+      });
+
+    // --- Upload File ---
+    builder
+      .addCase(uploadFile.pending, (state) => {
+        state.isResourceUploading = true;
+        state.error = null;
+      })
+      .addCase(uploadFile.fulfilled, (state) => {
+        state.isResourceUploading = false;
+      })
+      .addCase(uploadFile.rejected, (state, action) => {
+        state.isResourceUploading = false;
         state.error = action.payload as string;
       });
 
