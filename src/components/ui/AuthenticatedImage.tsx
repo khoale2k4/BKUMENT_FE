@@ -12,11 +12,11 @@ export function AuthenticatedImage({ src, className, alt, onError }: Props) {
     const { imageUrl, isLoading } = useSecureImage(src);
 
     if (isLoading) {
-        return <div className={`${className} bg-gray-100 animate-pulse`} />;
+        return <span className={`${className} bg-gray-100 animate-pulse inline-block`} />;
     }
 
     if (!imageUrl) {
-        return <div className={`${className} bg-gray-200`} />; // Fallback
+        return <span className={`${className} bg-gray-200 inline-block`} />; // Fallback
     }
 
     return <img src={imageUrl} className={className} onError={onError} alt={alt || "Image"} />;

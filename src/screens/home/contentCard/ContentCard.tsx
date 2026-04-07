@@ -17,67 +17,86 @@ export default function ContentCard({ data }: { data: CardProp }) {
     const { t } = useTranslation();
     const timeRead = Math.ceil((data?.content?.split(" ")?.length || 0) / 200) || 1;
 
-    const authorName = 'Unknown';
-
-    const avatarUrl = "https://placehold.co/100x100/3b82f6/white?text=A";
-
     return (
-        <div className="py-6 border-b border-gray-100 last:border-none w-full max-w-3xl cursor-pointer" onClick={() => data?.onClick?.(data.id)}>
-            <div className="flex items-center gap-2 mb-3">
-                <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
-                    {data.author.avatarUrl && <AuthenticatedImage src={data.author.avatarUrl} className="w-full h-full object-cover" />}
-                    {!data.author.avatarUrl && <img
-                        src={data.author.avatarUrl}
-                        alt="avatar"
-                        className="w-full h-full object-cover"
-                    />}
+        <div 
+            className="group relative bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 mb-4 cursor-pointer transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-gray-200 hover:-translate-y-0.5 active:scale-[0.99]" 
+            onClick={() => data?.onClick?.(data.id)}
+        >
+            <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-50 group-hover:ring-blue-50 transition-all">
+                        {data.author.avatarUrl ? (
+                            <AuthenticatedImage 
+                                src={data.author.avatarUrl} 
+                                className="w-full h-full object-cover" 
+                            />
+                        ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+                                {data.author.name?.charAt(0)}
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <div className="text-sm font-semibold text-gray-900 leading-tight">
+                            {data.author.name}
+                        </div>
+                        <div className="text-[12px] text-gray-400 mt-0.5 flex items-center gap-1.5">
+                            <span>{data?.time ? formatTimeAgo(data.time, t) : ''}</span>
+                            <span className="w-0.5 h-0.5 rounded-full bg-gray-300"></span>
+                            <span>{t('home.contentCard.minRead', '{{count}} min read', { count: timeRead })}</span>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex items-center text-[13px] leading-none">
-                    <span className="font-medium text-gray-900">{data.author.name}</span>
-                    <span className="mx-1 text-gray-400">·</span>
-                    <span className="text-gray-500">{data?.time ? formatTimeAgo(data.time, t) : ''}</span>
+                
+                <div className="flex items-center gap-1">
+                     <div className="flex items-center gap-1.5 px-2.5 py-1 bg-gray-50 rounded-full text-gray-500 transition-colors">
+                        <Eye size={14} />
+                        <span className="text-[12px] font-medium leading-none">{data.views || 0}</span>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex justify-between gap-8 mb-8">
-                <div className="flex-1 flex flex-col justify-center">
-                    <h2 className="text-[22px] font-bold text-gray-900 mb-1 leading-snug hover:underline decoration-1 underline-offset-2">
+            <div className="flex flex-col-reverse sm:flex-row justify-between gap-5 mb-5">
+                <div className="flex-1 min-w-0">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2 leading-snug transition-colors line-clamp-2">
                         {data?.title}
                     </h2>
-                    <p className="text-gray-500 text-base line-clamp-2 leading-relaxed font-normal font-sans">
+                    <p className="text-gray-500 text-[15px] line-clamp-3 leading-relaxed font-normal">
                         {data?.content}
                     </p>
                 </div>
 
                 {data?.coverImage && (
-                    <div className="w-28 h-28 sm:w-36 sm:h-28 flex-shrink-0 overflow-hidden rounded bg-gray-100">
-                        <AuthenticatedImage src={data.coverImage} alt={data.title || 'cover'} className="w-full h-full object-cover" />
+                    <div className="w-full sm:w-40 h-44 sm:h-28 flex-shrink-0 overflow-hidden rounded-xl bg-gray-50 border border-gray-100 shadow-sm transition-transform duration-500 group-hover:scale-[1.02]">
+                        <AuthenticatedImage 
+                            src={data.coverImage} 
+                            alt={data.title || 'cover'} 
+                            className="w-full h-full object-cover" 
+                        />
                     </div>
                 )}
             </div>
 
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-                    {data?.tags?.[0] && (
-                        <span className="bg-[#F2F2F2] text-gray-700 text-[13px] px-3 py-1 rounded-full hover:bg-gray-200 transition">
-                            {data.tags[0]}
+            <div className="flex items-center justify-between pt-2">
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    {data?.tags?.slice(0, 3).map((tag, idx) => (
+                        <span 
+                            key={idx}
+                            className="bg-gray-50 text-gray-600 text-[12px] px-3 py-1 rounded-lg border border-gray-100 whitespace-nowrap hover:bg-white hover:border-gray-200 transition-colors"
+                        >
+                            #{tag}
                         </span>
-                    )}
-
-                    <span className="text-[13px] text-gray-500">{t('home.contentCard.minRead', '{{count}} min read', { count: timeRead })}</span>
-                    
-                    <span className="text-gray-300">•</span>
-                    
-                    <div className="flex items-center gap-1 text-gray-500">
-                        <Eye size={14} strokeWidth={2} />
-                        <span className="text-[13px] font-medium">{data.views || 0}</span>
-                    </div>
+                    ))}
                 </div>
 
-                <div className="flex items-center gap-4 text-gray-500 relative">
+                <div className="flex items-center gap-2">
                     <button 
-                        className="hover:text-gray-900 transition flex items-center justify-center p-1.5 hover:bg-gray-100 rounded-full"
-                        onClick={(e) => { e.stopPropagation(); }}
+                        className="text-gray-400 hover:text-blue-600 p-2 hover:bg-blue-50 rounded-xl transition-all"
+                        onClick={(e) => { 
+                            e.stopPropagation();
+                            // bookmark logic here if needed
+                        }}
+                        title="Lưu lại"
                     >
                         <BookmarkPlus size={20} strokeWidth={1.5} />
                     </button>

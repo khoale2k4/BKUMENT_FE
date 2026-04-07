@@ -366,7 +366,7 @@ export default function HomePage() {
                                     <EmptyState tab={activeTab} />
                                 ) : (
                                     <>
-                                        <div className="divide-y divide-gray-100">
+                                        <div className="flex flex-col gap-1">
                                             {displayItems.map((content: any) => (
                                                 <ContentCard
                                                     key={content.id}
