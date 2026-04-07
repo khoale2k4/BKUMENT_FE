@@ -7,6 +7,7 @@ import {
   Star,
   Users,
   PlayCircle,
+  MessageSquare,
 } from "lucide-react"; // Đảm bảo import thêm Star, Users, PlayCircle
 import { TutorData } from "@/lib/redux/features/tutorFindingSlice";
 
@@ -113,14 +114,12 @@ export const UserTutorInfo: React.FC<{
   return (
     <>
       <div className="mb-4">
-        <h3 className="text-xl font-bold text-gray-900 mb-1">
-          {tutor.name} - {tutor.id}
-        </h3>
+        <h3 className="text-xl font-bold text-gray-900 mb-1">{tutor.name}</h3>
 
         {/* Placeholder text giống thiết kế (Followers, Trường học) */}
         <p className="text-sm text-gray-500 mb-2">
           88K followers • 1 following <br />
-          <span className="text-gray-400">A final year of HCMUT</span>
+          {/* <span className="text-gray-400">A final year of HCMUT</span> */}
         </p>
 
         {/* Môn học */}
@@ -136,14 +135,21 @@ export const UserTutorInfo: React.FC<{
           {/* Fill màu vàng cho icon sao */}
           <Star size={16} className="text-amber-500 fill-amber-500" />
           <span>
-            <strong>{tutor.averageRating || "0.0"}</strong> Rating
+            <strong>{tutor.averageRating?.toFixed(1) || "0.0"} </strong> Rating
+          </span>
+        </div>
+
+        <div className="flex items-center gap-1.5 text-gray-600">
+          <MessageSquare size={16} className="text-green-500" />
+          <span>
+            <strong>{tutor.ratingCount || "0"} </strong> Reviews
           </span>
         </div>
 
         <div className="flex items-center gap-1.5">
           <Users size={16} className="text-blue-600" />
           <span>
-            <strong>{}</strong> Students
+            <strong>{"0"}</strong> Students
           </span>
         </div>
 

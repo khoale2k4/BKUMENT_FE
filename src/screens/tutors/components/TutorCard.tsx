@@ -111,14 +111,6 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
           Sử dụng flex-col, justify-end (đẩy nút xuống dưới cùng) và items-end (căn phải).
         */}
         <div className="shrink-0 flex flex-col md:items-end justify-end mt-4 md:mt-0 pt-4 md:pt-0 border-t md:border-t-0 border-gray-100">
-          {/* Tuỳ chọn: Khu vực chứa Giá và Thời lượng (như trong ảnh mẫu) */}
-          {/* {!isAdminView && (
-            <div className="text-right mb-4">
-              <div className="text-2xl font-bold text-gray-900">$20</div>
-              <div className="text-sm text-gray-500">50 - min lesson</div>
-            </div>
-          )} */}
-
           {/* Cột Actions (Nút bấm) */}
           {isAdminView ? (
             <div className="flex flex-col gap-2 w-full md:w-40 mt-auto">
