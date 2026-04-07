@@ -46,6 +46,7 @@ interface Course {
   topicName: string;
   subjectName: string;
   userStatus: string;
+  coverImageUrl: string;
 }
 
 interface TutorInfo {
