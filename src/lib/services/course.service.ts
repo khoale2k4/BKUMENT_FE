@@ -93,6 +93,7 @@ export const getAllStudyingClasses = async (page: number, size: number) => {
 export const getClassDetailsById = async (classId: string) => {
     // Giả sử GET_CLASS_DETAILS là một function nhận classId
     const response = await httpClient.get(API_ENDPOINTS.LMS.GET_CLASS_DETAILS(classId));
+    console.log("API Response for class details:", response.data.result); // Debug log
     return response.data.result;
 };
 
