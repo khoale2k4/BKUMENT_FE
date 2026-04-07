@@ -4,7 +4,7 @@ import React from 'react';
 import { Clock, Users, BarChart3, BookOpen, HelpCircle, Settings } from 'lucide-react';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { useRouter } from 'next/navigation';
-
+import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 interface CourseHeaderProps {
   courseId: string;
 }
@@ -15,7 +15,7 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ courseId }) => {
   // SỬA Ở ĐÂY: Lấy trực tiếp currentClassDetail từ tutorFinding slice
   // Đổi tên biến (alias) thành currentCourse để tái sử dụng code cũ bên dưới cho lẹ
   const { currentClassDetail: currentCourse } = useAppSelector((state) => state.tutorFinding);
-
+  console.log("link ảnh ở CourseHeader:", currentCourse?.coverImageUrl); // Debug log
   // Nếu không có khóa học (chưa load xong hoặc lỗi) thì hiện khung xương (Skeleton)
   if (!currentCourse) {
     return <div className="mb-8 animate-pulse bg-gray-100 h-32 rounded-2xl"></div>;
@@ -24,7 +24,6 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ courseId }) => {
   const stats = [
     { icon: <Clock size={16} className="text-orange-500" />, label: `${currentCourse.startDate} - ${currentCourse.endDate}` },
     { icon: <Users size={16} className="text-orange-500" />, label: currentCourse.status },
-    // Dùng optional chaining (?.) để chống sập nếu schedules bị null
     { icon: <BarChart3 size={16} className="text-orange-500" />, label: `${currentCourse.schedules?.length || 0} Sessions/Week` },
     { icon: <BookOpen size={16} className="text-orange-500" />, label: currentCourse.subjectName },
     { icon: <HelpCircle size={16} className="text-orange-500" />, label: currentCourse.topicName },
@@ -56,6 +55,17 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ courseId }) => {
           <Settings size={22} />
         </button>
       </div>
+
+      {currentCourse.coverImageUrl && (
+        <div className="w-full h-56 sm:h-72 md:h-80 mb-6 rounded-2xl overflow-hidden shadow-sm border border-gray-100 relative group">
+
+          <AuthenticatedImage 
+            src={currentCourse.coverImageUrl} 
+            alt={currentCourse.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        </div>
+      )}
       
       {/* Thống kê khóa học (Pills) */}
       <div className="flex flex-wrap gap-3 items-center">

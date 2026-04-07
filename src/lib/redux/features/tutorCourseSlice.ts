@@ -27,6 +27,7 @@ export interface CourseItem {
   tutorAvatar: string;
   topicName: string;
   subjectName: string;
+  coverImageUrl: string;
 }
 
 // Interface cho Môn học và Chủ đề (New)

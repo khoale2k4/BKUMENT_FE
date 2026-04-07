@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { Clock, BarChart3 } from 'lucide-react';
-import { useTranslation } from 'react-i18next'; // Import hook dịch ngôn ngữ
+import React from "react";
+import { useRouter } from "next/navigation";
+import { Clock, BarChart3 } from "lucide-react";
+import { useTranslation } from "react-i18next"; // Import hook dịch ngôn ngữ
 // Import interface từ slice của bạn (Nhớ đổi đường dẫn nếu cần)
-import { CourseItem } from '@/lib/redux/features/tutorCourseSlice'; 
+import { CourseItem } from "@/lib/redux/features/tutorCourseSlice";
+import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 
 interface CourseCardProps {
   course: CourseItem;
@@ -22,31 +23,39 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
     <div className="flex flex-col md:flex-row border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-shadow bg-white">
       {/* Thumbnail */}
       <div className="w-full md:w-72 h-48 flex-shrink-0 relative bg-gray-100">
-        <img 
+        {/* <img 
           src="/images/course_img.png" // Hoặc dùng ảnh thật nếu API có cung cấp thumbnail khoá học
           alt={course.name} 
           className={`w-full h-full object-cover transition-opacity ${course.status === 'CANCELLED' ? 'opacity-60 grayscale' : ''}`}
           onError={(e) => {
             (e.target as HTMLImageElement).src = 'https://placehold.co/300x200/eee/999?text=No+Image';
           }}
+        /> */}
+
+        <AuthenticatedImage
+          src={course.coverImageUrl || "/images/course_img.png"}
+          alt={course.name}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
 
       {/* Content */}
       <div className="p-6 flex-grow flex flex-col justify-between">
         <div>
-          <p className="text-xs text-gray-500 mb-1 italic">{t('by')} {course.tutorName}</p>
-          <h3 
+          <p className="text-xs text-gray-500 mb-1 italic">
+            {t("by")} {course.tutorName}
+          </p>
+          <h3
             onClick={() => router.push(`/courses/${course.id}`)}
             className={`text-xl font-bold mb-3 cursor-pointer line-clamp-2 ${
-              course.status === 'CANCELLED' 
-                ? 'text-gray-400 line-through' 
-                : 'text-slate-900 hover:text-orange-500'
+              course.status === "CANCELLED"
+                ? "text-gray-400 line-through"
+                : "text-slate-900 hover:text-orange-500"
             }`}
           >
             {course.name}
           </h3>
-          
+
           {/* Tags */}
           <div className="flex flex-wrap gap-2 mb-4">
             <span className="px-3 py-1 bg-[#7294ff] text-white text-[10px] font-bold rounded-md uppercase tracking-wider">
@@ -60,34 +69,38 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
           {/* Meta Stats */}
           <div className="flex flex-wrap gap-4 text-[11px] font-bold text-gray-500">
             <span className="flex items-center gap-1">
-              <Clock size={14} className="text-orange-500" /> 
-              {course.startDate} {course.endDate ? ` - ${course.endDate}` : ''}
+              <Clock size={14} className="text-orange-500" />
+              {course.startDate} {course.endDate ? ` - ${course.endDate}` : ""}
             </span>
             <span className="flex items-center gap-1 uppercase">
-              <BarChart3 size={14} className="text-orange-500" /> 
-              {sessionsPerWeek} {t('sessionsPerWeek')}
+              <BarChart3 size={14} className="text-orange-500" />
+              {sessionsPerWeek} {t("sessionsPerWeek")}
             </span>
           </div>
         </div>
 
         {/* Footer */}
         <div className="flex justify-between items-end mt-4">
-          <span className={`text-xs font-bold px-3 py-1 rounded-full ${
-            course.status === 'ENROLLING' ? 'bg-green-100 text-green-600' : 
-            course.status === 'CANCELLED' ? 'bg-red-100 text-red-600' : 
-            'bg-gray-100 text-gray-600'
-          }`}>
+          <span
+            className={`text-xs font-bold px-3 py-1 rounded-full ${
+              course.status === "ENROLLING"
+                ? "bg-green-100 text-green-600"
+                : course.status === "CANCELLED"
+                  ? "bg-red-100 text-red-600"
+                  : "bg-gray-100 text-gray-600"
+            }`}
+          >
             {/* Bạn cũng có thể dùng t(`status.${course.status}`) nếu muốn dịch trạng thái */}
-            {course.status} 
+            {course.status}
           </span>
-          
+
           {/* Ẩn nút View And Update nếu lớp đã bị hủy */}
-          {course.status !== 'CANCELLED' && (
-            <button 
-              onClick={() => router.push(`/courses/${course.id}`)} 
+          {course.status !== "CANCELLED" && (
+            <button
+              onClick={() => router.push(`/courses/${course.id}`)}
               className="text-sm font-bold text-slate-900 hover:underline"
             >
-              {t('viewAndUpdate')}
+              {t("viewAndUpdate")}
             </button>
           )}
         </div>
