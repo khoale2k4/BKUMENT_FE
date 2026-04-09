@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import CourseRichTextEditor from "./CourseRichTextEditor";
 
 interface Props {
   description: string;
@@ -13,12 +14,13 @@ const DescriptionSection: React.FC<Props> = ({ description, onChange }) => {
 
   return (
     <div>
-      <label className="block text-sm font-bold text-gray-700 mb-2">{t('classroom.create.sections.description', 'Description')}</label>
-      <textarea 
-        className="w-full p-3 border border-gray-200 rounded-md min-h-[120px] outline-none focus:border-orange-500 resize-y"
-        placeholder={t('classroom.create.form.descriptionPlaceholder', 'Detailed description for the class...')}
-        value={description} 
-        onChange={(e) => onChange(e.target.value)} 
+      <label className="block text-sm font-bold text-gray-700 mb-2">
+        Description
+      </label>
+      {/* Thay vì textarea, chúng ta dùng Editor */}
+      <CourseRichTextEditor
+        value={description || ""}
+        onChange={(htmlValue) => onChange(htmlValue)}
       />
     </div>
   );
