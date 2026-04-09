@@ -5,11 +5,11 @@ import { useRouter } from "next/navigation";
 import { Clock, BarChart3 } from "lucide-react";
 import { useTranslation } from "react-i18next"; // Import hook dịch ngôn ngữ
 // Import interface từ slice của bạn (Nhớ đổi đường dẫn nếu cần)
-import { CourseItem } from "@/lib/redux/features/tutorCourseSlice";
+import { Course } from "../../../../types/course";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 
 interface CourseCardProps {
-  course: CourseItem;
+  course: Course;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
@@ -23,15 +23,6 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
     <div className="flex flex-col md:flex-row border border-gray-200 rounded-3xl overflow-hidden hover:shadow-lg transition-shadow bg-white">
       {/* Thumbnail */}
       <div className="w-full md:w-72 h-48 flex-shrink-0 relative bg-gray-100">
-        {/* <img 
-          src="/images/course_img.png" // Hoặc dùng ảnh thật nếu API có cung cấp thumbnail khoá học
-          alt={course.name} 
-          className={`w-full h-full object-cover transition-opacity ${course.status === 'CANCELLED' ? 'opacity-60 grayscale' : ''}`}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://placehold.co/300x200/eee/999?text=No+Image';
-          }}
-        /> */}
-
         <AuthenticatedImage
           src={course.coverImageUrl || "/images/course_img.png"}
           alt={course.name}

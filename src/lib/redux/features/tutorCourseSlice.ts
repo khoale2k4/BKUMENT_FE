@@ -6,42 +6,8 @@ import * as courseService from "@/lib/services/course.service";
 import httpClient from "@/lib/services/http";
 import { showToast } from "./toastSlice";
 import { uploadAvatarImage } from "@/lib/services/user.service";
-
+import { Topic, Subject, Schedule, Course } from "../../../types/course";
 // --- Interfaces ---
-
-export interface Schedule {
-  dayOfWeek: string;
-  startTime: string; // HH:MM:SS
-  endTime: string; // HH:MM:SS
-}
-
-export interface CourseItem {
-  id: string;
-  name: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  schedules: Schedule[];
-  status: string;
-  tutorId: string;
-  tutorName: string;
-  tutorAvatar: string;
-  topicName: string;
-  subjectName: string;
-  coverImageUrl: string;
-}
-
-// Interface cho Môn học và Chủ đề (New)
-export interface Topic {
-  id: string;
-  name: string;
-}
-
-export interface Subject {
-  id: string; // VD: INT1005
-  name: string; // VD: Cơ sở dữ liệu
-  topics: Topic[];
-}
 
 export interface CreateClassRequest {
   name: string;
@@ -68,7 +34,7 @@ export interface CreateNotificationRequest {
 }
 
 interface TutorCourseState {
-  classes: CourseItem[];
+  classes: Course[];
   subjects: Subject[]; // (New) Danh sách môn học tutor được dạy
   loading: boolean;
   submitting: boolean;
@@ -80,7 +46,7 @@ interface TutorCourseState {
   members: any[]; // Có thể định nghĩa interface riêng cho member nếu cần
   pendingMembers: any[]; // Danh sách thành viên chờ duyệt
   loadingMembers: boolean;
-  viewedTutorClasses: CourseItem[];
+  viewedTutorClasses: Course[];
   loadingViewedClasses: boolean;
   notifications: ClassNotification[];
   notificationsCurrentPage: number;

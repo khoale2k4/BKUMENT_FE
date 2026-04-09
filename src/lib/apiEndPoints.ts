@@ -32,12 +32,13 @@ export const API_ENDPOINTS = {
     LOGOUT: buildUrl(`${IDENTITY}/auth/logout`),
     PROFILE: buildUrl(`${IDENTITY}/api/auth/me`),
     REFRESH_TOKEN: buildUrl(`${IDENTITY}/auth/refresh`),
-    FORGOT_PASSWORD_WITH_EMAIL: (email: string) => buildUrl(`${IDENTITY}/auth/forgot-password?email=${email}`),
+    FORGOT_PASSWORD_WITH_EMAIL: (email: string) =>
+      buildUrl(`${IDENTITY}/auth/forgot-password?email=${email}`),
 
     RESET_PASSWORD: buildUrl(`${IDENTITY}/auth/reset-password`),
-    //http://143.198.80.199:8888/api/v1/identity/auth/forgot-password?email=lythanhnhatquangthongnhat2004%40gmail.com 
-    VERIFY_RESET_TOKEN: (token: string) => buildUrl(`${IDENTITY}/auth/verify-email?token=${token}`),
-
+    //http://143.198.80.199:8888/api/v1/identity/auth/forgot-password?email=lythanhnhatquangthongnhat2004%40gmail.com
+    VERIFY_RESET_TOKEN: (token: string) =>
+      buildUrl(`${IDENTITY}/auth/verify-email?token=${token}`),
   },
 
   ACCOUNT: {
@@ -49,7 +50,7 @@ export const API_ENDPOINTS = {
     UPDATE_USER_INFO: buildUrl(`${PROFILE}/my-profile`),
     GET_UNIVERSITIES: (page: number, size: number) =>
       buildUrl(`${PROFILE}/universities/search?page=${page}&size=${size}`),
-      // http://143.198.80.199:8888/api/v1/profile/universities/search?page=1&size=10
+    // http://143.198.80.199:8888/api/v1/profile/universities/search?page=1&size=10
     UPDATE_TUTOR_INFO: buildUrl(`${LMS}/tutors/me`),
     FOLLOW: (id: string) => buildUrl(`${PROFILE}/${id}/follow`),
     GET_FOLLOWERS: (id: string, page: number, size: number) =>
@@ -57,7 +58,6 @@ export const API_ENDPOINTS = {
     GET_FOLLOWING: (id: string, page: number, size: number) =>
       buildUrl(`${PROFILE}/${id}/following?page=${page}&size=${size}`),
     GET_PROFILE_BY_ID: (id: string) => buildUrl(`${PROFILE}/${id}`),
-   
   },
 
   DOCUMENTS: {
@@ -87,7 +87,10 @@ export const API_ENDPOINTS = {
 
     // http://143.198.80.199:8888/api/v1/profile/universities/search?query=HC&page=1&size=10
 
-    SEARCH_UNIVERSITIES: (query: string, page: number, size: number) => buildUrl(`${PROFILE}/universities/search?q=${query}&page=${page}&size=${size}`),
+    SEARCH_UNIVERSITIES: (query: string, page: number, size: number) =>
+      buildUrl(
+        `${PROFILE}/universities/search?q=${query}&page=${page}&size=${size}`,
+      ),
     MY_DOCUMENTS: (page: number, size: number) =>
       buildUrl(`${DOCUMENT}/my-documents?page=${page}&size=${size}`),
     USER_DOCUMENTS: (userId: string, page: number, size: number) =>
@@ -162,6 +165,25 @@ export const API_ENDPOINTS = {
     CREATE: buildUrl(`${SOCIAL}/comments`),
   },
 
+  RATINGS: {
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor
+    RATING_TUTOR: buildUrl(`${SOCIAL}/ratings/tutor`),
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/9810c099-4de0-4c4c-89d1-0bbb6fc4b291?page=0&size=10
+    GET_TUTOR_RATINGS: (tutorId: string, page: number, size: number) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${tutorId}?page=${page}&size=${size}`),
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/0c099-4de0-4c4c-89d1-0bbb6fc4b291/summary
+    GET_TUTOR_RATING_SUMMARY: (tutorId: string) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${tutorId}/summary`),
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/0c099-4de0-4c4c-89d1-0bbb6fc4b291/user/477d787d-2c55-4383-b79b-8f3347ede4e8
+    GET_MY_TUTOR_RATING: (tutorId: string, userId: string) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${tutorId}/user/${userId}`),
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/23232
+    UPDATE_RATING_TUTOR_BY_REVIEWID: (reviewId: string) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${reviewId}`),
+    DELETE_RATING_TUTOR_BY_REVIEWID: (reviewId: string) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${reviewId}`),
+  },
+
   HOME: {
     SEARCH: (query: string, page: number, size: number) =>
       buildUrl(`${AI}/search?query=${query}&page=${page + 1}&size=${size}`),
@@ -220,7 +242,6 @@ export const API_ENDPOINTS = {
     REJECT_APPLICATION: (id: string) =>
       buildUrl(`${LMS}/tutors/admin/applications/${id}/reject`),
   },
-
 
   REPORT: {
     CREATE: buildUrl(`${SOCIAL}/reports`),
