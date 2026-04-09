@@ -12,6 +12,7 @@ import { showToast } from "@/lib/redux/features/toastSlice";
 import { deleteDocumentAsync } from "@/lib/redux/features/myDocumentSlice";
 import { Flag, Share2, Trash2 } from "lucide-react";
 import { clsx } from "clsx";
+import { t } from 'i18next';
 
 export default function ContentCard({ data }: { data: CardProp }) {
     const { t } = useTranslation();

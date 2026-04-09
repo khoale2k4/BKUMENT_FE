@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { FileText, User, Calendar } from 'lucide-react';
+import { t } from 'i18next';
 
 interface RelatedDocumentProps {
     data: {

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Subject, Topic } from '@/lib/redux/features/tutorCourseSlice';
+import { Subject, Topic } from '@/types/course';
 
 interface Props {
   subjects: Subject[];
