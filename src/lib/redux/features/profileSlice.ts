@@ -151,7 +151,7 @@ export const getMyProfile = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
-          "Failed to fetch user profile",
+          "errors.notFound",
       );
     }
   },
@@ -167,7 +167,7 @@ export const updateMyProfile = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
-          "Failed to update user profile",
+          "errors.profileUpdateFailed",
       );
     }
   },
@@ -234,7 +234,7 @@ export const getProfileById = createAsyncThunk(
       return response.data.result as UserProfile;
     } catch (error: any) {
       // Nếu lỗi từ Axios thì message thường nằm ở error.response.data.message
-      const errorMessage = error.response?.data?.message || error.message || "Đã xảy ra lỗi";
+      const errorMessage = error.response?.data?.message || error.message || "errors.network";
       return rejectWithValue(errorMessage);
     }
   },
@@ -247,7 +247,7 @@ export const uploadAvatar = createAsyncThunk(
       const avatarUrl = await uploadAvatarImage(file);
       return avatarUrl;
     } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to upload avatar");
+      return rejectWithValue(error.message || "errors.avatarUploadFailed");
     }
   },
 );

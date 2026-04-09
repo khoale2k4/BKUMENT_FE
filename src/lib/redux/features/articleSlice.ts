@@ -71,7 +71,7 @@ export const fetchFeed = createAsyncThunk(
 
       content:
         category === "Documents"
-          ? dta.description || "Tài liệu đính kèm"
+          ? dta.description || "common.placeholders.documentDescription"
           : dta.content || "",
 
       coverImage: dta.coverImage || dta.previewImageUrl,
@@ -79,7 +79,7 @@ export const fetchFeed = createAsyncThunk(
 
       tags:
         dta.tags ||
-        (category === "Documents" ? ["PDF", "Doc"] : ["Hot", "24h"]),
+        (category === "Documents" ? ["PDF", "Doc"] : ["common.tags.hot", "common.tags.daily"]),
       views: dta.views || 0,
     }));
 
@@ -110,7 +110,7 @@ export const searchKeyword = createAsyncThunk(
       title: result.title,
       time: result.createdAt || new Date().toISOString(),
 
-      content: result.description || "Tài liệu đính kèm",
+      content: result.description || "common.placeholders.documentDescription",
       totalItems: result.totalElements,
 
       coverImage:
@@ -118,7 +118,7 @@ export const searchKeyword = createAsyncThunk(
 
       type: result.type || "DOC",
 
-      tags: result.tags || ["Kết quả tìm kiếm"],
+      tags: result.tags || ["common.tags.searchResult"],
       score: result.score,
       views: result.views || 0,
     }));

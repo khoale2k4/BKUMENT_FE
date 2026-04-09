@@ -56,6 +56,7 @@ interface DocumentState {
     
     averageRating: number | null;
     myRating: number | null;
+    ratingStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
     upload: UploadState;
 }
@@ -82,6 +83,7 @@ const initialState: DocumentState = {
 
     averageRating: null,
     myRating: null,
+    ratingStatus: 'idle',
 
     upload: {
         files: [],
@@ -209,11 +211,11 @@ export const uploadFile = createAsyncThunk(
             }));
             return localId;
         } catch (err: any) {
-            const errorMessage = err.response?.data?.message || 'Upload failed';
+            const errorMessage = err.response?.data?.message || 'errors.uploadFailed';
             dispatch(updateFileStatus({ localId, updates: { status: 'error', errorMessage } }));
             dispatch(showToast({
                 type: 'error',
-                title: 'Upload Failed',
+                title: 'common.toast.error',
                 message: errorMessage
             }));
             return rejectWithValue({ localId, errorMessage });
@@ -257,7 +259,7 @@ export const saveFilesMetadata = createAsyncThunk(
                 hasError = true;
                 dispatch(updateFileStatus({
                     localId: file.localId,
-                    updates: { status: 'error', errorMessage: "Save info failed" }
+                    updates: { status: 'error', errorMessage: "errors.saveFailed" }
                 }));
             }
         }
@@ -280,6 +282,7 @@ const documentSlice = createSlice({
             state.relatedStatus = 'idle';
             state.relatedPage = 0;
             state.relatedTotalPages = 0;
+            state.ratingStatus = 'idle';
         },
         setUploadFiles: (state, action: PayloadAction<FileUploadItem[]>) => {
             state.upload.files = [...state.upload.files, ...action.payload];
@@ -379,9 +382,18 @@ const documentSlice = createSlice({
             state.upload.uploadStatus = 'error';
         });
 
+        builder.addCase(fetchRatingData.pending, (state) => {
+            state.ratingStatus = 'loading';
+        });
+
         builder.addCase(fetchRatingData.fulfilled, (state, action) => {
+            state.ratingStatus = 'succeeded';
             state.averageRating = action.payload.average;
             state.myRating = action.payload.myRating;
+        });
+
+        builder.addCase(fetchRatingData.rejected, (state) => {
+            state.ratingStatus = 'failed';
         });
 
         builder.addCase(rateDocument.fulfilled, (state, action) => {

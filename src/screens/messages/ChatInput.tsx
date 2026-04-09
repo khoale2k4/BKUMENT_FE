@@ -46,7 +46,7 @@ const ChatInput = () => {
         if (!file || !activeConversationId) return;
 
         if (!file.type.startsWith('image/')) {
-            alert(t('chat.input.imageFormatError', 'Vui lòng chọn định dạng ảnh!'));
+            alert(t('chat.input.imageFormatError', 'Please select an image format!'));
             return;
         }
 
@@ -57,7 +57,7 @@ const ChatInput = () => {
                 file: file
             })).unwrap();
         } catch (error) {
-            alert(t('chat.input.sendImageFail', 'Gửi ảnh thất bại!'));
+            alert(t('chat.input.sendImageFail', 'Failed to send image!'));
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -91,7 +91,7 @@ const ChatInput = () => {
                 
                 <input
                     type="text"
-                    placeholder={t('chat.input.placeholder', 'Aa')}
+                    placeholder={t('chat.input.placeholder', 'Type a message...')}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={handleKeyDown}

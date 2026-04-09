@@ -6,6 +6,7 @@ import * as courseService from "@/lib/services/course.service";
 import httpClient from "@/lib/services/http";
 import { showToast } from "./toastSlice";
 import { uploadAvatarImage } from "@/lib/services/user.service";
+
 // --- Interfaces ---
 
 export interface Schedule {
@@ -50,6 +51,20 @@ export interface CreateClassRequest {
   endDate: string;
   topicId: string;
   schedules: Schedule[];
+}
+
+export interface ClassNotification {
+  id: string;
+  title: string;
+  message: string;
+  sentAt: string;
+  classId: string;
+  className: string;
+}
+
+export interface CreateNotificationRequest {
+  title: string;
+  message: string;
 }
 
 interface TutorCourseState {
@@ -118,29 +133,13 @@ const initialState: TutorCourseState = {
   isCoverUploading: false,
 };
 
-// --- Interfaces --- (Thêm vào phần đầu file)
-
-export interface ClassNotification {
-  id: string;
-  title: string;
-  message: string;
-  sentAt: string;
-  classId: string;
-  className: string;
-}
-
-export interface CreateNotificationRequest {
-  title: string;
-  message: string;
-}
-
 export const uploadCoverImage = createAsyncThunk(
   "tutorCourse/uploadCoverImage",
   async (file: File, { rejectWithValue }) => {
     try {
       return await uploadAvatarImage(file);
     } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to upload cover image");
+      return rejectWithValue(error.message || "common.errors.uploadFailed");
     }
   },
 );
@@ -211,7 +210,7 @@ export const cancelClass = createAsyncThunk(
     try {
       const data = await courseService.cancelClass(classId);
       if (data.code !== 1000)
-        throw new Error(data.message || "Failed to cancel class");
+        throw new Error(data.message || "common.errors.updateFailed");
       return classId;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -271,21 +270,19 @@ export const approveMember = createAsyncThunk(
         isApproved,
       );
       if (isApproved == true) {
-        // Thông báo thành công khi duyệt thành viên
-        console.log("Member approved successfully:", result);
         dispatch(
           showToast({
             type: "success",
-            title: "Thành công!",
-            message: "Đã chấp nhận yêu cầu tham gia!",
+            title: "common.toast.success",
+            message: "classroom.members.approveSuccess",
           }),
         );
       } else {
         dispatch(
           showToast({
             type: "success",
-            title: "Thành công!",
-            message: "Đã từ chối yêu cầu tham gia!",
+            title: "common.toast.success",
+            message: "classroom.members.rejectSuccess",
           }),
         );
       }

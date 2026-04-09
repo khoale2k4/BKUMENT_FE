@@ -7,12 +7,14 @@ import {
 import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
 import { closeSidebar } from '@/lib/redux/features/layoutSlide';
 import clsx from 'clsx';
+import { useTranslation } from 'react-i18next';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { AppRoute } from '@/lib/appRoutes';
 import { useEffect, useRef } from 'react';
 
 export default function Sidebar() {
+    const { t } = useTranslation();
     const { isSidebarOpen } = useAppSelector((state) => state.ui);
     const dispatch = useAppDispatch();
     const pathname = usePathname();
@@ -20,20 +22,20 @@ export default function Sidebar() {
       const { data: notifications = [], loading, unreadCount } = useAppSelector((state) => state.modal.appNotifications) || {};
 
     const mainMenuItems = [
-        { icon: Home, label: 'Home', href: AppRoute.home, count: 0 },
-        { icon: Book, label: 'Library', href: AppRoute.library, count: 0 },
-        { icon: User, label: 'Profile', href: AppRoute.profile, count: 0 },
-        { icon: NotebookText, label: 'Find Tutors', href: AppRoute.tutors, count: 0 },
-        { icon: FileText, label: 'My Blog', href: AppRoute.blogs.my, count: 0 },
-        { icon: File, label: 'My Documents', href: AppRoute.documents.my, count: 0 },
-        { icon: Send, label: 'Messages', href: AppRoute.messages, count: 2 },
+        { icon: Home, label: t('layout.sidebar.home'), href: AppRoute.home, count: 0 },
+        { icon: Book, label: t('layout.sidebar.library'), href: AppRoute.library, count: 0 },
+        { icon: User, label: t('layout.sidebar.profile'), href: AppRoute.profile, count: 0 },
+        { icon: NotebookText, label: t('layout.sidebar.findTutors'), href: AppRoute.tutors, count: 0 },
+        { icon: FileText, label: t('layout.sidebar.myBlog'), href: AppRoute.blogs.my, count: 0 },
+        { icon: File, label: t('layout.sidebar.myDocuments'), href: AppRoute.documents.my, count: 0 },
+        { icon: Send, label: t('layout.sidebar.messages'), href: AppRoute.messages, count: 2 },
         // { icon: UserSearch, label: 'Find Tutors', href: AppRoute.tutors, count: 0 },
-        { icon: Bell, label: 'Notifications', href: AppRoute.notifications, count: unreadCount },
+        { icon: Bell, label: t('layout.sidebar.notifications'), href: AppRoute.notifications, count: unreadCount },
     ];
 
     const secondaryMenuItems = [
-        { icon: PenSquare, label: 'Write Blog', href: AppRoute.blogs.write, count: 0 },
-        { icon: Users, label: 'Following', href: '/following', count: 2 },
+        { icon: PenSquare, label: t('layout.sidebar.writeBlog'), href: AppRoute.blogs.write, count: 0 },
+        { icon: Users, label: t('layout.sidebar.following'), href: '/following', count: 2 },
         // { icon: Users, label: 'My Groups', href: '/groups', count: 0 },
     ];
 
@@ -118,7 +120,7 @@ export default function Sidebar() {
                             className="flex items-center justify-center gap-2 w-full bg-[#292929] text-white py-2.5 rounded-full font-medium text-[15px] hover:bg-black transition shadow-sm hover:shadow-md whitespace-nowrap"
                         >
                             <UploadCloud size={18} className="shrink-0" />
-                            <span>Upload Document</span>
+                            <span>{t('layout.sidebar.uploadDocument')}</span>
                         </Link>
                     </div>
                     {mainMenuItems.map(renderMenuItem)}

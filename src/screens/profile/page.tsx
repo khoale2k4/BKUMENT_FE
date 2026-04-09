@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
 import React, { useState } from 'react';
 import { useAppSelector } from '@/lib/redux/hooks';
+import { useTranslation } from 'react-i18next';
 
 // Import các components con
 import ProfileHeader, { TabType } from "./tabs/ProfileHeader"
@@ -11,6 +12,7 @@ import AboutTab from './tabs/About';
 import MyStudyingClassTab from './tabs/MyClass/MyStudyingClassTab';
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   // State quản lý tab đang active
   const [activeTab, setActiveTab] = useState<TabType>('about');  
   // Lấy thông tin user (để hiển thị tên) từ Redux
@@ -23,7 +25,7 @@ const ProfilePage = () => {
   console.log('User Roles:', isTutor);
   
   // Ưu tiên lấy tên từ Auth Slice nếu có, hoặc fallback
-  const displayName = user?.name || (classes.length > 0 ? classes[0].tutorName : 'Tutor Profile');
+  const displayName = user?.name || (classes.length > 0 ? classes[0].tutorName : t('people.profile.defaultTitle'));
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 font-sans min-h-screen bg-white">

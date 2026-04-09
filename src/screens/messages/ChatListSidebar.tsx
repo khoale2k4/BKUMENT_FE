@@ -103,7 +103,7 @@ const ChatListSidebar = ({ isOpen, currentUserId }: ChatListSidebarProps) => {
                     }
                     setCurrentPage(nextPage);
                 } catch (error) {
-                    console.error("Lỗi khi tải thêm cuộc trò chuyện:", error);
+                    console.error(t('chat.sidebar.errorFetchMore', 'Error fetching more conversations:'), error);
                 } finally {
                     setIsFetchingMore(false);
                 }

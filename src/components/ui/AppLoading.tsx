@@ -3,6 +3,8 @@
 import React from "react";
 import Image from "next/image";
 
+import { useTranslation } from "react-i18next";
+
 interface AppLoadingProps {
     fullScreen?: boolean;
     text?: string;
@@ -10,8 +12,10 @@ interface AppLoadingProps {
 
 export default function AppLoading({
     fullScreen = true,
-    text = "Đang tải dữ liệu..."
+    text
 }: AppLoadingProps) {
+    const { t } = useTranslation();
+    const displayText = text || t('common.loading');
 
     const loaderContent = (
         <div className="flex flex-col items-center justify-center gap-6 p-4">
@@ -27,9 +31,9 @@ export default function AppLoading({
                 />
             </div>
 
-            {text && (
+            {displayText && (
                 <p className="text-sm sm:text-base font-medium text-gray-600 tracking-wide animate-pulse">
-                    {text}
+                    {displayText}
                 </p>
             )}
         </div>

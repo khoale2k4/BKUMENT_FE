@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Subject, Topic } from '@/lib/redux/features/tutorCourseSlice';
 
 interface Props {
@@ -15,11 +18,13 @@ interface Props {
 const SubjectTopicSection: React.FC<Props> = ({ 
   subjects, availableTopics, selectedSubjectId, selectedTopicId, loading, onSubjectChange, onTopicChange 
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Subject Dropdown */}
       <div>
-        <label className="block text-sm font-bold text-gray-700 mb-2">Subject (Môn học)</label>
+        <label className="block text-sm font-bold text-gray-700 mb-2">{t('classroom.create.form.selectSubject', 'Subject')}</label>
         <div className="relative">
           <select
             className="w-full p-3 border border-gray-200 rounded-md outline-none bg-white appearance-none focus:border-orange-500"
@@ -27,10 +32,10 @@ const SubjectTopicSection: React.FC<Props> = ({
             onChange={(e) => onSubjectChange(e.target.value)}
             disabled={loading}
           >
-            <option value="" disabled>-- Chọn môn học --</option>
+            <option value="" disabled>{t('classroom.create.form.selectSubject', '-- Select Subject --')}</option>
             {subjects.map((subject) => (
               <option key={subject.id} value={subject.id}>
-                {subject.name} ({subject.id})
+                {subject.name}
               </option>
             ))}
           </select>
@@ -44,7 +49,7 @@ const SubjectTopicSection: React.FC<Props> = ({
 
       {/* Topic Dropdown */}
       <div>
-        <label className="block text-sm font-bold text-gray-700 mb-2">Topic (Chủ đề)</label>
+        <label className="block text-sm font-bold text-gray-700 mb-2">{t('classroom.create.form.selectTopic', 'Topic')}</label>
         <div className="relative">
           <select
             className="w-full p-3 border border-gray-200 rounded-md outline-none bg-white appearance-none focus:border-orange-500 disabled:bg-gray-100 disabled:text-gray-400"
@@ -53,7 +58,9 @@ const SubjectTopicSection: React.FC<Props> = ({
             disabled={!selectedSubjectId}
           >
             <option value="" disabled>
-              {!selectedSubjectId ? '-- Vui lòng chọn môn trước --' : '-- Chọn chủ đề --'}
+              {!selectedSubjectId 
+                ? t('classroom.create.form.selectSubjectFirst', '-- Please select subject first --') 
+                : t('classroom.create.form.selectTopic', '-- Select Topic --')}
             </option>
             {availableTopics.map((topic) => (
               <option key={topic.id} value={topic.id}>

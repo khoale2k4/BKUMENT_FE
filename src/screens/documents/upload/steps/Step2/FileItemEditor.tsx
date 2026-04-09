@@ -229,7 +229,7 @@ const FileItemEditor = ({
                 />
 
                 <AutocompleteField
-                    label={t('documents.upload.step2.course', 'Topic')}
+                    label={t('documents.upload.step2.topic', 'Topic')}
                     value={topicQuery}
                     onChange={setTopicQuery}
                     onFocus={handleTopicFocus}
@@ -237,7 +237,7 @@ const FileItemEditor = ({
                     items={filteredTopics}
                     showDropdown={showTopicDropdown}
                     disabled={!selectedCourse}
-                    placeholder={!selectedCourse ? t('documents.upload.step2.placeholderCourse', 'Select course...') : t('documents.upload.step2.placeholderTitle', 'Select topic...')}
+                    placeholder={!selectedCourse ? t('documents.upload.step2.placeholderCourse', 'Select course...') : t('documents.upload.step2.placeholderTopic', 'Select topic...')}
                     renderItem={(topic) => (
                         <div className="text-sm text-gray-900">{topic.name}</div>
                     )}

@@ -16,10 +16,10 @@ export function EmailStep({ email, setEmail, onSubmit, isLoading }: EmailStepPro
   return (
     <>
       <h1 className="text-4xl font-bold mb-4 text-gray-900 font-serif">
-        {t('auth.forgot.title', 'Forgot Password?')}
+        {t('auth.forgot.emailTitle', 'Forgot Password?')}
       </h1>
       <h2 className="text-lg mb-8 text-gray-600 font-serif">
-        {t('auth.forgot.subtitle', 'Enter your registered email address and we will send you a verification code.')}
+        {t('auth.forgot.emailDesc', 'Enter your registered email address and we will send you a verification code.')}
       </h2>
 
       <form onSubmit={onSubmit} className="space-y-6">
@@ -33,7 +33,7 @@ export function EmailStep({ email, setEmail, onSubmit, isLoading }: EmailStepPro
           className={inputClassName}
         />
         <Button type="submit" className="bg-[#3F5D38] hover:bg-[#2d4228] w-full py-6 text-lg" disabled={isLoading}>
-          {isLoading ? t('auth.forgot.sending', 'Sending...') : t('auth.forgot.sendBtn', 'Send Code')}
+          {isLoading ? t('auth.forgot.sending', 'Sending...') : t('auth.forgot.sendCode', 'Send Code')}
         </Button>
       </form>
     </>

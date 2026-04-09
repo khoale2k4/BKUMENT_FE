@@ -85,7 +85,7 @@ export default function BlogDetailPage(params: PageProps) {
             <div className="min-h-screen flex items-center justify-center bg-white">
                 <div className="flex flex-col items-center gap-3 text-gray-500">
                     <div className="w-8 h-8 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
-                    <span className="text-sm font-medium">Đang tải bài viết...</span>
+                    <span className="text-sm font-medium">{t('blogs.detail.loading', 'Loading post...')}</span>
                 </div>
             </div>
         );
@@ -107,7 +107,7 @@ export default function BlogDetailPage(params: PageProps) {
                         <BlogActionsMenu
                             onShare={() => {
                                 navigator.clipboard.writeText(window.location.href);
-                                dispatch(showToast({ type: 'success', title: 'Thành công', message: 'Đã sao chép đường dẫn!' }));
+                                dispatch(showToast({ type: 'success', title: t('common.toast.success', 'Success'), message: t('blogs.detail.shareSuccess', 'Link copied to clipboard!') }));
                             }}
                             onReport={() => {
                                 if (id) dispatch(openReportModal({ targetId: id, type: 'BLOG' }));
@@ -115,10 +115,10 @@ export default function BlogDetailPage(params: PageProps) {
                             onDelete={() => {
                                 if (id) {
                                     dispatch(openConfirmModal({
-                                        title: "Xóa bài viết",
-                                        message: `Bạn có chắc chắn muốn xóa "${title}"? Hành động này không thể hoàn tác.`,
-                                        confirmText: "Xóa",
-                                        cancelText: "Hủy",
+                                        title: t('blogs.detail.deleteTitle', 'Delete Blog'),
+                                        message: t('blogs.detail.deleteMsg', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title: title }),
+                                        confirmText: t('blogs.detail.deleteBtn', 'Delete'),
+                                        cancelText: t('common.confirm.cancel', 'Cancel'),
                                         onConfirm: async () => {
                                             try {
                                                 await dispatch(deleteBlogAsync(id)).unwrap();
@@ -257,6 +257,7 @@ function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
     onDelete: () => void,
     isOwner: boolean
 }) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -290,7 +291,7 @@ function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <IconShare size={16} />
-                        Chia sẻ
+                        {t('blogs.detail.actions.share', 'Share')}
                     </button>
 
                     <button
@@ -298,7 +299,7 @@ function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <IconFlag size={16} />
-                        Báo cáo
+                        {t('blogs.detail.actions.report', 'Report')}
                     </button>
 
                     {isOwner && (
@@ -309,7 +310,7 @@ function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
                                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
                             >
                                 <IconTrash size={16} />
-                                Xóa bài viết
+                                {t('blogs.detail.actions.delete', 'Delete Blog')}
                             </button>
                         </>
                     )}

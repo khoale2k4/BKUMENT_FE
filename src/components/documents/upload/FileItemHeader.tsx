@@ -2,6 +2,7 @@ import React from "react";
 import { Trash, FileText, Image as ImageIcon, Loader2, CheckCircle2 } from "lucide-react";
 import { FaFileWord, FaFilePdf } from "react-icons/fa";
 import { UploadStatus } from "@/types/FileUpload";
+import { useTranslation } from "react-i18next";
 
 interface FileItemHeaderProps {
     fileName: string;
@@ -31,33 +32,35 @@ const FileItemHeader: React.FC<FileItemHeaderProps> = ({
     status,
     onDelete
 }) => {
+    const { t } = useTranslation();
+
     const getStatusBadge = () => {
         switch (status) {
             case 'analyzing':
                 return (
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        AI Analyzing...
+                        {t('documents.upload.step1.analyzing')}
                     </div>
                 );
             case 'success':
                 return (
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-600 rounded-full text-xs font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5" />
-                        Ready
+                        {t('documents.upload.step1.ready')}
                     </div>
                 );
             case 'uploading':
                 return (
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-medium">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        Uploading...
+                        {t('documents.upload.step1.uploading')}
                     </div>
                 );
             case 'error':
                 return (
                     <div className="px-3 py-1.5 bg-red-50 text-red-600 rounded-full text-xs font-medium">
-                        Error
+                        {t('documents.upload.step1.error')}
                     </div>
                 );
             default:
@@ -84,7 +87,7 @@ const FileItemHeader: React.FC<FileItemHeaderProps> = ({
                 <button
                     onClick={onDelete}
                     className="p-2 hover:bg-red-50 rounded-lg transition-colors group"
-                    title="Delete file"
+                    title={t('documents.upload.step1.deleteFile')}
                 >
                     <Trash className="w-4 h-4 text-gray-400 group-hover:text-red-500 transition-colors" />
                 </button>

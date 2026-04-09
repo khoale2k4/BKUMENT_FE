@@ -17,11 +17,10 @@ export function TokenStep({ email, token, setToken, onSubmit, isLoading }: Token
   return (
     <>
       <h1 className="text-4xl font-bold mb-4 text-gray-900 font-serif">
-        {t('auth.forgot.verifyTitle', 'Check your email')}
+        {t('auth.forgot.tokenTitle', 'Check your email')}
       </h1>
       <h2 className="text-lg mb-8 text-gray-600 font-serif">
-        {t('auth.forgot.verifySubtitle', `We've sent a 6-digit verification code to `)}
-        <span className="font-bold text-gray-900">{email}</span>
+        {t('auth.forgot.tokenDesc', { email })}
       </h2>
 
       <form onSubmit={onSubmit} className="space-y-6">
@@ -36,7 +35,7 @@ export function TokenStep({ email, token, setToken, onSubmit, isLoading }: Token
           maxLength={6}
         />
         <Button type="submit" className="bg-[#3F5D38] hover:bg-[#2d4228] w-full py-6 text-lg" disabled={isLoading}>
-          {isLoading ? t('auth.forgot.verifying', 'Verifying...') : t('auth.forgot.verifyTokenBtn', 'Verify Code')}
+          {isLoading ? t('auth.forgot.verifying', 'Verifying...') : t('auth.forgot.verify', 'Verify Code')}
         </Button>
       </form>
     </>

@@ -39,7 +39,7 @@ export default function RelatedDocumentCard({ data }: RelatedDocumentProps) {
                 <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
                     <div className="flex items-center gap-1">
                         <User size={12} />
-                        <span className="truncate max-w-[80px]">{data.author || "Unknown"}</span>
+                        <span className="truncate max-w-[80px]">{data.author || t('common.unknownAuthor', 'Unknown')}</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <Calendar size={12} />

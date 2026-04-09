@@ -68,8 +68,8 @@ const initialState: ModalState = {
     title: "",
     message: "",
     onConfirm: null,
-    confirmText: "Xác nhận",
-    cancelText: "Hủy",
+    confirmText: undefined,
+    cancelText: undefined,
   },
 };
 
@@ -176,8 +176,8 @@ const modalSlice = createSlice({
       state.confirmModal.title = action.payload.title;
       state.confirmModal.message = action.payload.message;
       state.confirmModal.onConfirm = action.payload.onConfirm;
-      state.confirmModal.confirmText = action.payload.confirmText || "Xác nhận";
-      state.confirmModal.cancelText = action.payload.cancelText || "Hủy";
+      state.confirmModal.confirmText = action.payload.confirmText;
+      state.confirmModal.cancelText = action.payload.cancelText;
     },
     closeConfirmModal: (state) => {
       state.confirmModal.isOpen = false;

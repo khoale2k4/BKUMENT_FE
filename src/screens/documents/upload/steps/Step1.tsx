@@ -115,13 +115,13 @@ const FileUploader = ({ files = [], onFileChange, onDrop, onDeleteFile }: FileUp
                                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                                             <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></div>
                                         </div>
-                                        <span className="text-xs font-semibold text-blue-600">Analyzing...</span>
+                                        <span className="text-xs font-semibold text-blue-600">{t('documents.upload.step1.analyzing', 'Analyzing...')}</span>
                                     </div>
                                 ) : (
                                     <div className="flex items-center space-x-2">
                                         {file.progress === 100 ? (
                                             <div className="flex items-center text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
-                                                <span className="text-xs font-semibold">Ready</span>
+                                                <span className="text-xs font-semibold">{t('documents.upload.step1.ready', 'Ready')}</span>
                                             </div>
                                         ) : (
                                             <div className="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-lg">

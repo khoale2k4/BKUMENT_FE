@@ -1,9 +1,13 @@
+"use client";
 import BkumentsLogo from "@/components/logo/Logo";
 import { AppRoute } from "@/lib/appRoutes";
 import Link from "next/link";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function OnboardingPage() {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900">
       {/* --- HEADER / NAVBAR --- */}
@@ -15,19 +19,19 @@ export default function OnboardingPage() {
         <div className="flex items-center gap-6 md:gap-8">
           <nav className="hidden md:flex gap-6 text-sm font-medium text-gray-600">
             <Link href="#" className="hover:text-black">
-              Our Stories
+              {t('onboarding.ourStories')}
             </Link>
             <Link href="#" className="hover:text-black">
-              Write
+              {t('onboarding.write')}
             </Link>
             <Link href={AppRoute.login} className="hover:text-black">
-              Sign In
+              {t('onboarding.signIn')}
             </Link>
           </nav>
 
           <Link href={AppRoute.register}>
             <button className="bg-black text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
-              Sign Up
+              {t('onboarding.signUp')}
             </button>
           </Link>
         </div>
@@ -39,19 +43,17 @@ export default function OnboardingPage() {
           {/* Left Column */}
           <div className="space-y-8">
             <h1 className="text-6xl md:text-8xl font-serif leading-tight">
-              Human <br />
-              Stories & Documents
+              {t('onboarding.title')}
             </h1>
 
             <p className="text-lg text-gray-600 max-w-lg leading-relaxed font-serif">
-              A Place To Read, Write, Connecting, Sharing Documents And Deepen
-              Your Understanding
+              {t('onboarding.subtitle')}
             </p>
 
             <div className="pt-4">
               <Link href={AppRoute.login}>
                 <button className="bg-black text-white px-8 py-4 rounded-full text-lg font-serif tracking-wide hover:scale-105 transition-transform duration-200">
-                  Start Reading
+                  {t('onboarding.startReading')}
                 </button>
               </Link>
             </div>
@@ -75,28 +77,28 @@ export default function OnboardingPage() {
       <footer className="py-6 border-t border-gray-50 mt-auto">
         <div className="flex flex-wrap justify-center gap-6 md:gap-10 text-xs md:text-sm text-gray-500 font-medium uppercase tracking-wider">
           <Link href="#" className="hover:text-black">
-            Help
+            {t('layout.footer.help')}
           </Link>
           <Link href="#" className="hover:text-black">
-            Status
+            {t('layout.footer.status')}
           </Link>
           <Link href="#" className="hover:text-black">
-            About
+            {t('layout.footer.about')}
           </Link>
           <Link href="#" className="hover:text-black">
-            Careers
+            {t('layout.footer.careers')}
           </Link>
           <Link href="#" className="hover:text-black">
-            Press
+            {t('layout.footer.press')}
           </Link>
           <Link href="#" className="hover:text-black">
-            Privacy
+            {t('layout.footer.privacy')}
           </Link>
           <Link href="#" className="hover:text-black">
-            Rules
+            {t('layout.footer.rules')}
           </Link>
           <Link href="#" className="hover:text-black">
-            Terms
+            {t('layout.footer.terms')}
           </Link>
         </div>
       </footer>

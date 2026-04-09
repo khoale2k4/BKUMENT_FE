@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ChevronLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useCourseForm } from './hooks/useCourseForm';
 
 // Imports components
@@ -11,6 +12,7 @@ import ScheduleSection from './components/ScheduleSection';
 import DescriptionSection from './components/DecriptionSection'
 
 const CreateCoursePage = () => {
+  const { t } = useTranslation();
   const {
     formData, loading, submitting, subjects, availableTopics, selectedSubjectId, isCoverUploading,
     handleInputChange, handleSubjectChange, handleAddSchedule, handleRemoveSchedule, handleUpdateSchedule, handleCoverImageChange, handleSubmit, router
@@ -23,11 +25,11 @@ const CreateCoursePage = () => {
         onClick={() => router.back()} 
         className="mb-8 flex items-center gap-2 text-gray-500 hover:text-black font-medium transition-colors"
       >
-        <ChevronLeft size={20} /> Back to Profile
+        <ChevronLeft size={20} /> {t('classroom.create.backToProfile', 'Back to Profile')}
       </button>
 
       <div className="space-y-8">
-        <h1 className="text-2xl font-bold text-slate-800">Create New Course</h1>
+        <h1 className="text-2xl font-bold text-slate-800">{t('classroom.create.title', 'Create New Course')}</h1>
 
         {/* 1. Basic Info */}
         <BasicInfoSection 
@@ -75,7 +77,9 @@ const CreateCoursePage = () => {
           }`}
           onClick={handleSubmit}
         >
-          {submitting ? 'Creating...' : 'Save & Next'}
+          {submitting 
+            ? t('classroom.create.creating', 'Creating...') 
+            : t('classroom.create.saveAndNext', 'Save & Next')}
         </button>
       </div>
     </div>

@@ -6,10 +6,12 @@ import TutorSearchFilters from './components/TutorSearchFilters';
 import TutorList from './components/TutorList';
 import Pagination from '../../components/ui/Pagination'; 
 import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
+import { useTranslation } from 'react-i18next';
 
 import { getTutorApplication, searchTutors } from '@/lib/redux/features/tutorFindingSlice'; 
 
 const TutorsPage = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { currentRole } = useAppSelector(state => state.auth);
   const { currentPage, totalPages } = useAppSelector(state => state.tutorFinding);
@@ -81,8 +83,8 @@ const TutorsPage = () => {
       {currentRole === 'ADMIN' && (
         <>
           <div className="mb-6 border-b border-gray-100 pb-5">
-            <h1 className="text-2xl font-bold text-gray-900">Quản lý duyệt Gia sư</h1>
-            <p className="text-gray-500 mt-1">Quản lý danh sách đơn đăng ký trở thành gia sư.</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t('tutors.manageTitle')}</h1>
+            <p className="text-gray-500 mt-1">{t('tutors.manageDesc')}</p>
           </div>
           
           {/* COMPONENT TAB CHO ADMIN */}
@@ -97,7 +99,7 @@ const TutorsPage = () => {
                     : 'text-gray-500 hover:text-gray-800'
                 }`}
               >
-                {status === 'PENDING' ? 'Đang chờ duyệt' : status === 'APPROVED' ? 'Đã duyệt' : 'Đã từ chối'}
+                {status === 'PENDING' ? t('tutors.status.pending') : status === 'APPROVED' ? t('tutors.status.approved') : t('tutors.status.rejected')}
                 
                 {/* Đường gạch dưới động (Animated underline) */}
                 {activeStatus === status && (

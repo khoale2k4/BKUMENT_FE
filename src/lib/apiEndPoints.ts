@@ -3,7 +3,7 @@ import { UNDERSCORE_GLOBAL_ERROR_ROUTE } from "next/dist/shared/lib/entry-consta
 import { RegisterTutorRequest } from "./redux/features/profileSlice";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://143.198.80.199:8888/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
 
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_SOCKET_URL || "http://143.198.80.199:8099";
@@ -226,7 +226,7 @@ export const API_ENDPOINTS = {
     CREATE: buildUrl(`${SOCIAL}/reports`),
     GET_AVERAGE_RATING: (resourceId: string) =>
       buildUrl(`${SOCIAL}/ratings/resource/${resourceId}/average`),
-    SUBMIT_RATING: buildUrl(`${SOCIAL}/ratings`),
+    SUBMIT_RATING: buildUrl(`${SOCIAL}/ratings/resource`),
     GET_MY_RATING: (resourceId: string) =>
       buildUrl(`${SOCIAL}/ratings/resource/${resourceId}/my-rating`),
   },

@@ -2,6 +2,7 @@
 
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 import { AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import React from "react";
 
 export interface MessageItem {
@@ -23,6 +24,7 @@ interface MessageGroupProps {
 }
 
 const MessageGroup = ({ isSelf, user, messages }: MessageGroupProps) => {
+    const { t } = useTranslation();
     
     const renderMessageContent = (msg: MessageItem, index: number, isSelf: boolean) => {
         const isSending = msg.status === 'sending';
@@ -36,11 +38,11 @@ const MessageGroup = ({ isSelf, user, messages }: MessageGroupProps) => {
                 <div key={msg.id || index} className={`mb-1 flex items-end gap-2 ${isSelf ? 'flex-row-reverse' : ''}`}>
                     <AuthenticatedImage 
                         src={msg.content} 
-                        alt="Shared image" 
+                        alt={t('chat.message.sharedImage', 'Shared image')} 
                         className={`rounded-2xl max-w-[280px] sm:max-w-md object-cover border border-gray-200 transition-opacity ${opacityClass} ${errorBorderClass}`} 
                     />
-                    {isError && <span className="text-xs text-red-500 font-medium whitespace-nowrap"><AlertCircle size={14} className="inline mr-1"/>Lỗi</span>}
-                    {isSending && <span className="text-xs text-gray-400 whitespace-nowrap">Đang gửi...</span>}
+                    {isError && <span className="text-xs text-red-500 font-medium whitespace-nowrap"><AlertCircle size={14} className="inline mr-1"/>{t('chat.message.error', 'Error')}</span>}
+                    {isSending && <span className="text-xs text-gray-400 whitespace-nowrap">{t('chat.message.sending', 'Sending...')}</span>}
                 </div>
             );
         }
@@ -56,11 +58,11 @@ const MessageGroup = ({ isSelf, user, messages }: MessageGroupProps) => {
                 
                 {isSelf && isError && (
                     <span className="text-xs text-red-500 font-medium whitespace-nowrap flex items-center">
-                        <AlertCircle size={14} className="mr-1"/> Lỗi
+                        <AlertCircle size={14} className="mr-1"/> {t('chat.message.error', 'Error')}
                     </span>
                 )}
                 {isSelf && isSending && (
-                    <span className="text-xs text-gray-400 whitespace-nowrap">Đang gửi...</span>
+                    <span className="text-xs text-gray-400 whitespace-nowrap">{t('chat.message.sending', 'Sending...')}</span>
                 )}
             </div>
         );

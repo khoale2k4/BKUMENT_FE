@@ -2,8 +2,10 @@
 import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
 import { closeConfirmModal } from '@/lib/redux/features/modalSlice';
 import { AlertTriangle, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function ConfirmationModal() {
+    const { t } = useTranslation();
     const { isOpen, title, message, onConfirm, confirmText, cancelText } = useAppSelector((state) => state.modal.confirmModal);
     const dispatch = useAppDispatch();
 
@@ -46,13 +48,13 @@ export default function ConfirmationModal() {
                             onClick={() => dispatch(closeConfirmModal())}
                             className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 transition cursor-pointer"
                         >
-                            {cancelText}
+                            {cancelText || t('common.confirm.cancel')}
                         </button>
                         <button
                             onClick={handleConfirm}
                             className="flex-1 px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-xl hover:bg-red-700 transition shadow-lg shadow-red-200 cursor-pointer"
                         >
-                            {confirmText}
+                            {confirmText || t('common.confirm.confirm')}
                         </button>
                     </div>
                 </div>

@@ -39,11 +39,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
   const handleAcceptApplication = () => {
     if (
       window.confirm(
-        t(
-          "tutorCard.confirmApprove",
-          "Bạn có chắc chắn muốn DUYỆT hồ sơ của gia sư {{name}}?",
-          { name: tutor.name },
-        ),
+        t("tutors.card.confirmApprove", { name: tutor.name })
       )
     ) {
       dispatch(approveTutorApplication(tutor.id));
@@ -52,7 +48,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
 
   const handleConfirmReject = () => {
     if (!rejectionReason.trim()) {
-      alert(t("tutorCard.requireRejectReason", "Vui lòng nhập lý do từ chối!"));
+      alert(t("tutors.card.requireRejectReason"));
       return;
     }
     dispatch(
@@ -63,7 +59,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
 
   const avatarUrl = tutor.avatar?.startsWith("http")
     ? tutor.avatar
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.name || t("common.user", "User"))}&background=random&color=fff&bold=true`;
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.name || t("common.unknownAuthor"))}&background=random&color=fff&bold=true`;
 
   return (
     <>
@@ -129,7 +125,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
                     className="w-full flex justify-center items-center gap-2 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-xl transition-all active:scale-95 shadow-sm"
                   >
                     <CheckCircle size={18} />{" "}
-                    {t("tutorCard.approveBtn", "Duyệt hồ sơ")}
+                    {t("tutors.card.approveBtn")}
                   </button>
                   <button
                     onClick={() => {
@@ -138,23 +134,19 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
                     }}
                     className="w-full flex justify-center items-center gap-2 py-2.5 bg-white border-2 border-red-100 hover:bg-red-50 hover:border-red-200 text-red-600 text-sm font-bold rounded-xl transition-all active:scale-95"
                   >
-                    <XCircle size={18} /> {t("tutorCard.rejectBtn", "Từ chối")}
+                    <XCircle size={18} /> {t("tutors.card.rejectBtn")}
                   </button>
                 </>
               ) : (
                 <button
                   onClick={() =>
                     alert(
-                      t(
-                        "tutorCard.viewUserDetailAlert",
-                        "Xem chi tiết user: {{id}}",
-                        { id: tutor.id },
-                      ),
+                      t("tutors.card.viewUserDetailAlert", { id: tutor.id })
                     )
                   }
                   className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all active:scale-95 shadow-sm"
                 >
-                  {t("tutorCard.viewDetailBtn", "Xem chi tiết")}
+                  {t("tutors.card.viewDetailBtn")}
                 </button>
               )}
             </div>
@@ -164,13 +156,13 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
                 onClick={() => router.push(`/tutors/${tutor.id}`)}
                 className="w-full py-2.5 bg-[#ff6b9e] hover:bg-[#ff4d8b] text-white text-sm font-semibold rounded-xl shadow-sm transition-colors border border-transparent"
               >
-                {t("tutorCard.viewMoreBtn", "View more")}
+                {t("tutors.card.viewMoreBtn")}
               </button>
               <button
                 onClick={handleSendMessage}
                 className="w-full py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl border border-gray-300 shadow-sm transition-colors"
               >
-                {t("profile.header.messageBtn", "Send a message")}
+                {t("people.profile.header.messageBtn")}
               </button>
             </div>
           )}

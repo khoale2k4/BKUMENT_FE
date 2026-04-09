@@ -1,27 +1,54 @@
 import Link from 'next/link';
 import { Youtube, Send, Facebook } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Footer() {
+    const { t } = useTranslation();
     const footerLinks = [
         {
-            title: "my team",
-            links: ["About Us", "Scholarship Programs", "Education Model", "Academic Partners"]
+            title: t('layout.footer.myTeam'),
+            links: [
+                t('layout.footer.aboutUs'), 
+                t('layout.footer.scholarship'), 
+                t('layout.footer.educationModel'), 
+                t('layout.footer.academicPartners')
+            ]
         },
         {
-            title: "Corporate Training",
-            links: ["All Courses", "Frontend Programming", "Backend Programming", "Marketing", "Data Analytics"]
+            title: t('layout.footer.corporateTraining'),
+            links: [
+                t('layout.footer.allCourses'), 
+                t('layout.footer.frontend'), 
+                t('layout.footer.backend'), 
+                t('layout.footer.marketing'), 
+                t('layout.footer.dataAnalytics')
+            ]
         },
         {
-            title: "Others",
-            links: ["All Courses", "Frontend Programming", "Backend Programming", "Marketing", "Data Analytics"]
+            title: t('layout.footer.others'),
+            links: [
+                t('layout.footer.allCourses'), 
+                t('layout.footer.frontend'), 
+                t('layout.footer.backend'), 
+                t('layout.footer.marketing'), 
+                t('layout.footer.dataAnalytics')
+            ]
         },
         {
-            title: "Others",
-            links: ["Vacancies", "Social Responsibility", "Contact"]
+            title: t('layout.footer.others'),
+            links: [
+                t('layout.footer.vacancies'), 
+                t('layout.footer.socialResponsibility'), 
+                t('layout.footer.contact')
+            ]
         },
         {
-            title: "Others",
-            links: ["Academy", "Our Graduates", "Our Teachers"]
+            title: t('layout.footer.others'),
+            links: [
+                t('layout.footer.academy'), 
+                t('layout.footer.graduates'), 
+                t('layout.footer.teachers')
+            ]
         }
     ];
 

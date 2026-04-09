@@ -6,6 +6,7 @@ import { closeReportModal } from '@/lib/redux/features/modalSlice';
 import { showToast } from '@/lib/redux/features/toastSlice'; 
 import { submitReportAsync } from '@/lib/redux/features/reportSlice';
 import { CreateReportPayload } from '@/lib/services/report.service';
+import { useTranslation } from 'react-i18next';
 
 const REPORT_REASON_KEYS = [
     "DIRECT_QUOTE_NO_CITATION",
@@ -20,23 +21,8 @@ const REPORT_REASON_KEYS = [
     "OTHERS" 
 ];
 
-const getReasonLabel = (key: string): string => {
-    const mapping: Record<string, string> = {
-        "DIRECT_QUOTE_NO_CITATION": "Trích dẫn trực tiếp không có nguồn",
-        "SELF_PLAGIARISM": "Đạo văn chính mình",
-        "IDEA_PLAGIARISM": "Đạo ý tưởng",
-        "STRUCTURE_PLAGIARISM": "Đạo cấu trúc",
-        "PARAPHRASED_NO_CITATION": "Diễn đạt lại không có nguồn",
-        "POOR_PARAPHRASING": "Diễn đạt kém / Sao chép từ ngữ",
-        "INCOMPLETE_CITATION": "Trích dẫn sai / Không đầy đủ",
-        "FALSIFIED_SOURCE": "Nguồn giả mạo",
-        "MISSING_REFERENCES": "Thiếu danh mục tài liệu tham khảo",
-        "OTHERS": "Khác"
-    };
-    return mapping[key] || key;
-};
-
 export default function ReportModal() {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     
     const { isOpen, targetId } = useAppSelector((state) => state.modal.reportModal);
@@ -62,17 +48,22 @@ export default function ReportModal() {
             detail: otherReason,
         };
 
-        console.log("Dữ liệu report sẽ gửi đi:", reportPayload);
-
         try {
-            // TODO: Gọi API Dispatch ở đây
             await dispatch(submitReportAsync(reportPayload)).unwrap();
             
-            dispatch(showToast({ type: 'success', title: 'Thành công', message: 'Cảm ơn bạn đã báo cáo.' }));
+            dispatch(showToast({ 
+                type: 'success', 
+                title: t('common.report.successTitle'), 
+                message: t('common.report.successMsg') 
+            }));
             handleClose();
         } catch (error) {
             console.error("Lỗi khi report:", error);
-            dispatch(showToast({ type: 'error', title: 'Lỗi', message: 'Không thể gửi báo cáo lúc này.' }));
+            dispatch(showToast({ 
+                type: 'error', 
+                title: t('common.report.errorTitle'), 
+                message: t('common.report.errorMsg') 
+            }));
         }
     };
 
@@ -89,20 +80,20 @@ export default function ReportModal() {
 
                 <div className="px-8 pb-8 overflow-y-auto no-scrollbar">
                     <h2 className="text-2xl font-medium text-center mb-8 tracking-wide">
-                        Lý do báo cáo
+                        {t('common.report.title')}
                     </h2>
 
                     <div className="mb-6">
-                        <label className="block text-sm font-light mb-2">Chọn một lý do</label>
+                        <label className="block text-sm font-light mb-2">{t('common.report.selectReason')}</label>
                         <select 
                             value={selectedReason}
                             onChange={(e) => setSelectedReason(e.target.value)}
                             className="w-full bg-white text-black rounded-lg py-2.5 px-3 focus:outline-none focus:ring-2 focus:ring-[#E85D45] cursor-pointer"
                         >
-                            <option value="" disabled>-- Vui lòng chọn lý do --</option>
+                            <option value="" disabled>{t('common.report.placeholderReason')}</option>
                             {REPORT_REASON_KEYS.map((reasonKey) => (
                                 <option key={reasonKey} value={reasonKey}>
-                                    {getReasonLabel(reasonKey)}
+                                    {t(`common.report.reasons.${reasonKey}`)}
                                 </option>
                             ))}
                         </select>
@@ -110,12 +101,12 @@ export default function ReportModal() {
 
                     {selectedReason === "OTHERS" && (
                         <div className="mb-6 animate-in fade-in slide-in-from-top-2 duration-200">
-                            <label className="block text-sm font-light mb-1">Vui lòng nói rõ hơn</label>
+                            <label className="block text-sm font-light mb-1">{t('common.report.otherReasonLabel')}</label>
                             <input 
                                 type="text" 
                                 value={otherReason}
                                 onChange={(e) => setOtherReason(e.target.value)}
-                                placeholder="Nhập chi tiết lý do tại đây..."
+                                placeholder={t('common.report.otherReasonPlaceholder')}
                                 className="w-full bg-white text-black rounded-lg py-2 px-3 focus:outline-none focus:ring-2 focus:ring-[#E85D45]"
                             />
                         </div>
@@ -127,7 +118,7 @@ export default function ReportModal() {
                             disabled={!selectedReason || (selectedReason === "OTHERS" && !otherReason.trim())}
                             className="bg-[#E85D45] hover:bg-[#d4523d] text-white px-8 py-2 rounded-full font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Báo cáo
+                            {t('common.report.submit')}
                         </button>
                     </div>
                 </div>

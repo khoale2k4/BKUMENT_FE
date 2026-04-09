@@ -116,7 +116,7 @@ export const loginUser = createAsyncThunk(
       const result = await authService.login(credentials);
       return result;
     } catch (error: any) {
-      return rejectWithValue(error.message || "Network error");
+      return rejectWithValue(error.message || "errors.network");
     }
   },
 );
@@ -127,12 +127,11 @@ export const registerUser = createAsyncThunk(
     try {
       const result = await authService.register(payload);
       if (result.code !== 1000) {
-        alert("Đăng ký thất bại: " + result.message);
-        return rejectWithValue(result.message || "Registration failed");
+        return rejectWithValue(result.message || "errors.registrationFailed");
       }
       return result;
     } catch (error: any) {
-      return rejectWithValue(error.message || "Network error");
+      return rejectWithValue(error.message || "errors.network");
     }
   },
 );
@@ -144,7 +143,7 @@ export const logoutUser = createAsyncThunk(
       const result = await authService.logout(token);
       return result;
     } catch (error: any) {
-      return rejectWithValue(error.message || "Logout failed");
+      return rejectWithValue(error.message || "errors.logoutFailed");
     }
   },
 );
@@ -156,7 +155,7 @@ export const refreshToken = createAsyncThunk(
       const result = await authService.refreshToken();
       return result;
     } catch (error: any) {
-      return rejectWithValue(error.message || "Refresh token failed");
+      return rejectWithValue(error.message || "errors.unauthorized");
     }
   },
 );
@@ -171,7 +170,7 @@ export const getUniversities = createAsyncThunk(
       return response as University[];
     } catch (error: any) {
       return rejectWithValue(
-        error.message || "Lỗi kết nối khi tải danh sách trường",
+        error.message || "errors.network",
       );
     }
   },
@@ -186,7 +185,7 @@ export const forgotPasswordWithEmail = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.message || "Lỗi khi gửi yêu cầu đặt lại mật khẩu",
+        error.message || "errors.network",
       );
     }
   },
@@ -200,7 +199,7 @@ export const verifyResetToken = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(
-        error.message || "Lỗi khi xác minh token đặt lại mật khẩu",
+        error.message || "errors.network",
       );
     }
   },
@@ -219,7 +218,7 @@ export const resetPassword = createAsyncThunk(
     } catch (error: any) {
       // Bắt lỗi chuẩn từ Backend trả về
       return rejectWithValue(
-        error.response?.data?.message || error.message || "Lỗi khi đặt lại mật khẩu mới"
+        error.response?.data?.message || error.message || "errors.server"
       );
     }
   },

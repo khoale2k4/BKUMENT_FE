@@ -38,7 +38,7 @@ export const fetchMyBlogs = createAsyncThunk(
             const response = await blogService.getMyBlogs(page, size);
             return response;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch your blogs');
+            return rejectWithValue(error.response?.data?.message || 'errors.fetchFailed');
         }
     }
 );
@@ -48,11 +48,11 @@ export const deleteBlogAsync = createAsyncThunk(
     async (id: string, { dispatch, rejectWithValue }) => {
         try {
             await blogService.deleteBlog(id);
-            dispatch(showToast({ type: 'success', title: 'Thành công', message: 'Đã xóa bài viết!' }));
+            dispatch(showToast({ type: 'success', title: 'common.toast.success', message: 'blogs.detail.deleteSuccess' }));
             return id;
         } catch (error: any) {
-            const message = error.response?.data?.message || 'Xóa bài viết thất bại';
-            dispatch(showToast({ type: 'error', title: 'Lỗi', message }));
+            const message = error.response?.data?.message || 'errors.deleteFailed';
+            dispatch(showToast({ type: 'error', title: 'common.toast.error', message }));
             return rejectWithValue(message);
         }
     }
@@ -66,7 +66,7 @@ export const getUserBlogsById = createAsyncThunk(
             const response = await blogService.getUserBlogs(userId, page, size);
             return response;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch user blogs');
+            return rejectWithValue(error.response?.data?.message || 'errors.fetchFailed');
         }
     }
 );

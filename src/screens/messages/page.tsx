@@ -20,7 +20,7 @@ export const getChatDisplayInfo = (chat: Conversation, currentUserId: string, t:
         };
     }
     const otherUser = chat.participants.find(p => p.userId !== currentUserId) || chat.participants[0];
-    if (!otherUser) return { name: t('chat.main.unknownUser', 'Unknown'), avatar: "" };
+    if (!otherUser) return { name: t('chat.main.unknownUser', 'Unknown User'), avatar: "" };
 
     return {
         name: `${otherUser.lastName} ${otherUser.firstName}`.trim() || otherUser.username,

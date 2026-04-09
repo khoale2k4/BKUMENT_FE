@@ -42,7 +42,8 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
         relatedPage, 
         relatedTotalPages,
         averageRating,
-        myRating
+        myRating,
+        ratingStatus
     } = useAppSelector((state) => state.documents);
     const currentUser = useAppSelector(state => state.profile.user);
     const [token, setToken] = useState<string | null>(() => getAccessToken());
@@ -76,7 +77,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
             console.error("Tải file thất bại:", error);
             dispatch(showToast({
                 type: 'error',
-                title: 'Lỗi',
+                title: t('common.toast.error'),
                 message: t('documents.detail.downloadFail', 'Download failed, please try again.')
             }));
         }
@@ -109,10 +110,10 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
     const handleDelete = () => {
         if (!currentDocument) return;
         dispatch(openConfirmModal({
-            title: "Xóa tài liệu",
-            message: `Bạn có chắc chắn muốn xóa "${currentDocument.title}"? Hành động này không thể hoàn tác.`,
-            confirmText: "Xóa",
-            cancelText: "Hủy",
+            title: t('documents.detail.deleteTitle', 'Delete Document'),
+            message: t('documents.detail.deleteMsg', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title: currentDocument.title }),
+            confirmText: t('documents.detail.deleteBtn', 'Delete'),
+            cancelText: t('common.confirm.cancel', 'Cancel'),
             onConfirm: async () => {
                 try {
                     await dispatch(deleteDocumentAsync(currentDocument.id)).unwrap();
@@ -206,6 +207,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                                 onRate={handleRate}
                                 readonly={!!myRating && myRating > 0}
                                 size="md"
+                                isLoading={ratingStatus === 'loading'}
                             />
                         </div>
                     </div>
@@ -352,6 +354,7 @@ function DocumentActionsMenu({ onShare, onReport, onDelete, isOwner, disabled }:
     isOwner: boolean,
     disabled: boolean
 }) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -374,7 +377,7 @@ function DocumentActionsMenu({ onShare, onReport, onDelete, isOwner, disabled }:
             <button 
                 onClick={() => setIsOpen(!isOpen)}
                 className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer"
-                title="Thêm"
+                title={t('documents.detail.actions.more', 'More')}
             >
                 <MoreHorizontal size={20} />
             </button>
@@ -386,7 +389,7 @@ function DocumentActionsMenu({ onShare, onReport, onDelete, isOwner, disabled }:
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <Share2 size={16} />
-                        Chia sẻ
+                        {t('documents.detail.actions.share', 'Share')}
                     </button>
                     
                     <button
@@ -394,7 +397,7 @@ function DocumentActionsMenu({ onShare, onReport, onDelete, isOwner, disabled }:
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <Flag size={16} />
-                        Báo cáo
+                        {t('documents.detail.actions.report', 'Report')}
                     </button>
 
                     {isOwner && (
@@ -405,7 +408,7 @@ function DocumentActionsMenu({ onShare, onReport, onDelete, isOwner, disabled }:
                                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
                             >
                                 <Trash2 size={16} />
-                                Xóa tài liệu
+                                {t('documents.detail.actions.delete', 'Delete Document')}
                             </button>
                         </>
                     )}

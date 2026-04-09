@@ -40,23 +40,23 @@ export function ResetPasswordStep({ onSubmit, isLoading }: ResetPasswordStepProp
         {t('auth.forgot.resetTitle', 'Set New Password')}
       </h1>
       <h2 className="text-lg mb-8 text-gray-600 font-serif">
-        {t('auth.forgot.resetSubtitle', 'Your new password must be different from previously used passwords.')}
+        {t('auth.forgot.resetDesc', 'Your new password must be different from previously used passwords.')}
       </h2>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <Input
-          label={t('auth.forgot.newPassLabel', 'New Password')}
+          label={t('auth.forgot.newPasswordLabel', 'New Password')}
           type="password"
-          placeholder={t('auth.forgot.newPassPlaceholder', 'Enter new password')}
+          placeholder={t('auth.forgot.emailPlaceholder', 'Enter new password')}
           required
           value={newPassword}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
           className={inputClassName}
         />
         <Input
-          label={t('auth.forgot.confirmPassLabel', 'Confirm Password')}
+          label={t('auth.forgot.confirmNewPasswordLabel', 'Confirm Password')}
           type="password"
-          placeholder={t('auth.forgot.confirmPassPlaceholder', 'Re-enter your password')}
+          placeholder={t('auth.register.confirmPasswordPlaceholder', 'Re-enter your password')}
           required
           value={confirmPassword}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}

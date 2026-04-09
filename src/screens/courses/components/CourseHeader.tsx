@@ -4,19 +4,19 @@ import React from 'react';
 import { Clock, Users, BarChart3, BookOpen, HelpCircle, Settings } from 'lucide-react';
 import { useAppSelector } from '@/lib/redux/hooks';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
+
 interface CourseHeaderProps {
   courseId: string;
 }
 
 const CourseHeader: React.FC<CourseHeaderProps> = ({ courseId }) => {
+  const { t } = useTranslation();
   const router = useRouter();
   
-  // SỬA Ở ĐÂY: Lấy trực tiếp currentClassDetail từ tutorFinding slice
-  // Đổi tên biến (alias) thành currentCourse để tái sử dụng code cũ bên dưới cho lẹ
   const { currentClassDetail: currentCourse } = useAppSelector((state) => state.tutorFinding);
-  console.log("link ảnh ở CourseHeader:", currentCourse?.coverImageUrl); // Debug log
-  // Nếu không có khóa học (chưa load xong hoặc lỗi) thì hiện khung xương (Skeleton)
+
   if (!currentCourse) {
     return <div className="mb-8 animate-pulse bg-gray-100 h-32 rounded-2xl"></div>;
   }
@@ -24,33 +24,33 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ courseId }) => {
   const stats = [
     { icon: <Clock size={16} className="text-orange-500" />, label: `${currentCourse.startDate} - ${currentCourse.endDate}` },
     { icon: <Users size={16} className="text-orange-500" />, label: currentCourse.status },
-    { icon: <BarChart3 size={16} className="text-orange-500" />, label: `${currentCourse.schedules?.length || 0} Sessions/Week` },
+    { 
+      icon: <BarChart3 size={16} className="text-orange-500" />, 
+      label: t('classroom.header.stats.sessionsPerWeek', '{{count}} Sessions/Week', { count: currentCourse.schedules?.length || 0 }) 
+    },
     { icon: <BookOpen size={16} className="text-orange-500" />, label: currentCourse.subjectName },
     { icon: <HelpCircle size={16} className="text-orange-500" />, label: currentCourse.topicName },
   ];
 
   return (
     <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Đường dẫn điều hướng (Breadcrumb) */}
       <nav className="text-sm text-gray-500 mb-4 font-medium flex items-center gap-2">
         <span className="text-orange-600 font-bold">{currentCourse.tutorName}</span> 
         <span>/</span> 
-        <span>Course</span> 
+        <span>{t('classroom.header.breadcrumb', 'Course')}</span> 
         <span>/</span> 
         <span className="text-gray-400 truncate max-w-[150px]">{currentCourse.id}</span>
       </nav>
       
-      {/* Tên khóa học và nút chỉnh sửa */}
       <div className="flex items-start md:items-center justify-between mb-6 gap-4">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-900 leading-tight font-serif tracking-tight">
           {currentCourse.name}
         </h1>
         
-        {/* Nút Cài đặt (Settings) */}
         <button 
           onClick={() => router.push(`/courses/${courseId}/edit`)}
           className="p-3 rounded-full hover:bg-orange-50 transition-all text-gray-400 hover:text-orange-600 shrink-0 shadow-sm border border-transparent hover:border-orange-100"
-          title="Chỉnh sửa khóa học"
+          title={t('classroom.header.editCourse', 'Edit Course')}
         >
           <Settings size={22} />
         </button>
@@ -58,7 +58,6 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ courseId }) => {
 
       {currentCourse.coverImageUrl && (
         <div className="w-full h-56 sm:h-72 md:h-80 mb-6 rounded-2xl overflow-hidden shadow-sm border border-gray-100 relative group">
-
           <AuthenticatedImage 
             src={currentCourse.coverImageUrl} 
             alt={currentCourse.name}
@@ -67,7 +66,6 @@ const CourseHeader: React.FC<CourseHeaderProps> = ({ courseId }) => {
         </div>
       )}
       
-      {/* Thống kê khóa học (Pills) */}
       <div className="flex flex-wrap gap-3 items-center">
         {stats.map((stat, i) => (
           <div 

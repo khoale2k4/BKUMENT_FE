@@ -28,7 +28,7 @@ export const fetchMyDocuments = createAsyncThunk(
             const response = await documentService.getMyDocuments(page, size);
             return response;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch your documents');
+            return rejectWithValue(error.response?.data?.message || 'errors.fetchFailed');
         }
     }
 );
@@ -40,15 +40,15 @@ export const deleteDocumentAsync = createAsyncThunk(
             await documentService.deleteDocument(id);
             dispatch(showToast({
                 type: 'success',
-                title: 'Thành công',
-                message: 'Đã xóa tài liệu!'
+                title: 'common.toast.success',
+                message: 'documents.detail.deleteSuccess'
             }));
             return id;
         } catch (error: any) {
-            const message = error.response?.data?.message || 'Xóa tài liệu thất bại';
+            const message = error.response?.data?.message || 'errors.deleteFailed';
             dispatch(showToast({
                 type: 'error',
-                title: 'Lỗi',
+                title: 'common.toast.error',
                 message
             }));
             return rejectWithValue(message);

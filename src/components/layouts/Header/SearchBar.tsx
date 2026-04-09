@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
 export default function SearchBar() {
+    const { t } = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
     const router = useRouter();
 
@@ -21,7 +23,7 @@ export default function SearchBar() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm kiếm tài liệu, bài viết..."
+                placeholder={t('layout.header.searchPlaceholder')}
                 className="w-full px-4 py-2 pl-10 bg-gray-100 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
             />
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -29,7 +31,7 @@ export default function SearchBar() {
                 type="submit"
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black text-white px-4 py-1 rounded-full text-sm font-medium hover:bg-gray-800 transition cursor-pointer"
             >
-                Tìm
+                {t('common.confirm.confirm')}
             </button>
         </form>
     );

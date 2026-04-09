@@ -56,7 +56,7 @@ export const submitComment = createAsyncThunk(
 
             return { newComment, replyId: payload.replyId };
         } catch (error: any) {
-            return rejectWithValue(error.message || 'Lỗi khi gửi bình luận');
+            return rejectWithValue(error.message || 'common.errors.sendFailed');
         }
     }
 );

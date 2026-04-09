@@ -46,7 +46,7 @@ export const uploadImage = createAsyncThunk(
             return await blogService.uploadImage(file);
         } catch (error: any) {
             console.error(error.message);
-            return rejectWithValue(error.message || 'Upload error');
+            return rejectWithValue(error.message || 'errors.uploadFailed');
         }
     }
 );
@@ -56,8 +56,8 @@ export const submitPost = createAsyncThunk(
     async (_, { getState, rejectWithValue }) => {
         const state = (getState() as any).blogs as BlogState;
 
-        if (!state.title.trim()) return rejectWithValue('Tiêu đề không được để trống');
-        if (!state.contentHTML.trim()) return rejectWithValue('Nội dung không được để trống');
+        if (!state.title.trim()) return rejectWithValue('errors.titleRequired');
+        if (!state.contentHTML.trim()) return rejectWithValue('errors.contentRequired');
 
         const payload = {
             title: state.title,
@@ -72,7 +72,7 @@ export const submitPost = createAsyncThunk(
         try {
             return await blogService.submitPost(payload);
         } catch (error: any) {
-            return rejectWithValue(error.message || 'Submit failed');
+            return rejectWithValue(error.message || 'blogs.write.header.failMsg');
         }
     }
 );

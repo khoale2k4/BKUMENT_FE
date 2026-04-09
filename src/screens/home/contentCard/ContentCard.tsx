@@ -92,11 +92,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                 <div className="flex items-center gap-2">
                     <button 
                         className="text-gray-400 hover:text-blue-600 p-2 hover:bg-blue-50 rounded-xl transition-all"
-                        onClick={(e) => { 
-                            e.stopPropagation();
-                            // bookmark logic here if needed
-                        }}
-                        title="Lưu lại"
+                        title={t('home.contentCard.save', 'Save')}
                     >
                         <BookmarkPlus size={20} strokeWidth={1.5} />
                     </button>
@@ -134,8 +130,8 @@ function ActionsMenu({ data }: { data: CardProp }) {
         navigator.clipboard.writeText(url);
         dispatch(showToast({
             type: 'success',
-            title: 'Thành công',
-            message: 'Đã sao chép đường dẫn!'
+            title: t('common.toast.success', 'Success'),
+            message: t('documents.detail.shareSuccess', 'Link copied to clipboard!')
         }));
     };
 
@@ -149,10 +145,10 @@ function ActionsMenu({ data }: { data: CardProp }) {
         e.stopPropagation();
         setIsOpen(false);
         dispatch(openConfirmModal({
-            title: "Xóa tài liệu",
-            message: `Bạn có chắc chắn muốn xóa "${data.title}"? Hành động này không thể hoàn tác.`,
-            confirmText: "Xóa",
-            cancelText: "Hủy",
+            title: t('documents.detail.deleteTitle', 'Delete Document'),
+            message: t('documents.detail.deleteMsg', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title: data.title }),
+            confirmText: t('documents.detail.deleteBtn', 'Delete'),
+            cancelText: t('common.confirm.cancel', 'Cancel'),
             onConfirm: () => {
                 dispatch(deleteDocumentAsync(data.id));
             }
@@ -181,7 +177,7 @@ function ActionsMenu({ data }: { data: CardProp }) {
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <Share2 size={16} />
-                        Chia sẻ
+                        {t('documents.detail.actions.share', 'Share')}
                     </button>
                     
                     <button
@@ -189,7 +185,7 @@ function ActionsMenu({ data }: { data: CardProp }) {
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <Flag size={16} />
-                        Báo cáo
+                        {t('documents.detail.actions.report', 'Report')}
                     </button>
 
                     {isOwner && (
@@ -200,7 +196,7 @@ function ActionsMenu({ data }: { data: CardProp }) {
                                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
                             >
                                 <Trash2 size={16} />
-                                Xóa tài liệu
+                                {t('documents.detail.actions.delete', 'Delete Document')}
                             </button>
                         </>
                     )}

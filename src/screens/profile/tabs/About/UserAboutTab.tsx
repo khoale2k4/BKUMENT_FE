@@ -233,7 +233,7 @@ const UserAboutTab = () => {
               <ProfileField
                 label={t('profile.user.about.university', 'University')}
                 name="university"
-                value={user?.university || t('profile.user.about.notUpdated', 'Chưa cập nhật')}
+                value={user?.university}
                 isEditing={false}
                 onChange={() => { }}
                 icon={<GraduationCap size={16} className="text-gray-400" />}

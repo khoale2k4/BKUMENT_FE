@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { ShieldAlert } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { getClassDocuments } from '@/lib/redux/features/tutorCourseSlice';
 import ContentCard from '@/screens/home/contentCard/ContentCard';
@@ -12,10 +13,10 @@ import { useRouter } from 'next/navigation';
 import { AppRoute } from '@/lib/appRoutes';
 
 const ResourcesTab = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  // 1. LẤY THÔNG TIN TỪ REDUX
   const { currentClassDetail: currentCourse } = useAppSelector((state) => state.tutorFinding);
   const {
     classDocuments = [],
@@ -29,7 +30,6 @@ const ResourcesTab = () => {
   const isOwner = userStatus === 'OWNER';
   const isApprovedStudent = userStatus === 'APPROVED' || userStatus === 'STUDENT';
 
-  // 2. FETCH TÀI LIỆU KHI VÀO TAB
   useEffect(() => {
     if (currentCourse?.id) {
       dispatch(getClassDocuments({ courseId: currentCourse.id, page: 0, size: 5 }));
@@ -47,32 +47,31 @@ const ResourcesTab = () => {
     router.push(AppRoute.documents.id(id));
   };
 
-  // --- RENDERING BẢO MẬT (CHẶN NGƯỜI NGOÀI) ---
   if (!isOwner && !isApprovedStudent) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-2xl border border-gray-100 p-8 shadow-sm animate-in fade-in duration-500">
         <ShieldAlert size={64} className="text-gray-300 mb-6" />
-        <h3 className="text-xl font-bold text-gray-800 mb-2">Truy cập bị từ chối</h3>
+        <h3 className="text-xl font-bold text-gray-800 mb-2">{t('classroom.members.accessDenied', 'Access Denied')}</h3>
         <p className="text-gray-500 text-center max-w-md">
-          Chỉ Gia sư và Học viên chính thức của lớp học mới có quyền xem và tải tài liệu.
+          {t('classroom.resources.accessDeniedDesc', 'Only the Tutor and official Students of the class have permission to view and download documents.')}
         </p>
       </div>
     );
   }
 
-  // --- RENDERING BÌNH THƯỜNG DÀNH CHO OWNER VÀ APPROVED ---
   return (
     <div className="bg-white rounded-2xl p-8 font-sans animate-in fade-in duration-500 shadow-sm border border-gray-100">
 
-      {/* KHU VỰC HEADER VÀ NÚT UPLOAD */}
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-slate-900 border-b-2 border-green-500 pb-2 inline-block">Tài liệu lớp học</h2>
+        <h2 className="text-2xl font-bold text-slate-900 border-b-2 border-green-500 pb-2 inline-block">
+          {t('classroom.resources.title', 'Classroom Resources')}
+        </h2>
         {isOwner && (
           <Link
             href={`/course/${currentCourse?.id}/document_upload`}
             className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 font-semibold text-sm transition-colors shadow-sm active:scale-95 flex items-center gap-2"
           >
-            Tải lên tài liệu
+            {t('classroom.resources.upload', 'Upload Document')}
           </Link>
         )}
       </div>
@@ -98,7 +97,7 @@ const ResourcesTab = () => {
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20 text-center text-gray-500">
-            Hiện chưa có tài liệu nào trong lớp học này.
+            {t('classroom.resources.empty', 'No documents available in this classroom yet.')}
           </div>
         )}
       </div>

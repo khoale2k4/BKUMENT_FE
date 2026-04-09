@@ -72,7 +72,7 @@ const handleViewProfile = () => {
             if (targetId) {
                 router.push(`/people/${targetId}`);
             } else {
-                alert("Không tìm thấy thông tin người dùng này.");
+                alert(t('chat.header.errorFindUser', 'Could not find information for this user.'));
             }
         }
     };

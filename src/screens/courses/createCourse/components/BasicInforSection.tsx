@@ -1,4 +1,9 @@
+'use client';
+
 import React from 'react';
+import { Camera, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 
 interface Props {
   name: string;
@@ -10,16 +15,14 @@ interface Props {
   onChange: (field: string, value: string) => void;
 }
 
-import { Camera, Loader2 } from 'lucide-react';
-import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
-
 const BasicInfoSection: React.FC<Props> = ({ name, startDate, endDate, coverImageUrl, isUploading, onUpload, onChange }) => {
+  const { t } = useTranslation();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-bold text-gray-700 mb-2">Course Cover Image</label>
+        <label className="block text-sm font-bold text-gray-700 mb-2">{t('classroom.create.form.coverImage', 'Course Cover Image')}</label>
         <div
           onClick={() => fileInputRef.current?.click()}
           className="relative group w-full h-48 rounded-xl bg-gray-50 border-2 border-dashed border-gray-200 overflow-hidden cursor-pointer hover:border-orange-400 hover:bg-orange-50 transition-all flex items-center justify-center"
@@ -36,7 +39,7 @@ const BasicInfoSection: React.FC<Props> = ({ name, startDate, endDate, coverImag
           ) : (
             <div className="flex flex-col items-center text-gray-400 group-hover:text-orange-500">
               <Camera size={40} />
-              <span className="text-sm font-bold mt-2">UPLOAD COVER IMAGE</span>
+              <span className="text-sm font-bold mt-2">{t('classroom.create.form.uploadImage', 'UPLOAD COVER IMAGE')}</span>
             </div>
           )}
 
@@ -59,25 +62,23 @@ const BasicInfoSection: React.FC<Props> = ({ name, startDate, endDate, coverImag
           className="hidden"
           accept="image/*"
         />
-        <p className="text-[11px] text-gray-400 italic mt-2">* Recommended size: 1200x480 pixels. Max size: 5MB.</p>
+        <p className="text-[11px] text-gray-400 italic mt-2">{t('classroom.create.form.imageRecommendation', '* Recommended size: 1200x480 pixels. Max size: 5MB.')}</p>
       </div>
 
-      {/* Course Name */}
       <div>
-        <label className="block text-sm font-bold text-gray-700 mb-2">Course Name</label>
+        <label className="block text-sm font-bold text-gray-700 mb-2">{t('classroom.create.form.courseName', 'Course Name')}</label>
         <input
           type="text"
-          placeholder="Ví dụ: Lớp thực hành ERD căn bản"
+          placeholder={t('classroom.create.form.courseNamePlaceholder', 'Example: Basic ERD Practice Class')}
           className="w-full p-3 border border-gray-200 rounded-md outline-none focus:border-orange-500 transition-colors"
           value={name}
           onChange={(e) => onChange('name', e.target.value)}
         />
       </div>
 
-      {/* Date Range */}
       <div className="grid grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-2">Start Date</label>
+          <label className="block text-sm font-bold text-gray-700 mb-2">{t('classroom.create.form.startDate', 'Start Date')}</label>
           <input
             type="date"
             className="w-full p-3 border border-gray-200 rounded-md outline-none focus:border-orange-500"
@@ -86,7 +87,7 @@ const BasicInfoSection: React.FC<Props> = ({ name, startDate, endDate, coverImag
           />
         </div>
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-2">End Date</label>
+          <label className="block text-sm font-bold text-gray-700 mb-2">{t('classroom.create.form.endDate', 'End Date')}</label>
           <input
             type="date"
             className="w-full p-3 border border-gray-200 rounded-md outline-none focus:border-orange-500"
