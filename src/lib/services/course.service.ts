@@ -21,6 +21,7 @@ export const getMySubjects = async (): Promise<Subject[]> => {
 };
 
 export const createClass = async (courseData: CreateClassRequest) => {
+  console.log("DEBUG CHECK COURSE DATA at createClass SERVICE:", courseData);
   const response = await httpClient.post(
     API_ENDPOINTS.LMS.ADD_NEW_CLASS,
     courseData,
@@ -32,6 +33,7 @@ export const updateClass = async (
   classId: string,
   courseData: CreateClassRequest,
 ) => {
+  console.log("DEBUG CHECK COURSE DATA at updateClass SERVICE:", courseData);
   const response = await httpClient.patch(
     API_ENDPOINTS.LMS.UPDATE_CLASS(classId),
     courseData,
