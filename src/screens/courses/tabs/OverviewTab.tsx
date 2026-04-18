@@ -110,6 +110,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
             {isCanceling ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
             {isAlreadyCancelled ? t('classroom.overview.status.cancelled') : t('classroom.overview.status.cancelAction')}
           </button>
+          </>
         )}
 
         {(currentCourse.userStatus == "NONE" ||
@@ -132,6 +133,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
                 : (!isEnrollingStatus ? t('classroom.overview.status.closed') : t('classroom.overview.status.enrollAction'))
             }
           </button>
+          </>
         )}
 
         {/* --- THIẾT KẾ MỚI CHO TRẠNG THÁI APPROVED --- */}
