@@ -6,11 +6,14 @@ export interface ProfileFieldProps {
   name: string;
   isEditing: boolean;
   type?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   icon?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-const ProfileField: React.FC<ProfileFieldProps> = ({ label, value, name, isEditing, type = "text", onChange, icon }) => {
+const ProfileField: React.FC<ProfileFieldProps> = ({ 
+  label, value, name, isEditing, type = "text", onChange, icon, children 
+}) => {
   const { t } = useTranslation();
   const displayValue = value || '';
 
@@ -22,7 +25,9 @@ const ProfileField: React.FC<ProfileFieldProps> = ({ label, value, name, isEditi
       </label>
 
       {isEditing ? (
-        type === 'textarea' ? (
+        children ? (
+          <div className="pt-1">{children}</div>
+        ) : type === 'textarea' ? (
           <textarea
             name={name}
             value={displayValue}

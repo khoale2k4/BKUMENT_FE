@@ -13,12 +13,15 @@ import ProfileHeader from './ProfileHeader';
 import ProfileAboutBox from './ProfileAboutBox';
 import ContentCard from '@/screens/home/contentCard/ContentCard';
 
+import { useTranslation } from 'react-i18next';
+
 interface FollowingLayoutProps {
   profileId: string;
   listType: 'followers' | 'followings';
 }
 
 const FollowingLayout: React.FC<FollowingLayoutProps> = ({ profileId, listType }) => {
+  const { t } = useTranslation();
   const router = useRouter(); // Khởi tạo router
   const dispatch = useAppDispatch();
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
@@ -65,7 +68,7 @@ const { viewedItems: items, viewedStatus: blogStatus } = useAppSelector((state) 
         {!selectedUser && (
           <div className="flex items-center justify-center h-full text-gray-500">
             <span className="bg-white px-6 py-3 rounded-full shadow-sm border border-gray-200">
-              Chọn một người dùng bên trái để xem trang cá nhân.
+              {t('profile.user.tabs.selectUserHint')}
             </span>
           </div>
         )}
@@ -74,7 +77,7 @@ const { viewedItems: items, viewedStatus: blogStatus } = useAppSelector((state) 
         {selectedUser && (isViewedProfileLoading || !viewedProfile) && (
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <Loader2 className="animate-spin text-blue-600" size={36} />
-            <p className="text-gray-500 font-medium text-sm animate-pulse">Đang tải thông tin chi tiết...</p>
+            <p className="text-gray-500 font-medium text-sm animate-pulse">{t('common.loadingDetails')}</p>
           </div>
         )}
 
@@ -87,7 +90,7 @@ const { viewedItems: items, viewedStatus: blogStatus } = useAppSelector((state) 
             {/* DANH SÁCH BÀI VIẾT (BLOGS) */}
             <div className="mt-6 mx-auto max-w-4xl bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-6 border-b border-gray-100 pb-4">
-                Bài viết của {viewedProfile.fullName || viewedProfile.firstName}
+                {t('people.profile.blogsBy', { name: viewedProfile.fullName || viewedProfile.firstName })}
               </h3>
 
               {blogStatus === 'loading' ? (
@@ -106,7 +109,7 @@ const { viewedItems: items, viewedStatus: blogStatus } = useAppSelector((state) 
                         coverImage: blog.coverImage,
                         author: {
                           id: blog.author?.id || viewedProfile.id, // Fallback ID
-                          name: blog.author?.name || viewedProfile.fullName || 'Ẩn danh', // Fallback tên
+                          name: blog.author?.name || viewedProfile.fullName || t('common.unknownAuthor'), // Fallback tên
                           avatarUrl: blog.author?.avatarUrl || viewedProfile.avatarUrl || null
                         },
                         type: 'BLOG',
@@ -121,7 +124,7 @@ const { viewedItems: items, viewedStatus: blogStatus } = useAppSelector((state) 
                 </div>
               ) : (
                 <div className="text-center py-10 text-gray-500 bg-gray-50 rounded-xl">
-                  Người dùng này chưa có bài viết nào.
+                  {t('people.profile.noBlogs')}
                 </div>
               )}
             </div>

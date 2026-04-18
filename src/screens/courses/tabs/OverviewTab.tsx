@@ -22,16 +22,16 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
   const { currentClassDetail: currentCourse } = useAppSelector((state) => state.tutorFinding);
 
   const handleCancel = async (id: string) => {
-    if (window.confirm(t('classroom.overview.cancelConfirm', 'Are you sure you want to cancel this class? This action cannot be undone.'))) {
+    if (window.confirm(t('classroom.overview.cancelConfirm'))) {
       setIsCanceling(true);
       const result = await dispatch(cancelClass(id));
       setIsCanceling(false);
       
       if (cancelClass.fulfilled.match(result)) {
-        alert(t('classroom.overview.cancelSuccess', 'Class cancelled successfully!'));
+        alert(t('classroom.overview.cancelSuccess'));
         router.push('/profile');
       } else {
-        alert(t('common.error', 'Error') + ": " + result.payload);
+        alert(t('common.error.prefix') + result.payload);
       }
     }
   };
@@ -42,9 +42,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
     setIsEnrolling(false);
 
     if (enrollInClass.fulfilled.match(result)) {
-      alert(t('classroom.overview.enrollSuccess', 'Enrollment request sent successfully! Please wait for tutor approval.'));
+      alert(t('classroom.overview.enrollSuccess'));
     } else {
-      alert(t('classroom.overview.enrollFail', 'Enrollment failed: ') + result.payload);
+      alert(t('classroom.overview.enrollFail') + result.payload);
     }
   };
 
@@ -59,7 +59,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
     <div className="bg-[#f9f9f9] rounded-2xl p-8 border border-gray-100 shadow-sm animate-in fade-in duration-500 flex flex-col min-h-[300px] justify-between">
       
       <div className="space-y-6 text-gray-700 leading-relaxed text-[16px]">
-        <p>{currentCourse.description || t('classroom.overview.noDescription', 'No detailed description for this class yet.')}</p>
+        <p>{currentCourse.description || t('classroom.overview.noDescription')}</p>
       </div>
 
       <div className="flex justify-end mt-8 pt-6 border-t border-gray-200">
@@ -75,7 +75,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
               }`}
           >
             {isCanceling ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-            {isAlreadyCancelled ? t('classroom.overview.status.cancelled', 'Class Cancelled') : t('classroom.overview.status.cancelAction', 'Cancel Class')}
+            {isAlreadyCancelled ? t('classroom.overview.status.cancelled') : t('classroom.overview.status.cancelAction')}
           </button>
         )}
           
@@ -91,8 +91,8 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
           >
             {isEnrolling ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
             {isAlreadyCancelled 
-                ? t('classroom.overview.status.cancelled', 'Class Cancelled') 
-                : (!isEnrollingStatus ? t('classroom.overview.status.closed', 'Registration Closed') : t('classroom.overview.status.enrollAction', 'Join Class'))
+                ? t('classroom.overview.status.cancelled') 
+                : (!isEnrollingStatus ? t('classroom.overview.status.closed') : t('classroom.overview.status.enrollAction'))
             }
           </button>
         )}
@@ -100,14 +100,14 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
         { currentCourse.userStatus === 'APPROVED'  && (
           <div className="flex items-center gap-2.5 px-6 py-2.5 bg-green-50 border border-green-200 text-green-700 rounded-full font-semibold text-sm shadow-sm cursor-default">
             <CheckCircle size={18} className="text-green-600" />
-            <span>{t('classroom.overview.status.member', 'You are a member of this class')}</span>
+            <span>{t('classroom.overview.status.member')}</span>
           </div>
         )}  
 
         { currentCourse.userStatus === 'PENDING'  && (
           <div className="flex items-center gap-2.5 px-6 py-2.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-full font-semibold text-sm shadow-sm cursor-wait">
             <Clock size={18} className="text-amber-600 animate-pulse" />
-            <span>{t('classroom.overview.status.pending', 'Waiting for tutor approval...')}</span>
+            <span>{t('classroom.overview.status.pending')}</span>
           </div>
         )}
       

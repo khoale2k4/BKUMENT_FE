@@ -66,9 +66,9 @@ export default function Footer() {
                         </Link>
 
                         <div className="flex flex-col md:flex-row gap-4 md:gap-8 text-sm font-medium text-gray-300">
-                            <span>+994 50 717 17 17</span>
-                            <span>vbook@gmail.com</span>
-                            <span>Ho Chi Minh City, Viet Nam</span>
+                            <span>{t('layout.footer.phone')}</span>
+                            <span>{t('layout.footer.email')}</span>
+                            <span>{t('layout.footer.address')}</span>
                         </div>
                     </div>
                     

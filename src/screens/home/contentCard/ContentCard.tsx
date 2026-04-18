@@ -12,7 +12,6 @@ import { showToast } from "@/lib/redux/features/toastSlice";
 import { deleteDocumentAsync } from "@/lib/redux/features/myDocumentSlice";
 import { Flag, Share2, Trash2 } from "lucide-react";
 import { clsx } from "clsx";
-import { t } from 'i18next';
 
 export default function ContentCard({ data }: { data: CardProp }) {
     const { t } = useTranslation();
@@ -44,7 +43,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                         <div className="text-[12px] text-gray-400 mt-0.5 flex items-center gap-1.5">
                             <span>{data?.time ? formatTimeAgo(data.time, t) : ''}</span>
                             <span className="w-0.5 h-0.5 rounded-full bg-gray-300"></span>
-                            <span>{t('home.contentCard.minRead', '{{count}} min read', { count: timeRead })}</span>
+                            <span>{t('home.contentCard.minRead', { count: timeRead })}</span>
                         </div>
                     </div>
                 </div>
@@ -93,7 +92,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                 <div className="flex items-center gap-2">
                     <button 
                         className="text-gray-400 hover:text-blue-600 p-2 hover:bg-blue-50 rounded-xl transition-all"
-                        title={t('home.contentCard.save', 'Save')}
+                        title={t('home.contentCard.save')}
                     >
                         <BookmarkPlus size={20} strokeWidth={1.5} />
                     </button>
@@ -106,6 +105,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
 }
 
 function ActionsMenu({ data }: { data: CardProp }) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const dispatch = useAppDispatch();
@@ -131,8 +131,8 @@ function ActionsMenu({ data }: { data: CardProp }) {
         navigator.clipboard.writeText(url);
         dispatch(showToast({
             type: 'success',
-            title: t('common.toast.success', 'Success'),
-            message: t('documents.detail.shareSuccess', 'Link copied to clipboard!')
+            title: t('common.toast.success'),
+            message: t('documents.detail.shareSuccess')
         }));
     };
 
@@ -146,10 +146,10 @@ function ActionsMenu({ data }: { data: CardProp }) {
         e.stopPropagation();
         setIsOpen(false);
         dispatch(openConfirmModal({
-            title: t('documents.detail.deleteTitle', 'Delete Document'),
-            message: t('documents.detail.deleteMsg', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title: data.title }),
-            confirmText: t('documents.detail.deleteBtn', 'Delete'),
-            cancelText: t('common.confirm.cancel', 'Cancel'),
+            title: t('documents.detail.deleteTitle'),
+            message: t('documents.detail.deleteMsg', { title: data.title }),
+            confirmText: t('documents.detail.deleteBtn'),
+            cancelText: t('common.confirm.cancel'),
             onConfirm: () => {
                 dispatch(deleteDocumentAsync(data.id));
             }
@@ -178,7 +178,7 @@ function ActionsMenu({ data }: { data: CardProp }) {
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <Share2 size={16} />
-                        {t('documents.detail.actions.share', 'Share')}
+                        {t('documents.detail.actions.share')}
                     </button>
                     
                     <button
@@ -186,7 +186,7 @@ function ActionsMenu({ data }: { data: CardProp }) {
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <Flag size={16} />
-                        {t('documents.detail.actions.report', 'Report')}
+                        {t('documents.detail.actions.report')}
                     </button>
 
                     {isOwner && (
@@ -197,7 +197,7 @@ function ActionsMenu({ data }: { data: CardProp }) {
                                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
                             >
                                 <Trash2 size={16} />
-                                {t('documents.detail.actions.delete', 'Delete Document')}
+                                {t('documents.detail.actions.delete')}
                             </button>
                         </>
                     )}

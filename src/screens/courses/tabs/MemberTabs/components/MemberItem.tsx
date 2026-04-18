@@ -1,6 +1,7 @@
 // app/courses/[id]/tabs/components/MemberItem.tsx
 import React, { useState } from 'react';
 import { Check, X, UserMinus, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '@/lib/redux/hooks';
 import { approveMember } from '@/lib/redux/features/tutorCourseSlice';
 
@@ -19,6 +20,7 @@ interface MemberItemProps {
 }
 
 const MemberItem: React.FC<MemberItemProps> = ({ member }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -29,7 +31,7 @@ const MemberItem: React.FC<MemberItemProps> = ({ member }) => {
     
     if (approveMember.fulfilled.match(resultAction)) {
     } else {
-      alert("Đã xảy ra lỗi: " + resultAction.payload);
+      alert(t('common.error.prefix') + resultAction.payload);
       setIsProcessing(false); 
     }
   };
@@ -37,7 +39,7 @@ const MemberItem: React.FC<MemberItemProps> = ({ member }) => {
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+      return date.toLocaleDateString(undefined, { day: '2-digit', month: 'short', year: 'numeric' });
     } catch { return dateString; }
   };
 
@@ -45,7 +47,6 @@ const MemberItem: React.FC<MemberItemProps> = ({ member }) => {
   const avatarSrc = member.studentAvatar || fallbackAvatar;
 
   return (
-    // Đã xóa class "group" ở đây vì không cần bắt sự kiện hover của dòng nữa
     <div className="flex items-center justify-between p-2 hover:bg-gray-50 rounded-xl transition-colors">
       <div className="flex items-center gap-4">
         {/* Avatar */}
@@ -61,18 +62,18 @@ const MemberItem: React.FC<MemberItemProps> = ({ member }) => {
             <span className="text-sm text-gray-500 font-sans">{member.studentEmail}</span>
           </div>
           <p className="text-xs text-gray-500 mt-1 uppercase tracking-tight font-sans">
-            {member.status === 'PENDING' ? 'Requested' : 'Joined'} {formatDate(member.enrolledAt)}
+            {member.status === 'PENDING' ? t('classroom.members.requested') : t('classroom.members.joined')} {formatDate(member.enrolledAt)}
           </p>
         </div>
       </div>
       
-      {/* Nút hành động - Xóa opacity-0 và group-hover ở thẻ div này */}
+      {/* Nút hành động */}
       <div className="flex items-center gap-2 transition-opacity">
         
         {/* Trạng thái CHÍNH THỨC */}
         {member.status === 'APPROVED' && (
           <button className="flex items-center gap-1 text-xs font-bold text-red-500 opacity-60 hover:opacity-100 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-md transition-all duration-200 font-sans">
-            <UserMinus size={14} /> Remove
+            <UserMinus size={14} /> {t('classroom.members.remove')}
           </button>
         )}
 
@@ -82,19 +83,17 @@ const MemberItem: React.FC<MemberItemProps> = ({ member }) => {
             <button 
               onClick={() => handleApproval(true)}
               disabled={isProcessing}
-              // Thêm opacity-60 (mờ lúc thường) và hover:opacity-100 (đậm màu khi hover nút)
               className="flex items-center justify-center gap-1 w-24 text-xs font-bold text-white bg-[#1a8917] opacity-60 hover:opacity-100 hover:brightness-110 hover:shadow-md py-1.5 rounded-full transition-all duration-200 font-sans shadow-sm active:scale-95 disabled:opacity-40"
             >
-              {isProcessing ? <Loader2 size={14} className="animate-spin" /> : <><Check size={14} strokeWidth={3} /> Accept</>}
+              {isProcessing ? <Loader2 size={14} className="animate-spin" /> : <><Check size={14} strokeWidth={3} /> {t('classroom.members.accept')}</>}
             </button>
             
             <button 
               onClick={() => handleApproval(false)}
               disabled={isProcessing}
-              // Thêm opacity-60 và hover:opacity-100
               className="flex items-center justify-center gap-1 w-24 text-xs font-bold text-red-500 border border-red-200 opacity-60 hover:opacity-100 hover:bg-red-50 hover:border-red-400 hover:text-red-600 hover:shadow-md py-1.5 rounded-full transition-all duration-200 font-sans shadow-sm active:scale-95 disabled:opacity-40"
             >
-              {isProcessing ? <Loader2 size={14} className="animate-spin text-red-500" /> : <><X size={14} strokeWidth={3} /> Decline</>}
+              {isProcessing ? <Loader2 size={14} className="animate-spin text-red-500" /> : <><X size={14} strokeWidth={3} /> {t('classroom.members.decline')}</>}
             </button>
           </>
         )}

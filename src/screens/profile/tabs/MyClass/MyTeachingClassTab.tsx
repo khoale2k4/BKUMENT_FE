@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Plus, Loader2, Inbox, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { getAllTeachingClasses } from '@/lib/redux/features/tutorCourseSlice';
 import CourseCard from './CourseCard'; // Nhớ kiểm tra import này đúng đường dẫn chưa nhé
@@ -10,6 +11,7 @@ import CourseCard from './CourseCard'; // Nhớ kiểm tra import này đúng đ
 const MyTeachingClassTab = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   
   const [currentSubTab, setCurrentSubTab] = useState<'active' | 'cancelled'>('active');
   
@@ -59,7 +61,7 @@ const MyTeachingClassTab = () => {
   if (error) {
     return (
       <div className="text-center py-10 text-red-500 font-medium bg-red-50 rounded-2xl border border-red-100">
-        <p>Lỗi tải dữ liệu: {error}</p>
+        <p>{t('profile.classes.errorLoading')}: {error}</p>
       </div>
     );
   }
@@ -73,13 +75,13 @@ const MyTeachingClassTab = () => {
             onClick={() => setCurrentSubTab('active')}
             className={`pb-4 transition-all ${currentSubTab === 'active' ? 'text-black border-b border-black' : 'text-gray-400 hover:text-black'}`}
           >
-            Active Classes ({activeCount})
+            {t('profile.user.tabs.activeClasses')} ({activeCount})
           </button>
           <button 
             onClick={() => setCurrentSubTab('cancelled')}
             className={`pb-4 transition-all ${currentSubTab === 'cancelled' ? 'text-black border-b border-black' : 'text-gray-400 hover:text-black'}`}
           >
-            Cancelled ({cancelledCount})
+            {t('profile.user.tabs.cancelledClasses')} ({cancelledCount})
           </button>
         </div>
 
@@ -87,7 +89,7 @@ const MyTeachingClassTab = () => {
           onClick={() => router.push('/courses/create')}
           className="mb-4 md:mb-0 flex items-center gap-2 bg-[#1a8917] hover:bg-[#156d12] text-white px-5 py-2 rounded-full text-sm font-medium transition-all shadow-sm active:scale-95"
         >
-          <Plus size={18} /> Add New Course
+          <Plus size={18} /> {t('profile.user.tabs.addNewCourse')}
         </button>
       </div>
 
@@ -97,8 +99,8 @@ const MyTeachingClassTab = () => {
           <Inbox size={48} className="mx-auto text-gray-300 mb-4" />
           <p className="font-medium text-gray-500">
             {currentSubTab === 'active' 
-              ? 'Bạn không có lớp học nào đang hoạt động ở trang này.' 
-              : 'Danh sách lớp học đã hủy trống.'}
+              ? t('profile.classes.noActiveTeaching') 
+              : t('profile.classes.noCancelledTeaching')}
           </p>
         </div>
       ) : (
@@ -121,7 +123,7 @@ const MyTeachingClassTab = () => {
           </button>
           
           <span className="text-sm font-medium text-gray-700">
-            Page {page} of {totalPages}
+            {t('common.page')} {page} {t('common.of')} {totalPages}
           </span>
           
           <button

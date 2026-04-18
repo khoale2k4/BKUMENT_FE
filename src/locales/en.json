@@ -25,7 +25,32 @@
         "address": "Address",
         "university": "University",
         "universityId": "University ID",
-        "notUpdated": "Not updated yet"
+        "notUpdated": "Not updated yet",
+        "about": {
+          "intro": "Introduction",
+          "livesAt": "Lives in",
+          "points": "Achievement",
+          "score": "points",
+          "contactInfo": "Contact Info & Basic",
+          "email": "Email",
+          "phone": "Phone Number",
+          "dob": "Date of Birth"
+        }
+      },
+      "tabs": {
+        "home": "Home",
+        "teachingClasses": "My Teaching Classes",
+        "studyingClasses": "My Studying Classes",
+        "about": "About",
+        "activeClasses": "Active Classes",
+        "cancelledClasses": "Cancelled",
+        "addNewCourse": "Add New Course",
+        "findNewClass": "Find New Class",
+        "selectUserHint": "Select a user on the left to view their profile."
+      },
+      "home": {
+        "dashboardOverview": "Dashboard Overview",
+        "overviewDescription": "Quickly view your latest activities and statistics."
       }
     },
     "tutor": {
@@ -51,6 +76,23 @@
         "noTopics": "No specific topics yet.",
         "noSubjectsAdded": "This tutor hasn't added any subjects yet."
       }
+    },
+    "classes": {
+      "by": "by",
+      "sessionsPerWeek": "sessions/week",
+      "viewAndUpdate": "View & Update",
+      "exploreNow": "Explore Now",
+      "noActiveTeaching": "You have no open courses on this page.",
+      "noCancelledTeaching": "Cancelled courses list is empty.",
+      "noActiveStudying": "You haven't joined any courses yet.",
+      "noCancelledStudying": "No cancelled courses.",
+      "errorLoading": "Error loading course data"
+    },
+    "status": {
+      "ENROLLING": "Enrolling",
+      "ACTIVE": "Active",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
     }
   },
   "dropdown": {
@@ -210,7 +252,63 @@
       "contact": "Contact",
       "academy": "Academy",
       "graduates": "Our Graduates",
-      "teachers": "Our Teachers"
+      "teachers": "Our Teachers",
+      "address": "Ho Chi Minh City, Viet Nam",
+      "phone": "+994 50 717 17 17",
+      "email": "vbook@gmail.com"
+    }
+  },
+  "home": {
+    "tabs": {
+      "following": "Articles",
+      "documents": "Documents",
+      "people": "People"
+    },
+    "contentCard": {
+      "minRead": "{{count}} min read",
+      "save": "Save"
+    },
+    "search": {
+      "fail": "Search failed. Please try again.",
+      "results": "Results for \"{{query}}\"",
+      "found": "Found {{count}} results",
+      "clear": "Clear search"
+    },
+    "error": {
+      "title": "Oops! Something went wrong",
+      "desc": "We couldn't load the feed. Please try again later.",
+      "retry": "Try again",
+      "loadPeopleFail": "Could not load people list."
+    },
+    "people": {
+      "title": "People you may know",
+      "desc": "Discover and connect with other users.",
+      "followers": "followers",
+      "following": "Following",
+      "follow": "Follow",
+      "followSuccess": "You are now following {{name}}!",
+      "followFail": "Follow failed. Please try again."
+    },
+    "empty": {
+      "following": {
+        "title": "No content yet",
+        "desc": "Follow more authors to see new articles."
+      },
+      "recommended": {
+        "title": "No recommendations",
+        "desc": "We will suggest relevant content soon."
+      },
+      "documents": {
+        "title": "No documents",
+        "desc": "No documents shared yet."
+      },
+      "people": {
+        "title": "No suggestions",
+        "desc": "No connection suggestions available at the moment."
+      }
+    },
+    "sidebar": {
+      "recommended": "Recommended topics"
     }
   },
   "people": {
@@ -230,6 +328,24 @@
       "hoursAgo": "{{count}} hours ago",
       "minutesAgo": "{{count}} minutes ago"
     },
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "loadingImage": "Loading image...",
+    "loadingDetails": "Loading details...",
+    "page": "Page",
+    "of": "of",
+    "pageInfo": "Page {{page}} of {{total}}",
+    "error": {
+      "fileLoad": "File load error",
+      "checkPath": "Please check the path again.",
+      "prefix": "An error occurred: "
+    },
+    "processing": "Processing...",
+    "noDocumentSelected": "No document selected",
+    "seeMorePages": "See {{count}} more pages",
+    "collapse": "Collapse",
     "toast": {
       "success": "Success",
       "error": "Error",
@@ -385,6 +501,7 @@
       "next": "Next",
       "submit": "Upload now",
       "saving": "Saving...",
+      "aiTitle": "AI Analysis Result",
       "step1": {
         "title": "Upload Files",
         "dropzone": "Drag & drop files here or click to browse",
@@ -488,12 +605,7 @@
       }
     }
   },
-  "home": {
-    "contentCard": {
-      "minRead": "{{count}} min read",
-      "save": "Save"
-    }
-  },
+
   "chat": {
     "sidebar": {
       "title": "Chats",
@@ -582,6 +694,11 @@
       "accessDeniedDesc": "Only the Tutor and official Students of the class have permission to view the member list.",
       "approveSuccess": "Join request accepted!",
       "rejectSuccess": "Join request rejected!",
+      "accept": "Accept",
+      "decline": "Decline",
+      "remove": "Remove",
+      "requested": "Requested",
+      "joined": "Joined",
       "tabs": {
         "approved": "Official",
         "pending": "Pending"
@@ -601,7 +718,21 @@
       "title": "Push Notifications",
       "add": "Add Notification",
       "accessDeniedDesc": "Only the Tutor and official Students of the class have permission to view notifications.",
-      "pageInfo": "Page {{page}} of {{total}}"
+      "pageInfo": "Page {{page}} of {{total}}",
+      "table": {
+        "title": "Title",
+        "message": "Message",
+        "destination": "Destination",
+        "date": "Date Created",
+        "actions": "Actions"
+      },
+      "addModal": {
+        "title": "Add Push Notification",
+        "titleLabel": "Title",
+        "messageLabel": "Message",
+        "cancel": "Cancel",
+        "confirm": "Create Notification"
+      }
     },
     "create": {
       "title": "Create New Course",
@@ -645,12 +776,41 @@
     }
   },
   "tutors": {
+    "detail": {
+      "loading": "Loading information...",
+      "back": "Back to Tutors list",
+      "title": "Tutor's courses",
+      "currently": "There are currently",
+      "coursesOpen": "courses open.",
+      "empty": "This tutor has no courses available yet."
+    },
+    "list": {
+      "loading": "Searching for suitable tutors...",
+      "notFound": "No tutors found!",
+      "filterHint": "Try changing keywords or search filters."
+    },
+    "info": {
+      "experience": "Experience",
+      "intro": "Introduction",
+      "loading": "Loading information...",
+      "registrationDate": "Registration Date:",
+      "viewCV": "View CV attached",
+      "noCV": "No CV available",
+      "noIntro": "This tutor hasn't updated their introduction yet.",
+      "multiSubject": "Multiple subjects",
+      "followers": "followers",
+      "following": "following",
+      "reviews": "reviews",
+      "students": "students",
+      "courses": "courses"
+    },
     "manageTitle": "Manage Tutors",
     "manageDesc": "Manage applications to become a tutor.",
     "status": {
       "pending": "Pending",
       "approved": "Approved",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "rejectionReason": "Rejection Reason:"
     },
     "rejectModal": {
       "title": "Reason for rejection",
@@ -668,6 +828,46 @@
       "confirmApprove": "Are you sure you want to APPROVE the application of tutor {{name}}?",
       "viewUserDetailAlert": "View details of user: {{id}}",
       "viewMoreBtn": "View more"
+    },
+    "filters": {
+      "online": "Online",
+      "offline": "Offline",
+      "searchPlaceholder": "Search for course, blog or documents...",
+      "subjectPlaceholder": "Subject (e.g. English)",
+      "topicPlaceholder": "Topic (e.g. Speaking)",
+      "selectSubjectFirst": "Select subject first",
+      "allFormats": "All formats",
+      "searchBtn": "Search"
+    },
+    "register": {
+      "title": "Become a Tutor",
+      "subtitle": "Share your knowledge and earn income today.",
+      "upload": "UPLOAD",
+      "imageHint": "* Square image recommended, size under 2MB.",
+      "minSubjectWarning": "* Please select at least one subject.",
+      "redirecting": "Welcome to the Tutor team. Redirecting...",
+      "avatarSuccess": "Avatar uploaded successfully!",
+      "avatarError": "Failed to upload avatar",
+      "cvSuccess": "CV uploaded successfully!",
+      "cvError": "Failed to upload CV",
+      "missingInfoTitle": "Missing information!",
+      "missingInfoMessage": "Please fill in all required fields and select at least one subject.",
+      "successTitle": "Registration successful!",
+      "successMessage": "Tutor registration profile sent successfully!",
+      "failTitle": "Registration failed!",
+      "nameLabel": "Your display name",
+      "namePlaceholder": "e.g. Tutor Quang",
+      "avatarLabel": "Your avatar",
+      "avatarLinkPlaceholder": "Paste image link or click the box to upload",
+      "experienceLabel": "Teaching experience",
+      "experiencePlaceholder": "e.g. 3 years of Math tutoring, formerly a teaching assistant at...",
+      "cvLabel": "CV Link / Certificate (Optional)",
+      "cvPlaceholder": "Paste link (Google Drive, Notion...) or upload file",
+      "introLabel": "Self introduction",
+      "introPlaceholder": "Write a few lines about your teaching methods, personality...",
+      "subjectsLabel": "Subjects you can teach",
+      "loadingSubjects": "Loading subjects list...",
+      "submitBtn": "Complete Registration"
     }
   }
 }

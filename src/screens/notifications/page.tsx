@@ -8,29 +8,17 @@ import {
   markAsRead,
   markAllAsRead,
 } from "@/lib/redux/features/modalSlice";
-import { Loader2, Bell, CheckCheck, Inbox } from "lucide-react";
+import { Bell, CheckCheck, Inbox } from "lucide-react";
 import { AppNotification } from "@/lib/services/notification.service";
 import Pagination from "@/components/ui/Pagination";
 import { useTranslation } from "react-i18next";
+import { formatTimeAgo } from "@/lib/utils/formatTimeAgo";
+import SkeletonLoader from "@/components/ui/SkeletonLoader";
 
 const NotificationsPage = () => {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     const [activeTab, setActiveTab] = useState<'ALL' | 'UNREAD'>('ALL');
-    
-    const timeAgo = (dateString: string) => {
-        if (!dateString) return "";
-        const date = new Date(dateString);
-        const now = new Date();
-        const seconds = Math.round((now.getTime() - date.getTime()) / 1000);
-        const days = Math.floor(seconds / (3600 * 24));
-        if (days > 0) return t('common.time.daysAgo', { count: days });
-        const hours = Math.floor(seconds / 3600);
-        if (hours > 0) return t('common.time.hoursAgo', { count: hours });
-        const minutes = Math.floor(seconds / 60);
-        if (minutes > 0) return t('common.time.minutesAgo', { count: minutes });
-        return t('common.justNow');
-    };
     
     // Lấy dữ liệu từ Redux
     const { 
@@ -105,11 +93,8 @@ const NotificationsPage = () => {
                 <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6">
                     <div className="flex flex-col">
                         
-                        {loading && notifications.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-12 gap-3 text-slate-400">
-                                <Loader2 className="animate-spin w-8 h-8 text-blue-500" />
-                                <span className="text-sm font-medium">{t('layout.header.notifications.loading')}</span>
-                            </div>
+                        {loading ? (
+                            <SkeletonLoader variant="notification" count={5} />
                         ) : displayedNotifications.length === 0 ? (
                             
                             <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
@@ -153,7 +138,7 @@ const NotificationsPage = () => {
                                             </h2>
                                             <span className="text-slate-300 text-xs">•</span>
                                             <span className="text-xs font-medium text-slate-400">
-                                                {timeAgo(noti.timestamp)}
+                                                {formatTimeAgo(noti.timestamp, t)}
                                             </span>
                                             {!noti.read && (
                                                 <span className="w-2 h-2 rounded-full bg-blue-600 ml-1"></span>

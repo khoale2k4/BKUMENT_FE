@@ -34,7 +34,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
       <div className="p-6 flex-grow flex flex-col justify-between">
         <div>
           <p className="text-xs text-gray-500 mb-1 italic">
-            {t("by")} {course.tutorName}
+            {t("profile.classes.by")} {course.tutorName}
           </p>
           <h3
             onClick={() => router.push(`/courses/${course.id}`)}
@@ -65,7 +65,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
             </span>
             <span className="flex items-center gap-1 uppercase">
               <BarChart3 size={14} className="text-orange-500" />
-              {sessionsPerWeek} {t("sessionsPerWeek")}
+              {sessionsPerWeek} {t("profile.classes.sessionsPerWeek")}
             </span>
           </div>
         </div>
@@ -81,8 +81,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
                   : "bg-gray-100 text-gray-600"
             }`}
           >
-            {/* Bạn cũng có thể dùng t(`status.${course.status}`) nếu muốn dịch trạng thái */}
-            {course.status}
+            {t(`profile.status.${course.status}`)}
           </span>
 
           {/* Ẩn nút View And Update nếu lớp đã bị hủy */}
@@ -91,7 +90,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
               onClick={() => router.push(`/courses/${course.id}`)}
               className="text-sm font-bold text-slate-900 hover:underline"
             >
-              {t("viewAndUpdate")}
+              {t("profile.classes.viewAndUpdate")}
             </button>
           )}
         </div>

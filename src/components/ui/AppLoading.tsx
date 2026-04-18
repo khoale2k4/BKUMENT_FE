@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 import { useTranslation } from "react-i18next";
@@ -15,7 +15,14 @@ export default function AppLoading({
     text
 }: AppLoadingProps) {
     const { t } = useTranslation();
-    const displayText = text || t('common.loading');
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Only use translated text after mounting to avoid hydration mismatch
+    const displayText = text || (mounted ? t('common.loading') : "");
 
     const loaderContent = (
         <div className="flex flex-col items-center justify-center gap-6 p-4">

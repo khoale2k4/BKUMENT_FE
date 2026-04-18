@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { FileText, User, Calendar } from 'lucide-react';
-import { t } from 'i18next';
 
 interface RelatedDocumentProps {
     data: {
@@ -15,7 +14,7 @@ interface RelatedDocumentProps {
 }
 
 export default function RelatedDocumentCard({ data }: RelatedDocumentProps) {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     return (
         <div
             onClick={data.onClick}
@@ -40,7 +39,7 @@ export default function RelatedDocumentCard({ data }: RelatedDocumentProps) {
                 <div className="flex items-center justify-between text-xs text-gray-500 mt-2">
                     <div className="flex items-center gap-1">
                         <User size={12} />
-                        <span className="truncate max-w-[80px]">{data.author || t('common.unknownAuthor', 'Unknown')}</span>
+                        <span className="truncate max-w-[80px]">{data.author || t('common.unknownAuthor')}</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <Calendar size={12} />

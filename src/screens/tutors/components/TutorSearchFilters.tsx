@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Search, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { SearchFilters } from "@/lib/redux/features/tutorFindingSlice";
 import { Subject, Topic } from "@/types/course";
 
@@ -18,6 +19,7 @@ const TutorSearchFilters: React.FC<TutorSearchFiltersProps> = ({
   onFilterChange,
   onSearch,
 }) => {
+  const { t } = useTranslation();
   // Tự động lọc ra danh sách Topics dựa trên Subject
   const availableTopics = useMemo(() => {
     if (!filters.subjectName) return [];
@@ -46,7 +48,7 @@ const TutorSearchFilters: React.FC<TutorSearchFiltersProps> = ({
       <div className="relative w-full shadow-sm rounded-full">
         <input
           type="text"
-          placeholder="Search for course, blog or documents..."
+          placeholder={t('tutors.filters.searchPlaceholder')}
           value={filters.keyword || ""}
           onChange={(e) => onFilterChange("keyword", e.target.value)}
           onKeyDown={handleKeyDown}
@@ -72,7 +74,7 @@ const TutorSearchFilters: React.FC<TutorSearchFiltersProps> = ({
           <input
             list="subject-list"
             type="text"
-            placeholder="Môn học (VD: Tiếng Anh)"
+            placeholder={t('tutors.filters.subjectPlaceholder')}
             value={filters.subjectName || ""}
             onChange={handleSubjectChange}
             className="w-48 md:w-56 px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 focus:ring-1 focus:ring-gray-300 focus:border-gray-300 outline-none transition-all placeholder:text-gray-500"
@@ -91,8 +93,8 @@ const TutorSearchFilters: React.FC<TutorSearchFiltersProps> = ({
             type="text"
             placeholder={
               filters.subjectName
-                ? "Chủ đề (VD: Giao tiếp)"
-                : "Chọn môn học trước"
+                ? t('tutors.filters.topicPlaceholder')
+                : t('tutors.filters.selectSubjectFirst')
             }
             value={filters.topicName || ""}
             onChange={(e) => onFilterChange("topicName", e.target.value)}
@@ -120,9 +122,9 @@ const TutorSearchFilters: React.FC<TutorSearchFiltersProps> = ({
             backgroundSize: "1rem",
           }}
         >
-          <option value="">Tất cả hình thức</option>
-          <option value="ONLINE">Online</option>
-          <option value="OFFLINE">Offline</option>
+          <option value="">{t('tutors.filters.allFormats')}</option>
+          <option value="ONLINE">{t('tutors.filters.online')}</option>
+          <option value="OFFLINE">{t('tutors.filters.offline')}</option>
         </select>
 
         {/* Nút Tìm kiếm (Tùy chọn hiển thị ở hàng này cho rõ ràng) */}
@@ -131,7 +133,7 @@ const TutorSearchFilters: React.FC<TutorSearchFiltersProps> = ({
           disabled={loading}
           className="px-6 py-2 bg-slate-900 hover:bg-black text-white text-sm font-medium rounded-full transition-colors active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2"
         >
-          Tìm kiếm
+          {t('tutors.filters.searchBtn')}
         </button>
       </div>
     </div>

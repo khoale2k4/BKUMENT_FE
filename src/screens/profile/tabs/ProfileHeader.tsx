@@ -4,6 +4,8 @@ import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { useAppSelector } from '@/lib/redux/hooks';
 
+import { useTranslation } from 'react-i18next';
+
 // Định nghĩa kiểu dữ liệu cho các Tab
 export type TabType = 'home' | 'my-teaching-class' | 'about' | 'my-studying-class';
 
@@ -14,11 +16,12 @@ interface ProfileHeaderProps {
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({ tutorName, activeTab, onTabChange }) => {
+  const { t } = useTranslation();
   const tabs: { id: TabType; label: string }[] = [
-    { id: 'home', label: 'Home' },
-    { id: 'my-teaching-class', label: 'My Teaching Classes' },
-    { id: 'my-studying-class', label: 'My Studying Classes' },
-    { id: 'about', label: 'About' },
+    { id: 'home', label: t('profile.user.tabs.home') },
+    { id: 'my-teaching-class', label: t('profile.user.tabs.teachingClasses') },
+    { id: 'my-studying-class', label: t('profile.user.tabs.studyingClasses') },
+    { id: 'about', label: t('profile.user.tabs.about') },
   ];
 
     const { roles, currentRole } = useAppSelector(state => state.auth);

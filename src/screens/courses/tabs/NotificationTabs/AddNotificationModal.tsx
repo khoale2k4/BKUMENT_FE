@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Loader2, Send } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { createClassNotification } from '@/lib/redux/features/tutorCourseSlice';
 
@@ -10,6 +11,7 @@ interface AddNotificationModalProps {
 }
 
 const AddNotificationModal: React.FC<AddNotificationModalProps> = ({ courseId, isOpen, onClose }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { creatingNotification } = useAppSelector((state) => state.tutorCourse);
 
@@ -29,9 +31,9 @@ const AddNotificationModal: React.FC<AddNotificationModalProps> = ({ courseId, i
     if (createClassNotification.fulfilled.match(result)) {
       setTitle('');
       setMessage('');
-      onClose(); // Đóng modal sau khi tạo thành công (bên Slice đã unshift vào mảng rồi)
+      onClose();
     } else {
-      alert("Lỗi tạo thông báo: " + result.payload);
+      alert(t('classroom.create.messages.error') + result.payload);
     }
   };
 
@@ -41,7 +43,7 @@ const AddNotificationModal: React.FC<AddNotificationModalProps> = ({ courseId, i
         
         {/* Header Modal */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-          <h3 className="text-lg font-bold text-gray-900">Add Push Notification</h3>
+          <h3 className="text-lg font-bold text-gray-900">{t('classroom.notifications.addModal.title')}</h3>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors">
             <X size={20} />
           </button>
@@ -50,22 +52,22 @@ const AddNotificationModal: React.FC<AddNotificationModalProps> = ({ courseId, i
         {/* Body Modal (Form) */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Title <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('classroom.notifications.addModal.titleLabel')} <span className="text-red-500">*</span></label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="E.g. Ngày mai lo đi học"
+              placeholder={t('classroom.create.form.courseNamePlaceholder')}
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">Message <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t('classroom.notifications.addModal.messageLabel')} <span className="text-red-500">*</span></label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Write your message here..."
+              placeholder={t('classroom.create.form.descriptionPlaceholder')}
               rows={4}
               className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all resize-none"
               required
@@ -74,7 +76,7 @@ const AddNotificationModal: React.FC<AddNotificationModalProps> = ({ courseId, i
 
           <div className="pt-4 flex gap-3 justify-end">
             <button type="button" onClick={onClose} className="px-5 py-2.5 text-gray-600 font-semibold hover:bg-gray-100 rounded-xl transition-colors">
-              Cancel
+              {t('classroom.notifications.addModal.cancel')}
             </button>
             <button
               type="submit"
@@ -82,7 +84,7 @@ const AddNotificationModal: React.FC<AddNotificationModalProps> = ({ courseId, i
               className="flex items-center gap-2 px-6 py-2.5 bg-green-500 text-white font-semibold rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {creatingNotification ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-              Send Notification
+              {t('classroom.notifications.addModal.confirm')}
             </button>
           </div>
         </form>

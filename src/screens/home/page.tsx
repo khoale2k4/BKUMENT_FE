@@ -41,9 +41,9 @@ export default function HomePage() {
     const tabs = ['Following', 'Documents', 'People'];
 
     const tabToText = (tab: string) => {
-        if (tab === 'Following') return t('home.tabs.following', 'Articles');
-        if (tab === 'Documents') return t('home.tabs.documents', 'Documents');
-        return t('home.tabs.people', 'People');
+        if (tab === 'Following') return t('home.tabs.following');
+        if (tab === 'Documents') return t('home.tabs.documents');
+        return t('home.tabs.people');
     };
 
     const urlSearchQuery = searchParams.get('search');
@@ -66,8 +66,8 @@ export default function HomePage() {
                         console.error('Search failed:', serializedError);
                         dispatch(showToast({
                             type: 'error',
-                            title: t('auth.login.error'),
-                            message: t('home.search.fail', 'Search failed. Please try again.'),
+                            title: t('common.toast.error'),
+                            message: t('home.search.fail'),
                         }));
                     }
                 });
@@ -87,8 +87,8 @@ export default function HomePage() {
                         console.error('Fetch failed:', serializedError);
                         dispatch(showToast({
                             type: 'error',
-                            title: t('auth.login.error'),
-                            message: t('home.error.desc', "We couldn't load the feed. Please try again later."),
+                            title: t('common.toast.error'),
+                            message: t('home.error.desc'),
                         }));
                     }
                 });
@@ -109,8 +109,8 @@ export default function HomePage() {
             if (err?.name !== 'AbortError') {
                 dispatch(showToast({
                     type: 'error',
-                    title: t('auth.login.error'),
-                    message: t('home.error.loadPeopleFail', 'Could not load people list.'),
+                    title: t('common.toast.error'),
+                    message: t('home.error.loadPeopleFail'),
                 }));
             }
         });
@@ -156,14 +156,14 @@ export default function HomePage() {
             await dispatch(followPerson(person.id)).unwrap();
             dispatch(showToast({
                 type: 'success',
-                title: t('auth.login.success'),
-                message: t('home.people.followSuccess', 'You are now following {{name}}!', { name: person.fullName }),
+                title: t('common.toast.success'),
+                message: t('home.people.followSuccess', { name: person.fullName }),
             }));
         } catch {
             dispatch(showToast({
                 type: 'error',
-                title: t('auth.login.error'),
-                message: t('home.people.followFail', 'Follow failed. Please try again.'),
+                title: t('common.toast.error'),
+                message: t('home.people.followFail'),
             }));
         } finally {
             setFollowingLoading(prev => {
@@ -181,24 +181,24 @@ export default function HomePage() {
     function EmptyState({ tab }: { tab: string }) {
         const messageMap: Record<string, { title: string; desc: string }> = {
             Following: {
-                title: t('home.empty.following.title', 'No content yet'),
-                desc: t('home.empty.following.desc', 'Follow more authors to see new articles.'),
+                title: t('home.empty.following.title'),
+                desc: t('home.empty.following.desc'),
             },
             Recommended: {
-                title: t('home.empty.recommended.title', 'No recommendations'),
-                desc: t('home.empty.recommended.desc', 'We will suggest relevant content soon.'),
+                title: t('home.empty.recommended.title'),
+                desc: t('home.empty.recommended.desc'),
             },
             Documents: {
-                title: t('home.empty.documents.title', 'No documents'),
-                desc: t('home.empty.documents.desc', 'No documents shared yet.'),
+                title: t('home.empty.documents.title'),
+                desc: t('home.empty.documents.desc'),
             },
             People: {
-                title: t('home.empty.people.title', 'No suggestions'),
-                desc: t('home.empty.people.desc', 'No connection suggestions available at the moment.'),
+                title: t('home.empty.people.title'),
+                desc: t('home.empty.people.desc'),
             },
             Search: {
-                title: t('home.empty.following.title', 'No search results found'),
-                desc: t('home.search.results', 'No results for "{{query}}"', { query: urlSearchQuery }),
+                title: t('home.empty.following.title'), // Keeping consistent with logic in original code
+                desc: t('home.search.results', { query: urlSearchQuery }),
             },
         };
 
@@ -254,7 +254,7 @@ export default function HomePage() {
                             <p className="text-xs text-gray-500 truncate mt-0.5">{person.university}</p>
                         )}
                         <p className="text-xs text-gray-400 mt-0.5">
-                            {person.followerCount ?? 0} {t('home.people.followers', 'followers')}
+                            {person.followerCount ?? 0} {t('home.people.followers')}
                         </p>
                     </div>
                 </button>
@@ -272,9 +272,9 @@ export default function HomePage() {
                     )}
                 >
                     {isFollowed ? (
-                        <><Check className="w-3 h-3" /> {t('home.people.following', 'Following')}</>
+                        <><Check className="w-3 h-3" /> {t('home.people.following')}</>
                     ) : (
-                        <><UserPlus className="w-3 h-3" /> {t('home.people.follow', 'Follow')}</>
+                        <><UserPlus className="w-3 h-3" /> {t('home.people.follow')}</>
                     )}
                 </button>
             </div>
@@ -288,10 +288,10 @@ export default function HomePage() {
                     <div className="flex items-center justify-between mb-8 pb-4 border-b border-gray-100">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900">
-                                {t('home.search.results', 'Results for "{{query}}"', { query: urlSearchQuery })}
+                                {t('home.search.results', { query: urlSearchQuery })}
                             </h2>
                             <p className="text-sm text-gray-500 mt-1">
-                                {t('home.search.found', 'Found {{count}} results', { count: totalItems })}
+                                {t('home.search.found', { count: totalItems })}
                             </p>
                         </div>
                         <button
@@ -301,7 +301,7 @@ export default function HomePage() {
                             }}
                             className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-full border border-gray-200 cursor-pointer"
                         >
-                            {t('home.search.clear', 'Clear search')}
+                            {t('home.search.clear')}
                         </button>
                     </div>
                 )}
@@ -333,9 +333,9 @@ export default function HomePage() {
                                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                                     <Frown className="w-8 h-8 text-red-500" />
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('home.error.title', 'Oops! Something went wrong')}</h3>
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('home.error.title')}</h3>
                                 <p className="text-gray-500 mb-6 max-w-sm">
-                                    {error || t('home.error.desc', "We couldn't load the feed. Please try again later.")}
+                                    {error || t('home.error.desc')}
                                 </p>
                                 <button
                                     onClick={() => {
@@ -347,7 +347,7 @@ export default function HomePage() {
                                     }}
                                     className="px-6 py-2 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200"
                                 >
-                                    {t('home.error.retry', 'Try again')}
+                                    {t('home.error.retry')}
                                 </button>
                             </div>
                         )}
@@ -408,8 +408,8 @@ export default function HomePage() {
                 {/* People May Know Tab */}
                 {activeTab === 'People' && (
                     <div>
-                        <h2 className="text-lg font-bold text-gray-900 mb-1">{t('home.people.title', 'People you may know')}</h2>
-                        <p className="text-sm text-gray-500 mb-6">{t('home.people.desc', 'Discover and connect with other users.')}</p>
+                        <h2 className="text-lg font-bold text-gray-900 mb-1">{t('home.people.title')}</h2>
+                        <p className="text-sm text-gray-500 mb-6">{t('home.people.desc')}</p>
 
                         {peopleStatus === 'loading' && (
                             <div className="space-y-4">
@@ -431,12 +431,12 @@ export default function HomePage() {
                                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
                                     <Frown className="w-8 h-8 text-red-500" />
                                 </div>
-                                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('home.error.desc', "We couldn't load the feed. Please try again later.")}</h3>
+                                <h3 className="text-lg font-bold text-gray-900 mb-2">{t('home.error.desc')}</h3>
                                 <button
                                     onClick={() => dispatch(fetchPeopleMayKnow({ page: peopleCurrentPage, size: PEOPLE_PAGE_SIZE }))}
                                     className="px-6 py-2 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors"
                                 >
-                                    {t('home.error.retry', 'Try again')}
+                                    {t('home.error.retry')}
                                 </button>
                             </div>
                         )}
@@ -472,7 +472,7 @@ export default function HomePage() {
             </main>
 
             <aside className="hidden xl:block w-80 pl-10 py-8 border-l border-gray-100">
-                <h3 className="font-bold text-gray-900 mb-4">{t('home.sidebar.recommended', 'Recommended topics')}</h3>
+                <h3 className="font-bold text-gray-900 mb-4">{t('home.sidebar.recommended')}</h3>
                 <div className="flex flex-wrap gap-2 mb-8">
                     {['Technology', 'Money', 'Business', 'Productivity', 'Art', 'Mindfulness'].map(tag => (
                         <span

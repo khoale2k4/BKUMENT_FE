@@ -51,9 +51,9 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({ courseId }) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
         <ShieldAlert size={64} className="text-gray-300 mb-6" />
-        <h3 className="text-xl font-bold text-gray-800 mb-2">{t('classroom.members.accessDenied', 'Access Denied')}</h3>
+        <h3 className="text-xl font-bold text-gray-800 mb-2">{t('classroom.members.accessDenied')}</h3>
         <p className="text-gray-500 text-center max-w-md">
-          {t('classroom.notifications.accessDeniedDesc', 'Only the Tutor and official Students of the class have permission to view notifications.')}
+          {t('classroom.notifications.accessDeniedDesc')}
         </p>
       </div>
     );
@@ -63,7 +63,7 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({ courseId }) => {
     <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm font-sans animate-in fade-in duration-500">
       
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h2 className="text-2xl font-bold text-slate-900">{t('classroom.notifications.title', 'Push Notifications')}</h2>
+        <h2 className="text-2xl font-bold text-slate-900">{t('classroom.notifications.title')}</h2>
         
         {isOwner && (
           <button 
@@ -71,7 +71,7 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({ courseId }) => {
             className="flex items-center gap-2 px-5 py-2.5 bg-white border border-green-500 text-green-600 font-semibold rounded-xl hover:bg-green-50 transition-colors shadow-sm active:scale-95"
           >
             <Plus size={18} />
-            {t('classroom.notifications.add', 'Add Notification')}
+            {t('classroom.notifications.add')}
           </button>
         )}
       </div>
@@ -84,7 +84,7 @@ const NotificationsTab: React.FC<NotificationsTabProps> = ({ courseId }) => {
       {notificationsTotalPages > 0 && (
         <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
           <p className="text-sm text-gray-500 font-medium">
-            {t('classroom.notifications.pageInfo', 'Page {{page}} of {{total}}', { page, total: notificationsTotalPages })}
+            {t('classroom.notifications.pageInfo', { page, total: notificationsTotalPages })}
           </p>
           
           <div className="flex items-center gap-3">
