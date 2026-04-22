@@ -631,8 +631,8 @@
       "errorFindUser": "Không tìm thấy thông tin người dùng này."
     },
     "header_extra": {
-        "sv": "SV",
-        "joinRequest": "Yêu cầu tham gia lớp mới"
+      "sv": "SV",
+      "joinRequest": "Yêu cầu tham gia lớp mới"
     },
     "main": {
       "loading": "Đang tải...",
@@ -828,6 +828,7 @@
       "requireRejectReason": "Vui lòng nhập lý do từ chối!",
       "confirmApprove": "Bạn có chắc chắn muốn DUYỆT hồ sơ của gia sư {{name}}?",
       "viewUserDetailAlert": "Xem chi tiết user: {{id}}",
+<<<<<<< Updated upstream
       "viewMoreBtn": "Xem thêm"
     },
     "filters": {
@@ -869,6 +870,10 @@
       "subjectsLabel": "Các môn học bạn có thể dạy",
       "loadingSubjects": "Đang tải danh sách môn học...",
       "submitBtn": "Hoàn tất Đăng ký"
+=======
+      "viewMoreBtn": "Xem thêm",
+      "messageBtn": "Nhắn tin"
+>>>>>>> Stashed changes
     }
   }
 }

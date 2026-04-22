@@ -37,11 +37,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
   };
 
   const handleAcceptApplication = () => {
-    if (
-      window.confirm(
-        t("tutors.card.confirmApprove", { name: tutor.name })
-      )
-    ) {
+    if (window.confirm(t("tutors.card.confirmApprove", { name: tutor.name }))) {
       dispatch(approveTutorApplication(tutor.id));
     }
   };
@@ -116,8 +112,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
                     onClick={handleAcceptApplication}
                     className="w-full flex justify-center items-center gap-2 py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-xl transition-all active:scale-95 shadow-sm"
                   >
-                    <CheckCircle size={18} />{" "}
-                    {t("tutors.card.approveBtn")}
+                    <CheckCircle size={18} /> {t("tutors.card.approveBtn")}
                   </button>
                   <button
                     onClick={() => {
@@ -133,7 +128,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
                 <button
                   onClick={() =>
                     alert(
-                      t("tutors.card.viewUserDetailAlert", { id: tutor.id })
+                      t("tutors.card.viewUserDetailAlert", { id: tutor.id }),
                     )
                   }
                   className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-sm font-bold rounded-xl transition-all active:scale-95 shadow-sm"
@@ -154,7 +149,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
                 onClick={handleSendMessage}
                 className="w-full py-2.5 bg-white hover:bg-gray-50 text-gray-700 text-sm font-semibold rounded-xl border border-gray-300 shadow-sm transition-colors"
               >
-                {t("people.profile.header.messageBtn")}
+                {t("tutors.card.messageBtn")}
               </button>
             </div>
           )}
