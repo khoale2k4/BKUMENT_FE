@@ -1,9 +1,10 @@
 import { GET } from "@/app/api/documents/courses/route";
 import { UNDERSCORE_GLOBAL_ERROR_ROUTE } from "next/dist/shared/lib/entry-constants";
 import { RegisterTutorRequest } from "./redux/features/profileSlice";
+// http://143.198.80.199:8888
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://143.198.80.199:8888/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "https://api.bkument.io.vn/api/v1";
 
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_SOCKET_URL || "http://143.198.80.199:8099";
@@ -43,7 +44,7 @@ export const API_ENDPOINTS = {
     UPDATE_USER_INFO: buildUrl(`${PROFILE}/my-profile`),
     GET_UNIVERSITIES: (page: number, size: number) =>
       buildUrl(`${PROFILE}/universities/search?page=${page}&size=${size}`),
-      // http://143.198.80.199:8888/api/v1/profile/universities/search?page=1&size=10
+    // http://143.198.80.199:8888/api/v1/profile/universities/search?page=1&size=10
     UPDATE_TUTOR_INFO: buildUrl(`${LMS}/tutors/me`),
     FOLLOW: (id: string) => buildUrl(`${PROFILE}/${id}/follow`),
     GET_FOLLOWERS: (id: string, page: number, size: number) =>
@@ -51,7 +52,6 @@ export const API_ENDPOINTS = {
     GET_FOLLOWING: (id: string, page: number, size: number) =>
       buildUrl(`${PROFILE}/${id}/following?page=${page}&size=${size}`),
     GET_PROFILE_BY_ID: (id: string) => buildUrl(`${PROFILE}/${id}`),
-   
   },
 
   DOCUMENTS: {
@@ -81,7 +81,8 @@ export const API_ENDPOINTS = {
 
     // http://143.198.80.199:8888/api/v1/profile/universities/search?query=HC&page=1&size=10
 
-    SEARCH_UNIVERSITIES: (query: string, page: number, size: number) => buildUrl(`${PROFILE}/search?q=${query}&page=${page}&size=${size}`),
+    SEARCH_UNIVERSITIES: (query: string, page: number, size: number) =>
+      buildUrl(`${PROFILE}/search?q=${query}&page=${page}&size=${size}`),
     MY_DOCUMENTS: (page: number, size: number) =>
       buildUrl(`${DOCUMENT}/my-documents?page=${page}&size=${size}`),
     DELETE: (id: string) => buildUrl(`${DOCUMENT}/${id}`),
@@ -203,7 +204,6 @@ export const API_ENDPOINTS = {
     REJECT_APPLICATION: (id: string) =>
       buildUrl(`${LMS}/tutors/admin/applications/${id}/reject`),
   },
-
 
   REPORT: {
     CREATE: buildUrl(`${SOCIAL}/reports`),
