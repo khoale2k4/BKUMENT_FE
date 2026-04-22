@@ -25,7 +25,32 @@
         "address": "Địa chỉ",
         "university": "Trường Đại học",
         "universityId": "Mã Trường Đại học",
-        "notUpdated": "Chưa cập nhật"
+        "notUpdated": "Chưa cập nhật",
+        "about": {
+          "intro": "Giới thiệu",
+          "livesAt": "Sống tại",
+          "points": "Thành tích",
+          "score": "điểm",
+          "contactInfo": "Thông tin liên hệ & Cơ bản",
+          "email": "Email",
+          "phone": "Số điện thoại",
+          "dob": "Ngày sinh"
+        }
+      },
+      "tabs": {
+        "home": "Trang chủ",
+        "teachingClasses": "Lớp tôi giảng dạy",
+        "studyingClasses": "Lớp tôi tham gia",
+        "about": "Giới thiệu",
+        "activeClasses": "Lớp học đang diễn ra",
+        "cancelledClasses": "Lớp đã hủy",
+        "addNewCourse": "Thêm khóa học mới",
+        "findNewClass": "Tìm lớp học mới",
+        "selectUserHint": "Chọn một người dùng bên trái để xem trang cá nhân."
+      },
+      "home": {
+        "dashboardOverview": "Tổng quan bảng điều khiển",
+        "overviewDescription": "Xem nhanh các hoạt động và thống kê mới nhất của bạn."
       }
     },
     "tutor": {
@@ -51,6 +76,23 @@
         "noTopics": "Chưa có chủ đề cụ thể.",
         "noSubjectsAdded": "Gia sư này chưa cập nhật môn học nào."
       }
+    },
+    "classes": {
+      "by": "bởi",
+      "sessionsPerWeek": "buổi / tuần",
+      "viewAndUpdate": "Xem & Cập nhật",
+      "exploreNow": "Kháp phá ngay",
+      "noActiveTeaching": "Bạn không có khóa học nào đang mở ở trang này.",
+      "noCancelledTeaching": "Danh sách khóa học đã hủy trống.",
+      "noActiveStudying": "Bạn chưa tham gia khóa học nào.",
+      "noCancelledStudying": "Không có khóa học nào bị hủy.",
+      "errorLoading": "Lỗi tải dữ liệu khóa học"
+    },
+    "status": {
+      "ENROLLING": "Đang tuyển sinh",
+      "ACTIVE": "Đang diễn ra",
+      "COMPLETED": "Đã hoàn thành",
+      "CANCELLED": "Đã hủy"
     }
   },
   "dropdown": {
@@ -210,9 +252,66 @@
       "contact": "Liên hệ",
       "academy": "Học viện",
       "graduates": "Học viên tốt nghiệp",
-      "teachers": "Giảng viên"
+      "teachers": "Giảng viên",
+      "address": "TP. Hồ Chí Minh, Việt Nam",
+      "phone": "+994 50 717 17 17",
+      "email": "vbook@gmail.com"
     }
   },
+  "home": {
+    "tabs": {
+      "following": "Bài viết",
+      "documents": "Tài liệu",
+      "people": "Mọi người"
+    },
+    "contentCard": {
+      "minRead": "{{count}} phút đọc",
+      "save": "Lưu"
+    },
+    "search": {
+      "fail": "Tìm kiếm thất bại. Vui lòng thử lại.",
+      "results": "Kết quả cho \"{{query}}\"",
+      "found": "Tìm thấy {{count}} kết quả",
+      "clear": "Xóa tìm kiếm"
+    },
+    "error": {
+      "title": "Rất tiếc! Đã xảy ra lỗi",
+      "desc": "Chúng tôi không thể tải được trang này. Vui lòng thử lại sau.",
+      "retry": "Thử lại",
+      "loadPeopleFail": "Không thể tải danh sách người dùng."
+    },
+    "people": {
+      "title": "Những người bạn có thể biết",
+      "desc": "Khám phá và kết nối với những người dùng khác.",
+      "followers": "người theo dõi",
+      "following": "Đang theo dõi",
+      "follow": "Theo dõi",
+      "followSuccess": "Bạn đang theo dõi {{name}}!",
+      "followFail": "Theo dõi thất bại. Vui lòng thử lại."
+    },
+    "empty": {
+      "following": {
+        "title": "Chưa có nội dung nào",
+        "desc": "Hãy theo dõi thêm các tác giả để xem các bài viết mới."
+      },
+      "recommended": {
+        "title": "Không có gợi ý",
+        "desc": "Chúng tôi sẽ sớm gợi ý nội dung phù hợp cho bạn."
+      },
+      "documents": {
+        "title": "Không có tài liệu",
+        "desc": "Chưa có tài liệu nào được chia sẻ."
+      },
+      "people": {
+        "title": "Không có gợi ý",
+        "desc": "Hiện tại không có gợi ý kết nối nào."
+      }
+    },
+    "sidebar": {
+      "recommended": "Chủ đề gợi ý"
+    }
+  },
+
   "people": {
     "profile": {
       "loading": "Đang tải thông tin chi tiết...",
@@ -230,6 +329,24 @@
       "hoursAgo": "{{count}} giờ trước",
       "minutesAgo": "{{count}} phút trước"
     },
+    "pagination": {
+      "previous": "Trước",
+      "next": "Tiếp theo"
+    },
+    "loadingImage": "Đang tải ảnh...",
+    "loadingDetails": "Đang tải thông tin chi tiết...",
+    "page": "Trang",
+    "of": "trên",
+    "pageInfo": "Trang {{page}} / {{total}}",
+    "error": {
+      "fileLoad": "Lỗi tải file",
+      "checkPath": "Vui lòng kiểm tra lại đường dẫn.",
+      "prefix": "Đã xảy ra lỗi: "
+    },
+    "processing": "Đang xử lý...",
+    "noDocumentSelected": "Chưa có tài liệu nào được chọn",
+    "seeMorePages": "Xem thêm {{count}} trang",
+    "collapse": "Thu gọn",
     "toast": {
       "success": "Thành công",
       "error": "Lỗi",
@@ -385,6 +502,7 @@
       "next": "Tiếp theo",
       "submit": "Tải lên ngay",
       "saving": "Đang lưu...",
+      "aiTitle": "Kết quả phân tích AI",
       "step1": {
         "title": "Tải file lên",
         "dropzone": "Kéo thả file vào đây hoặc click để chọn",
@@ -488,12 +606,7 @@
       }
     }
   },
-  "home": {
-    "contentCard": {
-      "minRead": "{{count}} phút đọc",
-      "save": "Lưu lại"
-    }
-  },
+
   "chat": {
     "sidebar": {
       "title": "Trò chuyện",
@@ -582,6 +695,11 @@
       "accessDeniedDesc": "Chỉ Gia sư và Học viên chính thức của lớp học mới có quyền xem danh sách thành viên.",
       "approveSuccess": "Đã chấp nhận yêu cầu tham gia!",
       "rejectSuccess": "Đã từ chối yêu cầu tham gia!",
+      "accept": "Chấp nhận",
+      "decline": "Từ chối",
+      "remove": "Xóa",
+      "requested": "Đã yêu cầu",
+      "joined": "Đã tham gia",
       "tabs": {
         "approved": "Chính thức",
         "pending": "Chờ duyệt"
@@ -601,7 +719,21 @@
       "title": "Thông báo đẩy",
       "add": "Thêm thông báo",
       "accessDeniedDesc": "Chỉ Gia sư và Học viên chính thức của lớp học mới có quyền xem thông báo.",
-      "pageInfo": "Trang {{page}} / {{total}}"
+      "pageInfo": "Trang {{page}} / {{total}}",
+      "table": {
+        "title": "Tiêu đề",
+        "message": "Nội dung",
+        "destination": "Đích đến",
+        "date": "Ngày tạo",
+        "actions": "Hành động"
+      },
+      "addModal": {
+        "title": "Thêm thông báo đẩy",
+        "titleLabel": "Tiêu đề",
+        "messageLabel": "Nội dung",
+        "cancel": "Hủy",
+        "confirm": "Tạo thông báo"
+      }
     },
     "create": {
       "title": "Tạo khóa học mới",
@@ -645,12 +777,41 @@
     }
   },
   "tutors": {
+    "detail": {
+      "loading": "Đang tải thông tin...",
+      "back": "Quay lại danh sách Gia sư",
+      "title": "Các khóa học của Gia sư",
+      "currently": "Hiện đang có",
+      "coursesOpen": "khóa học đang được mở.",
+      "empty": "Gia sư này hiện chưa có khóa học nào."
+    },
+    "list": {
+      "loading": "Đang tìm kiếm gia sư phù hợp...",
+      "notFound": "Không tìm thấy gia sư nào!",
+      "filterHint": "Hãy thử thay đổi từ khóa hoặc bộ lọc tìm kiếm."
+    },
+    "info": {
+      "experience": "Kinh nghiệm",
+      "intro": "Giới thiệu",
+      "loading": "Đang tải thông tin...",
+      "registrationDate": "Ngày đăng ký:",
+      "viewCV": "Xem file CV đính kèm",
+      "noCV": "Không có CV",
+      "noIntro": "Gia sư này chưa cập nhật bài giới thiệu bản thân.",
+      "multiSubject": "Đa môn học",
+      "followers": "người theo dõi",
+      "following": "đang theo dõi",
+      "reviews": "đánh giá",
+      "students": "học viên",
+      "courses": "khóa học"
+    },
     "manageTitle": "Quản lý duyệt Gia sư",
     "manageDesc": "Quản lý danh sách đơn đăng ký trở thành gia sư.",
     "status": {
       "pending": "Đang chờ duyệt",
       "approved": "Đã duyệt",
-      "rejected": "Đã từ chối"
+      "rejected": "Từ chối",
+      "rejectionReason": "Lý do từ chối:"
     },
     "rejectModal": {
       "title": "Lý do từ chối hồ sơ",
@@ -667,8 +828,47 @@
       "requireRejectReason": "Vui lòng nhập lý do từ chối!",
       "confirmApprove": "Bạn có chắc chắn muốn DUYỆT hồ sơ của gia sư {{name}}?",
       "viewUserDetailAlert": "Xem chi tiết user: {{id}}",
-      "viewMoreBtn": "Xem thêm",
-      "messageBtn": "Nhắn tin"
+      "viewMoreBtn": "Xem thêm"
+    },
+    "filters": {
+      "online": "Trực tuyến",
+      "offline": "Trực tiếp",
+      "searchPlaceholder": "Tìm kiếm khóa học, blog hoặc tài liệu...",
+      "subjectPlaceholder": "Môn học (VD: Tiếng Anh)",
+      "topicPlaceholder": "Chủ đề (VD: Giao tiếp)",
+      "selectSubjectFirst": "Chọn môn học trước",
+      "allFormats": "Tất cả hình thức",
+      "searchBtn": "Tìm kiếm"
+    },
+    "register": {
+      "title": "Trở thành Gia sư",
+      "subtitle": "Chia sẻ kiến thức của bạn và tạo thu nhập ngay hôm nay.",
+      "upload": "TẢI LÊN",
+      "imageHint": "* Khuyên dùng ảnh vuông, dung lượng dưới 2MB.",
+      "minSubjectWarning": "* Vui lòng chọn ít nhất 1 môn học.",
+      "redirecting": "Chào mừng bạn gia nhập đội ngũ Gia sư. Hệ thống đang chuyển hướng...",
+      "avatarSuccess": "Đã tải ảnh đại diện lên!",
+      "avatarError": "Tải ảnh đại diện thất bại",
+      "cvSuccess": "Đã tải CV lên!",
+      "cvError": "Tải CV thất bại",
+      "missingInfoTitle": "Thiếu thông tin!",
+      "missingInfoMessage": "Vui lòng điền đầy đủ thông tin bắt buộc và chọn ít nhất 1 môn học.",
+      "successTitle": "Đăng ký thành công!",
+      "successMessage": "Đã gửi hồ sơ đăng ký gia sư thành công!",
+      "failTitle": "Đăng ký thất bại!",
+      "nameLabel": "Tên hiển thị của bạn",
+      "namePlaceholder": "VD: Gia sư Quang",
+      "avatarLabel": "Ảnh đại diện của bạn",
+      "avatarLinkPlaceholder": "Dán link ảnh hoặc click ô bên cạnh để upload",
+      "experienceLabel": "Kinh nghiệm giảng dạy",
+      "experiencePlaceholder": "VD: 3 năm kinh nghiệm dạy kèm Toán cấp 3, từng làm trợ giảng tại trung tâm...",
+      "cvLabel": "Link CV / Chứng chỉ (Không bắt buộc)",
+      "cvPlaceholder": "Dán link (Google Drive, Notion...) hoặc upload file",
+      "introLabel": "Giới thiệu bản thân",
+      "introPlaceholder": "Hãy viết vài dòng giới thiệu về phương pháp giảng dạy, tính cách của bạn...",
+      "subjectsLabel": "Các môn học bạn có thể dạy",
+      "loadingSubjects": "Đang tải danh sách môn học...",
+      "submitBtn": "Hoàn tất Đăng ký"
     }
   }
 }
