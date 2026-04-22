@@ -630,8 +630,8 @@
       "errorFindUser": "Could not find information for this user."
     },
     "header_extra": {
-        "sv": "SV",
-        "joinRequest": "New class join request"
+      "sv": "SV",
+      "joinRequest": "New class join request"
     },
     "main": {
       "loading": "Loading...",
@@ -827,7 +827,8 @@
       "requireRejectReason": "Please enter a reason for rejection!",
       "confirmApprove": "Are you sure you want to APPROVE the application of tutor {{name}}?",
       "viewUserDetailAlert": "View details of user: {{id}}",
-      "viewMoreBtn": "View more"
+      "viewMoreBtn": "View more",
+      "messageBtn": "Message"
     },
     "filters": {
       "online": "Online",

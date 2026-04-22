@@ -631,8 +631,8 @@
       "errorFindUser": "Không tìm thấy thông tin người dùng này."
     },
     "header_extra": {
-        "sv": "SV",
-        "joinRequest": "Yêu cầu tham gia lớp mới"
+      "sv": "SV",
+      "joinRequest": "Yêu cầu tham gia lớp mới"
     },
     "main": {
       "loading": "Đang tải...",

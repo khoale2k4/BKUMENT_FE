@@ -1,10 +1,11 @@
 import { GET } from "@/app/api/documents/courses/route";
 import { UNDERSCORE_GLOBAL_ERROR_ROUTE } from "next/dist/shared/lib/entry-constants";
 import { RegisterTutorRequest } from "./redux/features/profileSlice";
-
+// https://api.bkument.io.vn/
+// http://143.198.80.199:8888/api/v1
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8888/api/v1";
-
+  process.env.NEXT_PUBLIC_API_URL || "https://api.bkument.io.vn/api/v1";
+// http://143.198.80.199:8099
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_SOCKET_URL || "http://143.198.80.199:8099";
 
