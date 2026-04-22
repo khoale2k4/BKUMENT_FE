@@ -11,25 +11,28 @@ import {
 } from "@/lib/redux/features/modalSlice";
 import { AppNotification } from "@/lib/services/notification.service";
 
-// Hàm format thời gian 
-const formatTime = (dateString: string) => {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const now = new Date();
-  
-  const isToday = date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-  const timeString = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-  
-  if (isToday) return `Today at ${timeString}`;
-  
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  return `Last ${days[date.getDay()]} at ${timeString}`;
-};
+import { useTranslation } from "react-i18next";
 
 export default function NotificationDropdown() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const [isNotiOpen, setIsNotiOpen] = useState(false);
   
+  // Hàm format thời gian 
+  const formatTime = (dateString: string) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+    
+    const isToday = date.getDate() === now.getDate() && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+    const timeString = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    
+    if (isToday) return t('layout.header.notifications.todayAt', { time: timeString });
+    
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return t('layout.header.notifications.lastAt', { day: days[date.getDay()], time: timeString });
+  };
+
   // THÊM STATE ĐỂ LƯU TAB ĐANG CHỌN (Tất cả / Chưa đọc)
   const [activeTab, setActiveTab] = useState<'ALL' | 'UNREAD'>('ALL');
   
@@ -106,7 +109,7 @@ export default function NotificationDropdown() {
           {/* Header của Dropdown */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50/50">
             <div className="flex items-center gap-3">
-              <h3 className="font-bold text-gray-900">Notifications</h3>
+              <h3 className="font-bold text-gray-900">{t('layout.header.notifications.title')}</h3>
               
               {/* --- KHU VỰC TAB CHUYỂN ĐỔI --- */}
               <div className="flex items-center bg-gray-200/80 p-0.5 rounded-full">
@@ -114,13 +117,13 @@ export default function NotificationDropdown() {
                   onClick={() => setActiveTab('ALL')}
                   className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all ${activeTab === 'ALL' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                  All
+                  {t('layout.header.notifications.all')}
                 </button>
                 <button 
                   onClick={() => setActiveTab('UNREAD')}
                   className={`text-[11px] font-semibold px-2.5 py-1 rounded-full transition-all ${activeTab === 'UNREAD' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                 >
-                  Unread
+                  {t('layout.header.notifications.unread')}
                 </button>
               </div>
               {/* ----------------------------- */}
@@ -131,7 +134,7 @@ export default function NotificationDropdown() {
               <button 
                 onClick={handleMarkAllRead}
                 className="flex items-center gap-1 text-[13px] text-gray-600 hover:text-gray-900 transition-colors"
-                title="Mark all as read"
+                title={t('layout.header.notifications.markAllAsRead')}
               >
                 <CheckCircle2 className="w-[18px] h-[18px]" strokeWidth={2} />
               </button>
@@ -147,7 +150,7 @@ export default function NotificationDropdown() {
             ) : displayedNotifications.length === 0 ? (
               // Empty State linh hoạt theo Tab
               <div className="text-center py-10 text-gray-500 text-sm">
-                {activeTab === 'UNREAD' ? "You have no unread notifications." : "You have no new notifications."}
+                {activeTab === 'UNREAD' ? t('layout.header.notifications.emptyUnread') : t('layout.header.notifications.empty')}
               </div>
             ) : (
               // Map qua displayedNotifications thay vì notifications
@@ -166,7 +169,11 @@ export default function NotificationDropdown() {
                   <div className="shrink-0 mt-0.5 ml-2">
                     <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center">
                       {noti.metadata?.studentId ? (
-                        <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(noti.title.replace('Yêu cầu tham gia lớp mới', 'SV'))}&background=random`} alt="Avatar" className="w-full h-full object-cover" />
+                        <img 
+                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(noti.title.replace(t('chat.header_extra.joinRequest'), t('chat.header_extra.sv')))}&background=random`} 
+                          alt="Avatar" 
+                          className="w-full h-full object-cover" 
+                        />
                       ) : (
                         <User className="w-5 h-5 text-gray-500" />
                       )}
@@ -197,7 +204,7 @@ export default function NotificationDropdown() {
               onClick={() => setIsNotiOpen(false)} 
               className="text-[13px] text-blue-600 font-semibold hover:underline"
             >
-              View all notifications
+              {t('layout.header.notifications.viewAll')}
             </Link>
           </div>
 

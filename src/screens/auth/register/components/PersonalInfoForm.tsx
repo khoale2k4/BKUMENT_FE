@@ -35,12 +35,12 @@ export default function PersonalInfoForm({
       {/* Row 1: Name */}
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label={t('auth.register.firstNameLabel', 'First Name')} name="firstName" type="text"
+          label={t('auth.register.firstName', 'First Name')} name="firstName" type="text"
           placeholder={t('auth.register.firstNamePlaceholder', 'e.g. John')} value={formData.firstName}
           onChange={handleChange} required className={inputClassName}
         />
         <Input
-          label={t('auth.register.lastNameLabel', 'Last Name')} name="lastName" type="text"
+          label={t('auth.register.lastName', 'Last Name')} name="lastName" type="text"
           placeholder={t('auth.register.lastNamePlaceholder', 'e.g. Doe')} value={formData.lastName}
           onChange={handleChange} required className={inputClassName}
         />
@@ -49,12 +49,12 @@ export default function PersonalInfoForm({
       {/* Row 2: Contact */}
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label={t('auth.register.emailLabel', 'Email Address')} name="email" type="email"
+          label={t('auth.register.email', 'Email Address')} name="email" type="email"
           placeholder={t('auth.register.emailPlaceholder', 'john@example.com')} value={formData.email}
           onChange={handleChange} required className={inputClassName}
         />
         <Input
-          label={t('auth.register.phoneLabel', 'Phone Number')} name="phone" type="tel"
+          label={t('auth.register.phone', 'Phone Number')} name="phone" type="tel"
           placeholder={t('auth.register.phonePlaceholder', '+84...')} value={formData.phone}
           onChange={handleChange} required className={inputClassName}
         />
@@ -63,7 +63,7 @@ export default function PersonalInfoForm({
       {/* Row 3: Education & DOB */}
       <div className="grid grid-cols-2 gap-4">
         <Input
-          label={t('auth.register.dobLabel', 'Date of Birth')} name="dob" type="date"
+          label={t('auth.register.dob', 'Date of Birth')} name="dob" type="date"
           value={formData.dob} onChange={handleChange}
           required className={inputClassName}
         />
@@ -71,7 +71,7 @@ export default function PersonalInfoForm({
         {/* INPUT UNIVERSITY THÀNH THẺ SELECT */}
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-1">
-            {t('auth.register.universityLabel', 'University')} <span className="text-red-500">*</span>
+            {t('auth.register.university', 'University')} <span className="text-red-500">*</span>
           </label>
           <select 
             name="universityId" 
@@ -104,7 +104,7 @@ export default function PersonalInfoForm({
 
       {/* Row 4: Address (Full width) */}
       <Input
-        label={t('auth.register.addressLabel', 'Address')} name="address" type="text"
+        label={t('auth.register.address', 'Address')} name="address" type="text"
         placeholder={t('auth.register.addressPlaceholder', '123 Street, City, Country')} value={formData.address}
         onChange={handleChange} className={inputClassName}
       />
@@ -112,7 +112,7 @@ export default function PersonalInfoForm({
       {/* Row 5: Bio (Textarea) */}
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-semibold text-gray-700">
-          {t('auth.register.bioLabel', 'Bio')} <span className="text-gray-400 font-normal">{t('auth.register.optional', '(Optional)')}</span>
+          {t('auth.register.bio', 'Bio')} <span className="text-gray-400 font-normal">{t('auth.register.optional', '(Optional)')}</span>
         </label>
         <textarea
           name="bio"

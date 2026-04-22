@@ -4,8 +4,10 @@ import { useAppSelector, useAppDispatch } from '@/lib/redux/hooks';
 import { hideToast } from '@/lib/redux/features/toastSlice';
 import { CheckCircle2, XCircle, AlertCircle, Info, X } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 export default function GlobalToast() {
+    const { t } = useTranslation();
     const { isOpen, type, title, message, id } = useAppSelector((state) => state.toastNotification);
     const dispatch = useAppDispatch();
     const [isVisible, setIsVisible] = useState(false);
@@ -47,8 +49,8 @@ export default function GlobalToast() {
                     </div>
 
                     <div className="flex-1 pr-6">
-                        <p className="text-sm font-bold text-gray-900 whitespace-nowrap">{title}</p>
-                        <p className="mt-1 text-sm text-gray-500 leading-snug whitespace-nowrap">{message}</p>
+                        <p className="text-sm font-bold text-gray-900 whitespace-nowrap">{t(title)}</p>
+                        <p className="mt-1 text-sm text-gray-500 leading-snug whitespace-nowrap">{t(message)}</p>
                     </div>
 
                 </div>
@@ -60,7 +62,7 @@ export default function GlobalToast() {
                     }}
                     className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 p-1 rounded-md hover:bg-gray-100 transition focus:outline-none"
                 >
-                    <span className="sr-only">Close</span>
+                    <span className="sr-only">{t('common.toast.close')}</span>
                     <X className="h-4 w-4" />
                 </button>
             </div>

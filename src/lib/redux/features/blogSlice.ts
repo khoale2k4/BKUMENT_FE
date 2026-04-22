@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import * as blogService from '@/lib/services/blog.service';
+import * as documentService from '@/lib/services/document.service';
 
 interface Author {
     id: string,
@@ -18,6 +19,10 @@ interface BlogState {
     assetIds: string[];
     error: string | null;
     createdAt: string | null;
+
+    averageRating: number | null;
+    myRating: number | null;
+    views: number | null;
 }
 
 const initialState: BlogState = {
@@ -29,6 +34,9 @@ const initialState: BlogState = {
     error: null,
     assetIds: [] as string[],
     createdAt: null,
+    averageRating: null,
+    myRating: null,
+    views: null,
 };
 
 export const uploadImage = createAsyncThunk(
@@ -38,7 +46,7 @@ export const uploadImage = createAsyncThunk(
             return await blogService.uploadImage(file);
         } catch (error: any) {
             console.error(error.message);
-            return rejectWithValue(error.message || 'Upload error');
+            return rejectWithValue(error.message || 'errors.uploadFailed');
         }
     }
 );
@@ -48,8 +56,8 @@ export const submitPost = createAsyncThunk(
     async (_, { getState, rejectWithValue }) => {
         const state = (getState() as any).blogs as BlogState;
 
-        if (!state.title.trim()) return rejectWithValue('Tiêu đề không được để trống');
-        if (!state.contentHTML.trim()) return rejectWithValue('Nội dung không được để trống');
+        if (!state.title.trim()) return rejectWithValue('errors.titleRequired');
+        if (!state.contentHTML.trim()) return rejectWithValue('errors.contentRequired');
 
         const payload = {
             title: state.title,
@@ -64,15 +72,37 @@ export const submitPost = createAsyncThunk(
         try {
             return await blogService.submitPost(payload);
         } catch (error: any) {
-            return rejectWithValue(error.message || 'Submit failed');
+            return rejectWithValue(error.message || 'blogs.write.header.failMsg');
         }
+    }
+);
+
+export const fetchRatingData = createAsyncThunk(
+    'blog/fetchRating',
+    async (resourceId: string) => {
+        const [average, myRating] = await Promise.all([
+            documentService.getAverageRating(resourceId).catch(() => 0),
+            documentService.getMyRating(resourceId).catch(() => 0)
+        ]);
+        return { average, myRating };
+    }
+);
+
+export const rateBlog = createAsyncThunk(
+    'blog/rate',
+    async ({ resourceId, rating }: { resourceId: string, rating: number }, { dispatch }) => {
+        await documentService.submitRating(resourceId, rating);
+        dispatch(fetchRatingData(resourceId));
+        return rating;
     }
 );
 
 export const fetchPost = createAsyncThunk(
     'blog/fetchPost',
-    async (blogId: string) => {
-        return await blogService.fetchPostById(blogId);
+    async (blogId: string, { dispatch }) => {
+        const response = await blogService.fetchPostById(blogId);
+        dispatch(fetchRatingData(blogId));
+        return response;
     }
 );
 
@@ -119,11 +149,21 @@ export const blogSlice = createSlice({
                 state.title = action.payload.name;
                 state.author = action.payload.author;
                 state.createdAt = action.payload.createdAt;
+                state.views = action.payload.views;
                 state.status = 'succeeded';
             })
             .addCase(fetchPost.pending, (state) => {
                 state.status = 'getting';
-            })
+            });
+
+        builder.addCase(fetchRatingData.fulfilled, (state, action) => {
+            state.averageRating = action.payload.average;
+            state.myRating = action.payload.myRating;
+        });
+
+        builder.addCase(rateBlog.fulfilled, (state, action) => {
+            state.myRating = action.payload;
+        });
     }
 });
 

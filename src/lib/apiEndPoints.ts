@@ -1,11 +1,11 @@
 import { GET } from "@/app/api/documents/courses/route";
 import { UNDERSCORE_GLOBAL_ERROR_ROUTE } from "next/dist/shared/lib/entry-constants";
 import { RegisterTutorRequest } from "./redux/features/profileSlice";
-// http://143.198.80.199:8888
-
+// https://api.bkument.io.vn/
+// http://143.198.80.199:8888/api/v1
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "https://api.bkument.io.vn/api/v1";
-
+// http://143.198.80.199:8099
 const SOCKET_URL =
   process.env.NEXT_PUBLIC_SOCKET_URL || "http://143.198.80.199:8099";
 
@@ -33,6 +33,13 @@ export const API_ENDPOINTS = {
     LOGOUT: buildUrl(`${IDENTITY}/auth/logout`),
     PROFILE: buildUrl(`${IDENTITY}/api/auth/me`),
     REFRESH_TOKEN: buildUrl(`${IDENTITY}/auth/refresh`),
+    FORGOT_PASSWORD_WITH_EMAIL: (email: string) =>
+      buildUrl(`${IDENTITY}/auth/forgot-password?email=${email}`),
+
+    RESET_PASSWORD: buildUrl(`${IDENTITY}/auth/reset-password`),
+    //http://143.198.80.199:8888/api/v1/identity/auth/forgot-password?email=lythanhnhatquangthongnhat2004%40gmail.com
+    VERIFY_RESET_TOKEN: (token: string) =>
+      buildUrl(`${IDENTITY}/auth/verify-email?token=${token}`),
   },
 
   ACCOUNT: {
@@ -85,6 +92,10 @@ export const API_ENDPOINTS = {
       buildUrl(`${PROFILE}/search?q=${query}&page=${page}&size=${size}`),
     MY_DOCUMENTS: (page: number, size: number) =>
       buildUrl(`${DOCUMENT}/my-documents?page=${page}&size=${size}`),
+    USER_DOCUMENTS: (userId: string, page: number, size: number) =>
+      buildUrl(`${DOCUMENT}/user/${userId}?page=${page}&size=${size}`),
+    TOP_DOCUMENTS: (page: number, size: number) =>
+      buildUrl(`${DOCUMENT}/top-documents?page=${page}&size=${size}`),
     DELETE: (id: string) => buildUrl(`${DOCUMENT}/${id}`),
   },
 
@@ -97,7 +108,14 @@ export const API_ENDPOINTS = {
     UPLOAD_NEW_BLOG: buildUrl(`${BLOG}`),
     MY_BLOGS: (page: number, size: number) =>
       buildUrl(`${BLOG}/my-blogs?page=${page}&size=${size}`),
+    USER_BLOGS: (userId: string, page: number, size: number) =>
+      buildUrl(`${BLOG}/user/${userId}?page=${page}&size=${size}`),
+    TOP_BLOGS: (page: number, size: number) =>
+      buildUrl(`${BLOG}/top-blog?page=${page}&size=${size}`),
     DELETE: (id: string) => buildUrl(`${BLOG}/${id}`),
+    // // http://143.198.80.199:8888/api/v1/blog/user/6b2348e2-4629-4a1a-a66c-275444f5061f?page=0&size=10
+    // GET_USER_BLOGS: (userId: string, page: number, size: number) =>
+    //   buildUrl(`${BLOG}/user/${userId}?page=${page}&size=${size}`),
   },
 
   RESOURCE: {
@@ -146,6 +164,25 @@ export const API_ENDPOINTS = {
     CREATE: buildUrl(`${SOCIAL}/comments`),
   },
 
+  RATINGS: {
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor
+    RATING_TUTOR: buildUrl(`${SOCIAL}/ratings/tutor`),
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/9810c099-4de0-4c4c-89d1-0bbb6fc4b291?page=0&size=10
+    GET_TUTOR_RATINGS: (tutorId: string, page: number, size: number) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${tutorId}?page=${page}&size=${size}`),
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/0c099-4de0-4c4c-89d1-0bbb6fc4b291/summary
+    GET_TUTOR_RATING_SUMMARY: (tutorId: string) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${tutorId}/summary`),
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/0c099-4de0-4c4c-89d1-0bbb6fc4b291/user/477d787d-2c55-4383-b79b-8f3347ede4e8
+    GET_MY_TUTOR_RATING: (tutorId: string, userId: string) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${tutorId}/user/${userId}`),
+    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/23232
+    UPDATE_RATING_TUTOR_BY_REVIEWID: (reviewId: string) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${reviewId}`),
+    DELETE_RATING_TUTOR_BY_REVIEWID: (reviewId: string) =>
+      buildUrl(`${SOCIAL}/ratings/tutor/${reviewId}`),
+  },
+
   HOME: {
     SEARCH: (query: string, page: number, size: number) =>
       buildUrl(`${AI}/search?query=${query}&page=${page + 1}&size=${size}`),
@@ -185,8 +222,8 @@ export const API_ENDPOINTS = {
     GET_MEMBER_PENDING: (id: string) =>
       buildUrl(`${LMS}/classes/${id}/enrollments/pending`),
 
-    GET_CLASSES_BY_TUTORID: (id: string) =>
-      buildUrl(`${LMS}/classes/tutors/${id}`),
+    GET_CLASSES_BY_TUTORID: (id: string, page: number, size: number) =>
+      buildUrl(`${LMS}/classes/tutors/${id}?page=${page}&size=${size}`),
 
     APPROVE_ENROLLMENT: (id: string, approved: boolean) =>
       buildUrl(`${LMS}/enrollments/${id}/approval?approved=${approved}`),
@@ -207,6 +244,11 @@ export const API_ENDPOINTS = {
 
   REPORT: {
     CREATE: buildUrl(`${SOCIAL}/reports`),
+    GET_AVERAGE_RATING: (resourceId: string) =>
+      buildUrl(`${SOCIAL}/ratings/resource/${resourceId}/average`),
+    SUBMIT_RATING: buildUrl(`${SOCIAL}/ratings/resource`),
+    GET_MY_RATING: (resourceId: string) =>
+      buildUrl(`${SOCIAL}/ratings/resource/${resourceId}/my-rating`),
   },
 
   SOCKET: {

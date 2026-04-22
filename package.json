@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test": "jest"
   },
   "dependencies": {
     "@cyntler/react-doc-viewer": "^1.17.1",
@@ -14,6 +15,7 @@
     "@mantine/hooks": "^8.3.10",
     "@mantine/tiptap": "^8.3.10",
     "@reduxjs/toolkit": "^2.11.0",
+    "@sentry/nextjs": "^10.47.0",
     "@tabler/icons-react": "^3.36.0",
     "@tiptap/extension-font-family": "^3.14.0",
     "@tiptap/extension-highlight": "^3.14.0",
@@ -45,6 +47,9 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.19",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/luxon": "^3.7.1",
     "@types/node": "^20",
     "@types/react": "^19",
@@ -53,7 +58,11 @@
     "baseline-browser-mapping": "^2.10.12",
     "eslint": "^9",
     "eslint-config-next": "16.0.4",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "@types/jest": "^29.5.14",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

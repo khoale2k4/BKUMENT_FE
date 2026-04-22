@@ -42,7 +42,7 @@ export default function AccountSetupForm({ formData, handleChange, onPrev, onSub
 
       {/* THÊM MỚI: Confirm Password */}
       <Input
-        label={t('auth.register.confirmPasswordLabel', 'Confirm Password')}
+        label={t('auth.register.confirmPassword', 'Confirm Password')}
         name="confirmPassword"
         type="password"
         placeholder={t('auth.register.confirmPasswordPlaceholder', 'Re-enter your password')}
@@ -79,7 +79,7 @@ export default function AccountSetupForm({ formData, handleChange, onPrev, onSub
           disabled={isLoading || !formData.agreeTerms} 
           className="bg-[#3F5D38] hover:bg-[#2d4228] text-white w-2/3 py-3 rounded-xl disabled:opacity-70"
         >
-          {isLoading ? t('auth.register.signingUp', 'Signing up...') : t('auth.register.createAccount', 'Create Account')}
+          {isLoading ? t('auth.register.signingUp', 'Signing up...') : t('auth.register.signUp', 'Create Account')}
         </Button>
       </div>
     </form>

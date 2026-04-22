@@ -3,6 +3,8 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import clsx from "clsx";
 
+import { useTranslation } from "react-i18next";
+
 interface PaginationProps {
     currentPage: number;
     totalPages: number;
@@ -10,6 +12,7 @@ interface PaginationProps {
 }
 
 export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+    const { t } = useTranslation();
     const generatePagination = () => {
         if (totalPages <= 7) {
             return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -49,7 +52,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                 )}
             >
                 <ArrowLeft size={18} />
-                <span>Previous</span>
+                <span>{t('common.pagination.previous')}</span>
             </button>
 
             <div className="flex items-center gap-1 sm:gap-2">
@@ -89,7 +92,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
                         : "text-gray-600 hover:bg-gray-100 cursor-pointer"
                 )}
             >
-                <span>Next</span>
+                <span>{t('common.pagination.next')}</span>
                 <ArrowRight size={18} />
             </button>
         </div>

@@ -8,12 +8,11 @@ import {
 } from "../redux/features/profileSlice";
 import { API_ENDPOINTS } from "../apiEndPoints";
 import httpClient from "./http";
-
-const BASE_URL = "http://localhost:8888/api/v1";
+import { showToast } from "../redux/features/toastSlice";
 
 // Hàm helper để lấy token
 const getAuthHeaders = () => {
-  const token = sessionStorage.getItem("accessToken");
+  const token = localStorage.getItem("accessToken");
   return {
     "Content-Type": "application/json",
     ...(token && { Authorization: `Bearer ${token}` }),
@@ -90,6 +89,10 @@ export const registerTutor = async (
   );
   if (response.data.code !== 1000)
     throw new Error(response.data.message || "Failed to register tutor");
+
+  // if(response.data.code === 3008) {
+  //     dispatch(showToast({ type: "info", title: "Success!", message: response.data.message || "Tutor registration successful, pending approval." }));
+  // }
   console.log("API Response for register tutor:", response.data);
   return response.data.result as TutorProfile;
 };

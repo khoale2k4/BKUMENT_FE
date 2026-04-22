@@ -1,7 +1,7 @@
 import { FileUploadItem } from '@/types/FileUpload';
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import * as documentService from '@/lib/services/document.service';
-import * as commentService from '@/lib/services/comment.service';
+import * as articleService from '@/lib/services/article.service';
 import { showToast } from './toastSlice';
 import axios from 'axios';
 import { DocumentDetail } from '@/lib/services/document.service';
@@ -45,11 +45,6 @@ interface DocumentState {
 
     currentAuthor: UserInfo | null;
 
-    comments: commentService.Comment[];
-    commentsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
-    commentsPage: number;
-    commentsTotalPages: number;
-
     universities: University[];
     universitiesStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
@@ -58,6 +53,10 @@ interface DocumentState {
 
     topics: Topic[];
     topicsStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
+    
+    averageRating: number | null;
+    myRating: number | null;
+    ratingStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
 
     upload: UploadState;
 }
@@ -73,11 +72,6 @@ const initialState: DocumentState = {
 
     currentAuthor: null,
 
-    comments: [],
-    commentsStatus: 'idle',
-    commentsPage: 0,
-    commentsTotalPages: 0,
-
     universities: [],
     universitiesStatus: 'idle',
 
@@ -86,6 +80,10 @@ const initialState: DocumentState = {
 
     topics: [],
     topicsStatus: 'idle',
+
+    averageRating: null,
+    myRating: null,
+    ratingStatus: 'idle',
 
     upload: {
         files: [],
@@ -96,24 +94,30 @@ const initialState: DocumentState = {
 
 export const fetchDocumentById = createAsyncThunk(
     'documents/fetchDetail',
-    async (id: string) => {
+    async (id: string, { dispatch }) => {
         const response = await documentService.getDocumentById(id);
-        console.log(response);
+        dispatch(fetchRatingData(id));
         return response;
     }
 );
 
-export const fetchCommentsByDocId = createAsyncThunk(
-    'documents/fetchComments',
-    async ({ documentId, page, size }: { documentId: string, page: number, size: number }) => {
-        const response = await commentService.getCommentsByDocId(documentId, page, size);
+export const fetchRatingData = createAsyncThunk(
+    'documents/fetchRating',
+    async (resourceId: string) => {
+        const [average, myRating] = await Promise.all([
+            documentService.getAverageRating(resourceId).catch(() => 0),
+            documentService.getMyRating(resourceId).catch(() => 0)
+        ]);
+        return { average, myRating };
+    }
+);
 
-        return {
-            items: response.content || response,
-
-            page: page,
-            totalPages: response.totalPages || 1
-        };
+export const rateDocument = createAsyncThunk(
+    'documents/rate',
+    async ({ resourceId, rating }: { resourceId: string, rating: number }, { dispatch }) => {
+        await documentService.submitRating(resourceId, rating);
+        dispatch(fetchRatingData(resourceId));
+        return rating;
     }
 );
 
@@ -141,19 +145,6 @@ export const fetchRelatedDocuments = createAsyncThunk(
     }
 );
 
-export const fetchRepliesByCommentId = createAsyncThunk(
-    'documents/fetchReplies',
-    async ({ parentId, page, size }: { parentId: string, page: number, size: number }) => {
-        const response = await commentService.getCommentsByReplyId(parentId, page, size);
-        return {
-            parentId,
-            items: response.content || response,
-            page: page,
-            totalPages: response.totalPages || 1
-        };
-    }
-);
-
 export const searchUniversities = createAsyncThunk(
     'documents/searchUniversities',
     async (query: string) => {
@@ -164,9 +155,7 @@ export const searchUniversities = createAsyncThunk(
 export const searchCourses = createAsyncThunk(
     'documents/searchCourses',
     async (query: string) => {
-        const response = await documentService.searchCourses(query);
-        console.log(response);
-        return response;
+        return await documentService.searchCourses(query);
     }
 );
 
@@ -222,33 +211,14 @@ export const uploadFile = createAsyncThunk(
             }));
             return localId;
         } catch (err: any) {
-            const errorMessage = err.response?.data?.message || 'Upload failed';
+            const errorMessage = err.response?.data?.message || 'errors.uploadFailed';
             dispatch(updateFileStatus({ localId, updates: { status: 'error', errorMessage } }));
             dispatch(showToast({
                 type: 'error',
-                title: 'Upload Failed',
+                title: 'common.toast.error',
                 message: errorMessage
             }));
             return rejectWithValue({ localId, errorMessage });
-        }
-    }
-);
-
-export const submitCommentAsync = createAsyncThunk(
-    'documents/submitComment',
-    async (payload: commentService.CreateCommentPayload, { dispatch, rejectWithValue }) => {
-        try {
-            const newComment = await commentService.createComment(payload);
-
-            if (!payload.replyId) {
-                dispatch(fetchCommentsByDocId({ documentId: payload.resourceId, page: 0, size: 5 }));
-            } else {
-                dispatch(fetchRepliesByCommentId({ parentId: payload.replyId, page: 0, size: 5 }));
-            }
-
-            return { newComment, replyId: payload.replyId };
-        } catch (error: any) {
-            return rejectWithValue(error.message || 'Lỗi khi gửi bình luận');
         }
     }
 );
@@ -289,7 +259,7 @@ export const saveFilesMetadata = createAsyncThunk(
                 hasError = true;
                 dispatch(updateFileStatus({
                     localId: file.localId,
-                    updates: { status: 'error', errorMessage: "Save info failed" }
+                    updates: { status: 'error', errorMessage: "errors.saveFailed" }
                 }));
             }
         }
@@ -307,12 +277,12 @@ const documentSlice = createSlice({
         clearCurrentDocument: (state) => {
             state.currentDocument = null;
             state.currentAuthor = null;
-            state.comments = [];
             state.detailStatus = 'idle';
             state.relatedDocuments = [];
             state.relatedStatus = 'idle';
             state.relatedPage = 0;
             state.relatedTotalPages = 0;
+            state.ratingStatus = 'idle';
         },
         setUploadFiles: (state, action: PayloadAction<FileUploadItem[]>) => {
             state.upload.files = [...state.upload.files, ...action.payload];
@@ -353,81 +323,6 @@ const documentSlice = createSlice({
             })
             .addCase(fetchDocumentById.rejected, (state) => {
                 state.detailStatus = 'failed';
-            });
-
-        builder
-            .addCase(fetchRepliesByCommentId.pending, (state, action) => {
-                const { parentId, page } = action.meta.arg;
-                const parentIndex = state.comments.findIndex(c => c.id.toString() === parentId.toString());
-
-                if (parentIndex !== -1) {
-                    if (page === 0) {
-                        state.comments[parentIndex].isLoadingReplies = true;
-                    }
-                }
-            });
-
-        builder
-            .addCase(fetchRepliesByCommentId.fulfilled, (state, action) => {
-                const { parentId, items, page, totalPages } = action.payload;
-                const parentIndex = state.comments.findIndex(c => c.id.toString() === parentId.toString());
-
-                if (parentIndex !== -1) {
-                    state.comments[parentIndex].isLoadingReplies = false;
-                    state.comments[parentIndex].repliesPage = page;
-                    state.comments[parentIndex].repliesTotalPages = totalPages;
-
-                    if (page === 0) {
-                        state.comments[parentIndex].replies = items;
-                    } else {
-                        const oldReplies = state.comments[parentIndex].replies || [];
-                        state.comments[parentIndex].replies = [...oldReplies, ...items];
-                    }
-                }
-            });
-
-        builder
-            .addCase(fetchRepliesByCommentId.rejected, (state, action) => {
-                const { parentId } = action.meta.arg;
-                const parentIndex = state.comments.findIndex(c => c.id.toString() === parentId.toString());
-                if (parentIndex !== -1) {
-                    state.comments[parentIndex].isLoadingReplies = false;
-                }
-            });
-
-        builder
-            .addCase(fetchCommentsByDocId.pending, (state, action) => {
-                if (action.meta.arg.page === 0) {
-                    state.commentsStatus = 'loading';
-                }
-            })
-            .addCase(fetchCommentsByDocId.fulfilled, (state, action) => {
-                state.commentsStatus = 'succeeded';
-
-                if (action.payload.page === 0) {
-                    state.comments = action.payload.items;
-                } else {
-                    state.comments = [...state.comments, ...action.payload.items];
-                }
-
-                state.commentsPage = action.payload.page;
-                state.commentsTotalPages = action.payload.totalPages;
-            })
-            .addCase(fetchCommentsByDocId.rejected, (state) => {
-                state.commentsStatus = 'failed';
-            });
-
-        builder
-            .addCase(submitCommentAsync.fulfilled, (state, action) => {
-                const { replyId } = action.payload;
-
-                if (replyId) {
-                    const parentIndex = state.comments.findIndex(c => c.id.toString() === replyId.toString());
-                    if (parentIndex !== -1) {
-                        state.comments[parentIndex].numberOfChildComment =
-                            (state.comments[parentIndex].numberOfChildComment || 0) + 1;
-                    }
-                }
             });
 
         builder
@@ -485,6 +380,24 @@ const documentSlice = createSlice({
 
         builder.addCase(saveFilesMetadata.rejected, (state) => {
             state.upload.uploadStatus = 'error';
+        });
+
+        builder.addCase(fetchRatingData.pending, (state) => {
+            state.ratingStatus = 'loading';
+        });
+
+        builder.addCase(fetchRatingData.fulfilled, (state, action) => {
+            state.ratingStatus = 'succeeded';
+            state.averageRating = action.payload.average;
+            state.myRating = action.payload.myRating;
+        });
+
+        builder.addCase(fetchRatingData.rejected, (state) => {
+            state.ratingStatus = 'failed';
+        });
+
+        builder.addCase(rateDocument.fulfilled, (state, action) => {
+            state.myRating = action.payload;
         });
     },
 });

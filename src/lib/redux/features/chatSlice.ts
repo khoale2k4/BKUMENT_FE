@@ -83,7 +83,7 @@ export const sendMessageAsync = createAsyncThunk(
             const response = await chatService.sendMessage(conversationId, message, typeUpper, tempId);
             return { ...response, tempId };
         } catch (error: any) {
-            return rejectWithValue({ error: error.response?.data?.message || 'Failed to send message', tempId });
+            return rejectWithValue({ error: error.response?.data?.message || 'common.errors.sendFailed', tempId });
         }
     }
 );
@@ -96,7 +96,7 @@ export const createChatAsync = createAsyncThunk(
             console.log("Created chat response:", response);
             return response;
         } catch (error: any) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to create chat');
+            return rejectWithValue(error.response?.data?.message || 'common.errors.createFailed');
         }
     }
 );
@@ -118,7 +118,7 @@ export const uploadConversationAvatarAsync = createAsyncThunk(
             return assetId;
         } catch (error: any) {
             console.error("Lỗi upload avatar:", error);
-            return rejectWithValue(error.message || 'Lỗi khi cập nhật ảnh đại diện');
+            return rejectWithValue(error.message || 'common.errors.updateFailed');
         }
     }
 );
@@ -145,7 +145,7 @@ export const sendImageMessageAsync = createAsyncThunk(
             return result;
         } catch (error: any) {
             console.error("Lỗi gửi tin nhắn ảnh:", error);
-            return rejectWithValue(error.message || 'Lỗi khi gửi ảnh');
+            return rejectWithValue(error.message || 'common.errors.sendFailed');
         }
     }
 );

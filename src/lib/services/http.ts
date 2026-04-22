@@ -1,59 +1,60 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import { getAccessToken } from '@/lib/utils/token';
+import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
+import { getAccessToken } from "@/lib/utils/token";
 
 /**
  * HTTP client dùng chung cho toàn bộ ứng dụng
  * Tự động gắn Authorization header nếu có token
  */
 const httpClient: AxiosInstance = axios.create({
-    timeout: 30000,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+  timeout: 30000,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 /**
  * Request interceptor - tự động gắn token vào header
  */
 httpClient.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-        const token = getAccessToken();
+  (config: InternalAxiosRequestConfig) => {
+    const token = getAccessToken();
+    console.log("quang lay token ở http client:", token); // Debug log
 
-        if (token && config.headers) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
 );
 
 /**
  * Response interceptor - xử lý lỗi tập trung
  */
 httpClient.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        // Có thể thêm logic xử lý lỗi tập trung ở đây
-        // Ví dụ: redirect về login nếu 401
-        if (error.response?.status === 401) {
-            // Handle unauthorized
-            console.error('Unauthorized - Token may be invalid or expired');
-            if (typeof window !== 'undefined') {
-                const currentPath = window.location.pathname + window.location.search;
-                // if (!currentPath.includes('/login')) {
-                //     localStorage.setItem('redirectUrl', currentPath);
-                //     sessionStorage.removeItem('accessToken');
-                //     sessionStorage.removeItem('currentRole');
-                //     window.location.href = '/login';
-                // }
-            }
-        }
-
-        return Promise.reject(error);
+  (response) => response,
+  (error) => {
+    // Có thể thêm logic xử lý lỗi tập trung ở đây
+    // Ví dụ: redirect về login nếu 401
+    if (error.response?.status === 401) {
+      // Handle unauthorized
+      console.error("Unauthorized - Token may be invalid or expired");
+      if (typeof window !== "undefined") {
+        const currentPath = window.location.pathname + window.location.search;
+        // if (!currentPath.includes('/login')) {
+        //     localStorage.setItem('redirectUrl', currentPath);
+        //     localStorage.removeItem('accessToken');
+        //     localStorage.removeItem('currentRole');
+        //     window.location.href = '/login';
+        // }
+      }
     }
+
+    return Promise.reject(error);
+  },
 );
 
 export default httpClient;

@@ -2,54 +2,39 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 // Adjust the import path for RootState to match your project structure
 import { RootState } from "@/lib/redux/store";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
-import * as courseService from '@/lib/services/course.service';
+import * as courseService from "@/lib/services/course.service";
 import httpClient from "@/lib/services/http";
+import { showToast } from "./toastSlice";
+import { uploadAvatarImage } from "@/lib/services/user.service";
+import { Topic, Subject, Schedule, Course } from "../../../types/course";
 // --- Interfaces ---
-
-export interface Schedule {
-  dayOfWeek: string;
-  startTime: string; // HH:MM:SS
-  endTime: string; // HH:MM:SS
-}
-
-export interface CourseItem {
-  id: string;
-  name: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  schedules: Schedule[];
-  status: string;
-  tutorId: string;
-  tutorName: string;
-  tutorAvatar: string;
-  topicName: string;
-  subjectName: string;
-}
-
-// Interface cho Môn học và Chủ đề (New)
-export interface Topic {
-  id: string;
-  name: string;
-}
-
-export interface Subject {
-  id: string; // VD: INT1005
-  name: string; // VD: Cơ sở dữ liệu
-  topics: Topic[];
-}
 
 export interface CreateClassRequest {
   name: string;
   description: string;
   startDate: string;
+  coverImageUrl: string;
   endDate: string;
   topicId: string;
   schedules: Schedule[];
 }
 
+export interface ClassNotification {
+  id: string;
+  title: string;
+  message: string;
+  sentAt: string;
+  classId: string;
+  className: string;
+}
+
+export interface CreateNotificationRequest {
+  title: string;
+  message: string;
+}
+
 interface TutorCourseState {
-  classes: CourseItem[];
+  classes: Course[];
   subjects: Subject[]; // (New) Danh sách môn học tutor được dạy
   loading: boolean;
   submitting: boolean;
@@ -61,7 +46,7 @@ interface TutorCourseState {
   members: any[]; // Có thể định nghĩa interface riêng cho member nếu cần
   pendingMembers: any[]; // Danh sách thành viên chờ duyệt
   loadingMembers: boolean;
-  viewedTutorClasses: CourseItem[];
+  viewedTutorClasses: Course[];
   loadingViewedClasses: boolean;
   notifications: ClassNotification[];
   notificationsCurrentPage: number;
@@ -75,6 +60,7 @@ interface TutorCourseState {
   documentsTotalPages: number;
   loadingDocuments: boolean;
   documentsError: string | null;
+  isCoverUploading: boolean;
 }
 
 const initialState: TutorCourseState = {
@@ -89,6 +75,7 @@ const initialState: TutorCourseState = {
     name: "",
     description: "",
     startDate: "",
+    coverImageUrl: "",
     endDate: "",
     topicId: "",
     schedules: [],
@@ -109,28 +96,27 @@ const initialState: TutorCourseState = {
   documentsTotalPages: 1,
   loadingDocuments: false,
   documentsError: null,
+  isCoverUploading: false,
 };
 
-// --- Interfaces --- (Thêm vào phần đầu file)
-
-export interface ClassNotification {
-  id: string;
-  title: string;
-  message: string;
-  sentAt: string;
-  classId: string;
-  className: string;
-}
-
-export interface CreateNotificationRequest {
-  title: string;
-  message: string;
-}
+export const uploadCoverImage = createAsyncThunk(
+  "tutorCourse/uploadCoverImage",
+  async (file: File, { rejectWithValue }) => {
+    try {
+      return await uploadAvatarImage(file);
+    } catch (error: any) {
+      return rejectWithValue(error.message || "common.errors.uploadFailed");
+    }
+  },
+);
 
 // 1. Get all classes for the tutor
 export const getAllTeachingClasses = createAsyncThunk(
   "tutorCourse/getAllTeachingClasses",
-  async ({ page, size }: { page: number; size: number }, { rejectWithValue }) => {
+  async (
+    { page, size }: { page: number; size: number },
+    { rejectWithValue },
+  ) => {
     try {
       const data = await courseService.getAllTeachingClasses(page, size);
       if (data.code !== 1000) throw new Error(data.message);
@@ -169,7 +155,10 @@ export const createClass = createAsyncThunk(
 export const updateClass = createAsyncThunk(
   "tutorCourse/updateClass",
   async (
-    { classId, courseData }: { classId: string; courseData: CreateClassRequest },
+    {
+      classId,
+      courseData,
+    }: { classId: string; courseData: CreateClassRequest },
     { rejectWithValue },
   ) => {
     try {
@@ -186,7 +175,8 @@ export const cancelClass = createAsyncThunk(
   async (classId: string, { rejectWithValue }) => {
     try {
       const data = await courseService.cancelClass(classId);
-      if (data.code !== 1000) throw new Error(data.message || "Failed to cancel class");
+      if (data.code !== 1000)
+        throw new Error(data.message || "common.errors.updateFailed");
       return classId;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -221,9 +211,12 @@ export const getMemberPendingInCourse = createAsyncThunk(
 // 7. Get classes by tutorId
 export const getClassesByTutorId = createAsyncThunk(
   "tutorClasses/getClassesByTutorId",
-  async (tutorId: string, { rejectWithValue }) => {
+  async (
+    { tutorId, page, size }: { tutorId: string; page: number; size: number },
+    { rejectWithValue },
+  ) => {
     try {
-      return await courseService.getClassesByTutorId(tutorId);
+      return await courseService.getClassesByTutorId(tutorId, page, size);
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);
     }
@@ -235,10 +228,31 @@ export const approveMember = createAsyncThunk(
   "tutorCourse/approveMember",
   async (
     { enrollmentId, isApproved }: { enrollmentId: string; isApproved: boolean },
-    { rejectWithValue },
+    { dispatch, rejectWithValue },
   ) => {
     try {
-      const result = await courseService.approveMember(enrollmentId, isApproved);
+      const result = await courseService.approveMember(
+        enrollmentId,
+        isApproved,
+      );
+      if (isApproved == true) {
+        dispatch(
+          showToast({
+            type: "success",
+            title: "common.toast.success",
+            message: "classroom.members.approveSuccess",
+          }),
+        );
+      } else {
+        dispatch(
+          showToast({
+            type: "success",
+            title: "common.toast.success",
+            message: "classroom.members.rejectSuccess",
+          }),
+        );
+      }
+
       return { enrollmentId, isApproved, result };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -265,7 +279,10 @@ export const getClassNotifications = createAsyncThunk(
 export const createClassNotification = createAsyncThunk(
   "tutorCourse/createClassNotification",
   async (
-    { classId, payload }: { classId: string; payload: CreateNotificationRequest },
+    {
+      classId,
+      payload,
+    }: { classId: string; payload: CreateNotificationRequest },
     { rejectWithValue },
   ) => {
     try {
@@ -290,8 +307,6 @@ export const getClassDocuments = createAsyncThunk(
     }
   },
 );
-
-
 
 const tutorCourseSlice = createSlice({
   name: "tutorCourse",
@@ -340,7 +355,10 @@ const tutorCourseSlice = createSlice({
       .addCase(getMySubjects.fulfilled, (state, action) => {
         state.loading = false;
         // Xử lý cả trường hợp trả về trực tiếp mảng hoặc object chứa thuộc tính data/content từ phân trang
-        state.subjects = (action.payload as any)?.data || (action.payload as any)?.content || (Array.isArray(action.payload) ? action.payload : []);
+        state.subjects =
+          (action.payload as any)?.data ||
+          (action.payload as any)?.content ||
+          (Array.isArray(action.payload) ? action.payload : []);
       })
       .addCase(getMySubjects.rejected, (state, action) => {
         state.loading = false;
@@ -413,7 +431,10 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getClassDocuments.fulfilled, (state, action) => {
         state.loadingDocuments = false;
-        state.classDocuments = action.payload?.data || action.payload?.content || (Array.isArray(action.payload) ? action.payload : []);
+        state.classDocuments =
+          action.payload?.data ||
+          action.payload?.content ||
+          (Array.isArray(action.payload) ? action.payload : []);
         state.documentsCurrentPage = action.payload?.currentPage || 1;
         state.documentsTotalPages = action.payload?.totalPages || 1;
       })
@@ -456,11 +477,21 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(getClassesByTutorId.fulfilled, (state, action) => {
         state.loadingViewedClasses = false;
-        
+
         // CÁCH SỬA LỖI TẠI ĐÂY: Ép kiểu payload thành any để TypeScript không báo lỗi thuộc tính 'data'
         const payload = action.payload as any;
-        
-        state.viewedTutorClasses = Array.isArray(payload) ? payload : (payload?.data || payload?.content || []);
+
+        state.viewedTutorClasses = Array.isArray(payload)
+          ? payload
+          : payload?.data || payload?.content || [];
+        // gán đề phân trang
+        if (!Array.isArray(payload)) {
+          state.totalPages = payload?.totalPages || 1;
+          state.currentPage = payload?.currentPage ?? (payload?.number || 0); // Hỗ trợ cả Spring Boot (number)
+        } else {
+          // Fallback nếu API chỉ trả về mảng chay mà không có data phân trang
+          state.totalPages = Math.ceil(payload.length / 5);
+        }
       })
       .addCase(getClassesByTutorId.rejected, (state, action) => {
         state.loadingViewedClasses = false;
@@ -491,7 +522,7 @@ const tutorCourseSlice = createSlice({
       .addCase(createClassNotification.fulfilled, (state, action) => {
         state.creatingNotification = false;
 
-        // UX Cực tốt: Thay vì phải gọi lại API lấy list, 
+        // UX Cực tốt: Thay vì phải gọi lại API lấy list,
         // ta đẩy luôn thông báo mới vừa tạo lên ĐẦU danh sách hiện tại.
         // Giúp UI cập nhật ngay lập tức mà không bị giật lag.
         state.notifications.unshift(action.payload);
@@ -499,6 +530,20 @@ const tutorCourseSlice = createSlice({
       .addCase(createClassNotification.rejected, (state, action) => {
         state.creatingNotification = false;
         state.notificationError = action.payload as string;
+      });
+
+    // --- Handle uploadCoverImage ---
+    builder
+      .addCase(uploadCoverImage.pending, (state) => {
+        state.isCoverUploading = true;
+        state.error = null;
+      })
+      .addCase(uploadCoverImage.fulfilled, (state) => {
+        state.isCoverUploading = false;
+      })
+      .addCase(uploadCoverImage.rejected, (state, action) => {
+        state.isCoverUploading = false;
+        state.error = action.payload as string;
       });
   },
 });

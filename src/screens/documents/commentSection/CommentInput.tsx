@@ -2,6 +2,8 @@ import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 import { useAppSelector } from "@/lib/redux/hooks";
 import { useState, useRef, useEffect } from "react";
 
+import { useTranslation } from "react-i18next";
+
 interface CommentInputProps {
     currentUser: User;
     placeholder?: string;
@@ -14,13 +16,14 @@ interface CommentInputProps {
 
 export function CommentInput({
     currentUser,
-    placeholder = "Thêm bình luận của bạn...",
+    placeholder,
     initialValue = "",
     isReply = false,
     autoFocus = false,
     onCancel,
     onSubmit
 }: CommentInputProps) {
+    const { t } = useTranslation();
     const [text, setText] = useState(initialValue);
     const { user } = useAppSelector((state) => state.profile);
     
@@ -70,7 +73,7 @@ export function CommentInput({
                         ref={textareaRef}
                         value={text}
                         onChange={(e) => setText(e.target.value)}
-                        placeholder={placeholder}
+                        placeholder={placeholder || t('common.placeholders.comment')}
                         className={`w-full bg-gray-100 border-none rounded-xl p-4 resize-none text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-300 text-base ${isReply ? 'h-20 text-sm p-3 mb-2' : 'h-24 mb-2'}`}
                     />
 
@@ -80,7 +83,7 @@ export function CommentInput({
                                 onClick={onCancel}
                                 className="px-3 py-1.5 text-gray-500 text-sm font-medium hover:text-gray-900 hover:bg-gray-100 rounded-full transition"
                             >
-                                Hủy
+                                {t('common.confirm.cancel')}
                             </button>
                         )}
                         {text.trim() && (
@@ -88,7 +91,7 @@ export function CommentInput({
                                 onClick={handleSubmit}
                                 className={`bg-black text-white rounded-full font-medium hover:bg-gray-800 transition ${isReply ? 'px-4 py-1.5 text-sm' : 'px-4 py-2 text-sm'}`}
                             >
-                                {isReply ? 'Phản hồi' : 'Đăng bình luận'}
+                                {isReply ? t('common.actions.reply') : t('common.actions.postComment')}
                             </button>
                         )}
                     </div>

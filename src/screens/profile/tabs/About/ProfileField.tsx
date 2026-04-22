@@ -1,4 +1,4 @@
-import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export interface ProfileFieldProps {
   label: string;
@@ -6,11 +6,15 @@ export interface ProfileFieldProps {
   name: string;
   isEditing: boolean;
   type?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   icon?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-const ProfileField: React.FC<ProfileFieldProps> = ({ label, value, name, isEditing, type = "text", onChange, icon }) => {
+const ProfileField: React.FC<ProfileFieldProps> = ({ 
+  label, value, name, isEditing, type = "text", onChange, icon, children 
+}) => {
+  const { t } = useTranslation();
   const displayValue = value || '';
 
   return (
@@ -21,13 +25,15 @@ const ProfileField: React.FC<ProfileFieldProps> = ({ label, value, name, isEditi
       </label>
 
       {isEditing ? (
-        type === 'textarea' ? (
+        children ? (
+          <div className="pt-1">{children}</div>
+        ) : type === 'textarea' ? (
           <textarea
             name={name}
             value={displayValue}
             onChange={onChange}
             className="w-full p-0 text-lg text-gray-900 border-b border-gray-300 focus:border-black focus:ring-0 bg-transparent resize-none min-h-[80px] outline-none transition-colors placeholder:text-gray-300"
-            placeholder={`Enter your ${label.toLowerCase()}...`}
+            placeholder={t('profile.user.fieldPlaceholder', `Enter your ${label.toLowerCase()}...`, { label: label.toLowerCase() })}
           />
         ) : (
           <input
@@ -36,12 +42,12 @@ const ProfileField: React.FC<ProfileFieldProps> = ({ label, value, name, isEditi
             value={displayValue}
             onChange={onChange}
             className="w-full p-0 py-1 text-lg text-gray-900 border-b border-gray-300 focus:border-black focus:ring-0 bg-transparent outline-none transition-colors placeholder:text-gray-300"
-            placeholder={`Enter your ${label.toLowerCase()}...`}
+            placeholder={t('profile.user.fieldPlaceholder', `Enter your ${label.toLowerCase()}...`, { label: label.toLowerCase() })}
           />
         )
       ) : (
         <p className={`text-lg text-gray-800 py-1 border-b border-transparent ${!displayValue && 'italic text-gray-400'}`}>
-          {displayValue || 'Not provided'}
+          {displayValue || t('profile.user.about.notUpdated', 'Not provided')}
         </p>
       )}
     </div>

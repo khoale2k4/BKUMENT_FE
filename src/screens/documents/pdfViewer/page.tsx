@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
+import { useTranslation } from 'react-i18next';
 import { PDFLoadingSkeleton } from './skeleton';
 import { getAccessToken } from '@/lib/utils/token';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 export default function PDFViewer({ fileUrl, token }: { fileUrl: string, token: string | null }) {
+    const { t } = useTranslation();
     const [numPages, setNumPages] = useState<number>(0);
     const [containerWidth, setContainerWidth] = useState<number>(0);
     const [isExpanded, setIsExpanded] = useState<boolean>(false);
@@ -39,12 +41,12 @@ export default function PDFViewer({ fileUrl, token }: { fileUrl: string, token: 
                 onLoadSuccess={onDocumentLoadSuccess}
                 loading={<PDFLoadingSkeleton />}
                 noData={
-                    <div className="text-gray-400 text-sm">Chưa có tài liệu nào được chọn</div>
+                    <div className="text-gray-400 text-sm">{t('common.noDocumentSelected')}</div>
                 }
                 error={
                     <div className="flex flex-col items-center text-red-500 py-10 gap-2">
-                        <span className="font-semibold">Lỗi tải file</span>
-                        <span className="text-sm">Vui lòng kiểm tra lại đường dẫn.</span>
+                        <span className="font-semibold">{t('common.error.fileLoad')}</span>
+                        <span className="text-sm">{t('common.error.checkPath')}</span>
                     </div>
                 }
             >
@@ -63,7 +65,7 @@ export default function PDFViewer({ fileUrl, token }: { fileUrl: string, token: 
                                 }
                             />
                             <div className="text-center text-xs text-gray-400 py-2 bg-gray-50">
-                                Page {pageNumber} of {numPages}
+                                {t('common.pageInfo', { page: pageNumber, total: numPages })}
                             </div>
                         </div>
                     ))}
@@ -74,7 +76,7 @@ export default function PDFViewer({ fileUrl, token }: { fileUrl: string, token: 
                             onClick={() => setIsExpanded(true)}
                             className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full shadow-sm hover:bg-gray-50 transition font-medium text-sm flex items-center gap-2 cursor-pointer"
                         >
-                            Xem thêm {numPages - 5} trang
+                            {t('common.seeMorePages', { count: numPages - 5 })}
                         </button>
                     </div>
                 )}
@@ -84,7 +86,7 @@ export default function PDFViewer({ fileUrl, token }: { fileUrl: string, token: 
                             onClick={() => setIsExpanded(false)}
                             className="bg-white border border-gray-300 text-gray-700 px-6 py-2 rounded-full shadow-sm hover:bg-gray-50 transition font-medium text-sm flex items-center gap-2"
                         >
-                            Thu gọn
+                            {t('common.collapse')}
                         </button>
                     </div>
                 )}

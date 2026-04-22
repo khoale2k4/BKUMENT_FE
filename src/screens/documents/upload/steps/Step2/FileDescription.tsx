@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { FileUploadItem } from "@/types/FileUpload";
 import FileItemEditor from "./FileItemEditor";
 
@@ -8,6 +9,7 @@ interface FileDescriptionProps {
 }
 
 const FileDescription = ({ files = [], onFilesChange }: FileDescriptionProps) => {
+    const { t } = useTranslation();
     const handleDetailChange = (localId: string, field: keyof FileUploadItem, value: string | string[]) => {
         if (!onFilesChange) return;
 
@@ -29,7 +31,7 @@ const FileDescription = ({ files = [], onFilesChange }: FileDescriptionProps) =>
         <div className="w-full max-w-5xl mx-auto overflow-visible">
             {files.length === 0 ? (
                 <div className="p-10 text-center border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 text-gray-400">
-                    Chưa có file nào để nhập thông tin
+                    {t('documents.upload.step2.placeholderNoFiles', 'No files to enter information')}
                 </div>
             ) : (
                 files.map((file) => (

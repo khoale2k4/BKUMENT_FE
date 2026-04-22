@@ -44,10 +44,34 @@ export const searchDocuments = async (page: number, size: number): Promise<Searc
 };
 
 /**
+ * Search top documents với pagination
+ */
+export const getTopDocuments = async (page: number, size: number): Promise<SearchResponse> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.TOP_DOCUMENTS(page, size));
+
+    return {
+        content: response.data.result.content,
+        totalPages: response.data.result.totalPages || 10,
+    };
+};
+
+/**
  * Search blogs với pagination
  */
 export const searchBlogs = async (page: number, size: number): Promise<SearchResponse> => {
     const response = await httpClient.get(API_ENDPOINTS.BLOGS.SEARCH(page, size));
+
+    return {
+        content: response.data.result.content,
+        totalPages: response.data.result.totalPages || 10,
+    };
+};
+
+/**
+ * Search top blogs với pagination
+ */
+export const getTopBlogs = async (page: number, size: number): Promise<SearchResponse> => {
+    const response = await httpClient.get(API_ENDPOINTS.BLOGS.TOP_BLOGS(page, size));
 
     return {
         content: response.data.result.content,

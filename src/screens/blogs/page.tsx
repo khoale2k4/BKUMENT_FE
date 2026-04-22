@@ -7,16 +7,20 @@ import { useRouter } from 'next/navigation';
 // 1. Import Redux hooks
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { useEffect } from 'react';
-import { fetchPost } from '@/lib/redux/features/blogSlice';
+import { fetchPost, rateBlog } from '@/lib/redux/features/blogSlice';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { openConfirmModal, openReportModal } from '@/lib/redux/features/modalSlice';
 import { deleteBlogAsync } from '@/lib/redux/features/myBlogSlice';
 import { showToast } from '@/lib/redux/features/toastSlice';
 import { IconDots, IconTrash, IconFlag, IconShare } from '@tabler/icons-react';
+import { Eye } from 'lucide-react';
 import { AppRoute } from '@/lib/appRoutes';
 import { useState, useRef } from 'react';
+import StarRating from '@/components/ui/StarRating';
+import CommentSection from '../documents/commentSection/page';
 
 import parse, { HTMLReactParserOptions, Element } from 'html-react-parser';
+import { formatDate } from '@/lib/utils/formatDate';
 
 interface PageProps {
     params: {
@@ -30,22 +34,39 @@ export default function BlogDetailPage(params: PageProps) {
     const router = useRouter();
     const dispatch = useAppDispatch();
 
-    const { id, title, contentHTML, coverImage, visibility, author, createdAt, status } = useAppSelector(
+    const {
+        id,
+        title,
+        contentHTML,
+        coverImage,
+        visibility,
+        author,
+        createdAt,
+        status,
+        averageRating,
+        myRating,
+        views
+    } = useAppSelector(
         (state) => state.blogs
     );
     const currentUser = useAppSelector(state => state.profile.user);
     const isOwner = currentUser?.id === author?.id;
 
+    const handleRate = (rating: number) => {
+        if (!id) return;
+        dispatch(rateBlog({ resourceId: id, rating }));
+    };
+
     const parseOptions: HTMLReactParserOptions = {
         replace(domNode) {
             if (domNode instanceof Element && domNode.name === 'img') {
                 const { src, alt, className } = domNode.attribs;
-                
+
                 return (
-                    <AuthenticatedImage 
-                        src={src} 
-                        alt={alt || t('blogs.detail.imageAlt', 'Post content image')} 
-                        className={className} 
+                    <AuthenticatedImage
+                        src={src}
+                        alt={alt || t('blogs.detail.imageAlt', 'Post content image')}
+                        className={className}
                         onError={(e: any) => {
                             e.currentTarget.src = "https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg";
                         }}
@@ -64,7 +85,7 @@ export default function BlogDetailPage(params: PageProps) {
             <div className="min-h-screen flex items-center justify-center bg-white">
                 <div className="flex flex-col items-center gap-3 text-gray-500">
                     <div className="w-8 h-8 border-2 border-gray-300 border-t-black rounded-full animate-spin" />
-                    <span className="text-sm font-medium">Đang tải bài viết...</span>
+                    <span className="text-sm font-medium">{t('blogs.detail.loading', 'Loading post...')}</span>
                 </div>
             </div>
         );
@@ -83,10 +104,10 @@ export default function BlogDetailPage(params: PageProps) {
                     </button>
 
                     <div className="flex gap-2">
-                        <BlogActionsMenu 
+                        <BlogActionsMenu
                             onShare={() => {
                                 navigator.clipboard.writeText(window.location.href);
-                                dispatch(showToast({ type: 'success', title: 'Thành công', message: 'Đã sao chép đường dẫn!' }));
+                                dispatch(showToast({ type: 'success', title: t('common.toast.success', 'Success'), message: t('blogs.detail.shareSuccess', 'Link copied to clipboard!') }));
                             }}
                             onReport={() => {
                                 if (id) dispatch(openReportModal({ targetId: id, type: 'BLOG' }));
@@ -94,10 +115,10 @@ export default function BlogDetailPage(params: PageProps) {
                             onDelete={() => {
                                 if (id) {
                                     dispatch(openConfirmModal({
-                                        title: "Xóa bài viết",
-                                        message: `Bạn có chắc chắn muốn xóa "${title}"? Hành động này không thể hoàn tác.`,
-                                        confirmText: "Xóa",
-                                        cancelText: "Hủy",
+                                        title: t('blogs.detail.deleteTitle', 'Delete Blog'),
+                                        message: t('blogs.detail.deleteMsg', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title: title }),
+                                        confirmText: t('blogs.detail.deleteBtn', 'Delete'),
+                                        cancelText: t('common.confirm.cancel', 'Cancel'),
                                         onConfirm: async () => {
                                             try {
                                                 await dispatch(deleteBlogAsync(id)).unwrap();
@@ -138,20 +159,39 @@ export default function BlogDetailPage(params: PageProps) {
                     <span className="text-gray-500 text-sm font-medium">
                         {t('blogs.detail.updatedJustNow', 'Updated just now')}
                     </span>
+                    <span className="text-gray-400 text-xs uppercase tracking-wide font-semibold">
+                        •
+                    </span>
+                    <div className="flex items-center gap-1.5 text-gray-500 text-sm font-medium">
+                        <Eye size={16} strokeWidth={2} />
+                        <span>{views || 0}</span>
+                    </div>
                 </div>
 
-                <h1 className="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-8">
+                <h1 className="text-3xl md:text-5xl font-extrabold text-black tracking-tight leading-[1.1] mb-6">
                     {title}
                 </h1>
+                <div className="mb-8">
+                    <StarRating
+                        rating={myRating}
+                        averageRating={averageRating}
+                        onRate={handleRate}
+                        readonly={!!myRating && myRating > 0}
+                        size="lg"
+                    />
+                </div>
 
                 <div className="flex items-center justify-between border-t border-b border-gray-100 py-4 mb-8">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                             {author?.avatarUrl ? (
-                                <img
+                                <AuthenticatedImage
                                     src={author.avatarUrl}
                                     alt="Author"
                                     className="w-full h-full object-cover"
+                                    onError={(e: any) => {
+                                        e.currentTarget.src = "https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg";
+                                    }}
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
@@ -161,13 +201,7 @@ export default function BlogDetailPage(params: PageProps) {
                         </div>
                         <div>
                             <div className="font-bold text-gray-900 text-sm">{author?.name || 'Author Name'}</div>
-                            <div className="text-xs text-gray-500">lythanhnhatquangthongnhat2004@gmail.com</div>
-                        </div>
-                    </div>
-
-                    <div className="flex gap-4 text-gray-400 text-sm">
-                        <div className="flex items-center gap-1">
-                            <IconEye size={16} /> 0 {t('blogs.detail.views', 'views')}
+                            <span>{createdAt ? formatDate(new Date(createdAt).toISOString()) : ''}</span>
                         </div>
                     </div>
                 </div>
@@ -175,9 +209,9 @@ export default function BlogDetailPage(params: PageProps) {
                 {coverImage && (
                     <div className="w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl overflow-hidden mb-10 shadow-sm border border-gray-100">
                         <AuthenticatedImage src={coverImage} onError={(e) => {
-                                e.currentTarget.src =
-                                    "https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg";
-                            }} className="w-full h-full object-cover" />
+                            e.currentTarget.src =
+                                "https://static.vecteezy.com/system/resources/thumbnails/004/141/669/small/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg";
+                        }} className="w-full h-full object-cover" />
                     </div>
                 )}
 
@@ -210,17 +244,20 @@ export default function BlogDetailPage(params: PageProps) {
                         ))}
                     </div>
                 </div>
+
+                <CommentSection params={{ id: params.params.id }} />
             </article>
         </div>
     );
 }
 
-function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: { 
-    onShare: () => void, 
-    onReport: () => void, 
-    onDelete: () => void, 
-    isOwner: boolean 
+function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
+    onShare: () => void,
+    onReport: () => void,
+    onDelete: () => void,
+    isOwner: boolean
 }) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -238,9 +275,9 @@ function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
 
     return (
         <div className="relative" ref={menuRef}>
-            <ActionIcon 
-                variant="subtle" 
-                color="gray" 
+            <ActionIcon
+                variant="subtle"
+                color="gray"
                 radius="xl"
                 onClick={() => setIsOpen(!isOpen)}
             >
@@ -254,15 +291,15 @@ function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <IconShare size={16} />
-                        Chia sẻ
+                        {t('blogs.detail.actions.share', 'Share')}
                     </button>
-                    
+
                     <button
                         onClick={() => { setIsOpen(false); onReport(); }}
                         className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                         <IconFlag size={16} />
-                        Báo cáo
+                        {t('blogs.detail.actions.report', 'Report')}
                     </button>
 
                     {isOwner && (
@@ -273,7 +310,7 @@ function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
                                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
                             >
                                 <IconTrash size={16} />
-                                Xóa bài viết
+                                {t('blogs.detail.actions.delete', 'Delete Blog')}
                             </button>
                         </>
                     )}

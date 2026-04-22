@@ -15,6 +15,7 @@ export interface DocumentDetail {
     university?: string;
     course?: string;
     createdAt: Date;
+    views: number;
 }
 
 interface Author {
@@ -96,7 +97,7 @@ export const getRelatedDocuments = async (id: string, page: number, size: number
  */
 export const searchUniversities = async (query: string, page: number, size: number): Promise<{ id: number; name: string; abbreviation: string; logoUrl: string | null }[]> => {
     const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.SEARCH_UNIVERSITIES(query, page, size));
-    return response.data.result;
+    return response.data.result.data;
 };
 
 /**
@@ -116,8 +117,59 @@ export const getMyDocuments = async (page: number, size: number): Promise<any> =
 };
 
 /**
+ * Lấy danh sách tài liệu của người dùng theo id
+ */
+export const getUserDocuments = async (userId: string, page: number, size: number): Promise<any> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.USER_DOCUMENTS(userId, page, size));
+    return response.data.result;
+};
+
+/**
+ * Lấy danh sách tài liệu nổi bật
+ */
+export const getTopDocuments = async (page: number, size: number): Promise<any> => {
+    const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.TOP_DOCUMENTS(page, size));
+    return response.data.result;
+};
+
+/**
  * Xóa tài liệu theo ID
  */
 export const deleteDocument = async (id: string): Promise<void> => {
     await httpClient.delete(API_ENDPOINTS.DOCUMENTS.DELETE(id));
+};
+
+/**
+ * Láy điểm đánh giá trung bình
+ */
+export const getAverageRating = async (resourceId: string): Promise<number> => {
+    try {
+        const response = await httpClient.get(API_ENDPOINTS.REPORT.GET_AVERAGE_RATING(resourceId));
+        const result = response.data.result;
+        return typeof result === 'object' ? (result.averageScore || result.score || 0) : (result || 0);
+    } catch (error) {
+        console.error("Lỗi khi lấy đánh giá trung bình:", error);
+        return 0;
+    }
+};
+
+/**
+ * Lấy đánh giá của bản thân
+ */
+export const getMyRating = async (resourceId: string): Promise<number> => {
+    try {
+        const response = await httpClient.get(API_ENDPOINTS.REPORT.GET_MY_RATING(resourceId));
+        const result = response.data.result;
+        return typeof result === 'object' ? (result.score || 0) : (result || 0);
+    } catch (error) {
+        console.error("Lỗi khi lấy đánh giá bản thân:", error);
+        return 0;
+    }
+};
+
+/**
+ * Gửi đánh giá mới
+ */
+export const submitRating = async (resourceId: string, score: number): Promise<void> => {
+    await httpClient.post(API_ENDPOINTS.REPORT.SUBMIT_RATING, { resourceId, score });
 };

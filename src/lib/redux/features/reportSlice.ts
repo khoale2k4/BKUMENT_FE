@@ -26,7 +26,7 @@ export const submitReportAsync = createAsyncThunk(
             return rejectWithValue(
                 error.response?.data?.message || 
                 error.message || 
-                'Lỗi khi gửi báo cáo'
+                'common.errors.sendFailed'
             );
         }
     }

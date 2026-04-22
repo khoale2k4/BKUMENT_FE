@@ -109,6 +109,7 @@ interface ProfileState {
 
   // Upload state
   isAvatarUploading: boolean;
+  isResourceUploading: boolean;
 }
 
 const initialState: ProfileState = {
@@ -136,13 +137,10 @@ const initialState: ProfileState = {
   viewedProfileError: null,
 
   isAvatarUploading: false,
+  isResourceUploading: false,
 };
 
-// --- 2. Async Thunks ---
 
-// ==================== USER THUNKS ====================
-
-// Feature 1: Get My Profile (User)
 export const getMyProfile = createAsyncThunk(
   "profile/getMyProfile",
   async (_, { rejectWithValue }) => {
@@ -153,13 +151,12 @@ export const getMyProfile = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
-          "Failed to fetch user profile",
+          "errors.notFound",
       );
     }
   },
 );
 
-// Feature 2: Edit My Profile (User)
 export const updateMyProfile = createAsyncThunk(
   "profile/updateMyProfile",
   async (updateData: UpdateProfileRequest, { rejectWithValue }) => {
@@ -170,12 +167,11 @@ export const updateMyProfile = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
-          "Failed to update user profile",
+          "errors.profileUpdateFailed",
       );
     }
   },
 );
-
 
 export const getFollowingByProfileId = createAsyncThunk(
   "profile/getFollowingByProfileId",
@@ -188,7 +184,6 @@ export const getFollowingByProfileId = createAsyncThunk(
   },
 );
 
-// === THÊM MỚI: Thunk Lấy danh sách Followers ===
 export const getFollowersByProfileId = createAsyncThunk(
   "profile/getFollowersByProfileId",
   async (
@@ -215,7 +210,7 @@ export const getProfileById = createAsyncThunk(
       const state = getState() as RootState;
       let token = state.auth?.token;
       if (!token && typeof window !== "undefined") {
-        token = sessionStorage.getItem("accessToken");
+        token = localStorage.getItem("accessToken");
       }
 
       console.log(`Fetching profile for ID: ${profileId} with token: ${token}`);
@@ -239,13 +234,12 @@ export const getProfileById = createAsyncThunk(
       return response.data.result as UserProfile;
     } catch (error: any) {
       // Nếu lỗi từ Axios thì message thường nằm ở error.response.data.message
-      const errorMessage = error.response?.data?.message || error.message || "Đã xảy ra lỗi";
+      const errorMessage = error.response?.data?.message || error.message || "errors.network";
       return rejectWithValue(errorMessage);
     }
   },
 );
 
-// Feature 2.5: Upload Avatar (User)
 export const uploadAvatar = createAsyncThunk(
   "profile/uploadAvatar",
   async (file: File, { rejectWithValue }) => {
@@ -253,14 +247,25 @@ export const uploadAvatar = createAsyncThunk(
       const avatarUrl = await uploadAvatarImage(file);
       return avatarUrl;
     } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to upload avatar");
+      return rejectWithValue(error.message || "errors.avatarUploadFailed");
+    }
+  },
+);
+
+export const uploadFile = createAsyncThunk(
+  "profile/uploadFile",
+  async (file: File, { rejectWithValue }) => {
+    try {
+      const fileUrl = await uploadAvatarImage(file);
+      return fileUrl;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to upload file");
     }
   },
 );
 
 // ==================== TUTOR THUNKS ====================
 
-// Feature 3: Get My Tutor Profile (Tutor)
 export const getMyTutorProfile = createAsyncThunk(
   "profile/getMyTutorProfile",
   async (_, { getState, rejectWithValue }) => {
@@ -272,7 +277,6 @@ export const getMyTutorProfile = createAsyncThunk(
   },
 );
 
-// Feature 4: Register / Create Tutor Profile (Tutor)
 export const registerTutorProfile = createAsyncThunk(
   "profile/registerTutorProfile",
   async (payload: RegisterTutorRequest, { getState, rejectWithValue }) => {
@@ -284,33 +288,16 @@ export const registerTutorProfile = createAsyncThunk(
   },
 );
 
-// Update tutor profile
 export const updateTutorProfile = createAsyncThunk(
   "profile/updateTutorProfile",
   async (updateData: UpdateTutorRequest, { getState, rejectWithValue }) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      // const response = await fetch(API_ENDPOINTS.ACCOUNT.UPDATE_TUTOR_INFO, {
-      //   method: "PATCH",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     ...(token && { Authorization: `Bearer ${token}` }),
-      //   },
-      //   body: JSON.stringify(updateData),
-      // });
-
-      // const data = await response.json();
-      // return data.result as TutorProfile;
       return await profileService.updateTutor(updateData);
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
   },
 );
-
-//
 
 // --- 3. Slice ---
 
@@ -427,6 +414,20 @@ const profileSlice = createSlice({
       })
       .addCase(uploadAvatar.rejected, (state, action) => {
         state.isAvatarUploading = false;
+        state.error = action.payload as string;
+      });
+
+    // --- Upload File ---
+    builder
+      .addCase(uploadFile.pending, (state) => {
+        state.isResourceUploading = true;
+        state.error = null;
+      })
+      .addCase(uploadFile.fulfilled, (state) => {
+        state.isResourceUploading = false;
+      })
+      .addCase(uploadFile.rejected, (state, action) => {
+        state.isResourceUploading = false;
         state.error = action.payload as string;
       });
 

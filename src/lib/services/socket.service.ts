@@ -1,6 +1,6 @@
-
 import { addMessage, receiveSocketMessageThunk } from '../redux/features/chatSlice';
 import { API_ENDPOINTS } from '../apiEndPoints';
+import i18n from '@/lib/utils/i18n';
 
 import { io, Socket } from "socket.io-client";
 import { AppDispatch } from "../redux/store";
@@ -80,20 +80,20 @@ class SocketService {
          this.dispatch(
             showToast({
               type: "info",
-              title: notificationData.title || "Thông báo mới",
+              title: notificationData.title || i18n.t('common.notifications.newNotification'),
               message:
                 notificationData.message ||
-                "Bạn vừa nhận được một thông báo mới.",
+                i18n.t('common.notifications.receivedNew'),
             }),
           );
 
         //   this.dispatch(
         //     showNotification({
         //       type: "info",
-        //       title: notificationData.title || "Thông báo mới",
+        //       title: notificationData.title || i18n.t('common.notifications.newNotification'),
         //       message:
         //         notificationData.message ||
-        //         "Bạn vừa nhận được một thông báo mới.",
+        //         i18n.t('common.notifications.receivedNew'),
         //     }),
         //   );
         }

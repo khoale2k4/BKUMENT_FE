@@ -29,8 +29,8 @@ const FileItemEditor = ({
     const [hasUniversitiesFetched, setHasUniversitiesFetched] = useState(false);
     const [hasCoursesFetched, setHasCoursesFetched] = useState(false);
 
-    const [isSelectingUniversity, setIsSelectingUniversity] = useState(false);
-    const [isSelectingCourse, setIsSelectingCourse] = useState(false);
+    const skipUniversitySearch = useRef(false);
+    const skipCourseSearch = useRef(false);
 
     const [universityQuery, setUniversityQuery] = useState(file.university || "");
     const [showUniversityDropdown, setShowUniversityDropdown] = useState(false);
@@ -70,55 +70,45 @@ const FileItemEditor = ({
     }, []);
 
     useEffect(() => {
-        if (isSelectingUniversity) {
+        if (skipUniversitySearch.current) {
+            skipUniversitySearch.current = false;
             return;
         }
 
-        if (universityDebounceTimer.current) {
-            clearTimeout(universityDebounceTimer.current);
-        }
+        if (universityDebounceTimer.current) clearTimeout(universityDebounceTimer.current);
 
         if (universityQuery.trim().length > 0) {
+            setShowUniversityDropdown(true);
             universityDebounceTimer.current = setTimeout(() => {
                 dispatch(searchUniversities(universityQuery));
                 setHasUniversitiesFetched(true);
-                setShowUniversityDropdown(true);
-            }, 1000);
+            }, 500);
         } else {
             setShowUniversityDropdown(false);
         }
 
-        return () => {
-            if (universityDebounceTimer.current) {
-                clearTimeout(universityDebounceTimer.current);
-            }
-        };
+        return () => clearTimeout(universityDebounceTimer.current!);
     }, [universityQuery, dispatch]);
 
     useEffect(() => {
-        if (isSelectingCourse) {
+        if (skipCourseSearch.current) {
+            skipCourseSearch.current = false;
             return;
         }
 
-        if (courseDebounceTimer.current) {
-            clearTimeout(courseDebounceTimer.current);
-        }
+        if (courseDebounceTimer.current) clearTimeout(courseDebounceTimer.current);
 
         if (courseQuery.trim().length > 0) {
+            setShowCourseDropdown(true);
             courseDebounceTimer.current = setTimeout(() => {
                 dispatch(searchCourses(courseQuery));
                 setHasCoursesFetched(true);
-                setShowCourseDropdown(true);
-            }, 1000);
+            }, 500);
         } else {
             setShowCourseDropdown(false);
         }
 
-        return () => {
-            if (courseDebounceTimer.current) {
-                clearTimeout(courseDebounceTimer.current);
-            }
-        };
+        return () => clearTimeout(courseDebounceTimer.current!);
     }, [courseQuery, dispatch]);
 
     useEffect(() => {
@@ -136,23 +126,21 @@ const FileItemEditor = ({
     }, [selectedCourse, topicQuery]);
 
     const handleUniversitySelect = (university: { id: number; name: string; abbreviation: string; logoUrl: string | null }) => {
-        setIsSelectingUniversity(true);
+        skipUniversitySearch.current = true;
         setUniversityQuery(university.name);
         setSelectedUniversityId(university.id.toString());
         onUpdate("university", university.name);
         onUpdate("universityId", university.id.toString());
         setShowUniversityDropdown(false);
-        setTimeout(() => setIsSelectingUniversity(false), 0);
     };
 
     const handleCourseSelect = (course: Course) => {
-        setIsSelectingCourse(true);
+        skipCourseSearch.current = true;
         setCourseQuery(course.name);
         setSelectedCourse(course);
         onUpdate("subject", course.name);
         onUpdate("courseId", course.id);
         setShowCourseDropdown(false);
-        setTimeout(() => setIsSelectingCourse(false), 0);
 
         setTopicQuery("");
         onUpdate("topic", "");
@@ -241,7 +229,7 @@ const FileItemEditor = ({
                 />
 
                 <AutocompleteField
-                    label={t('documents.upload.step2.course', 'Topic')}
+                    label={t('documents.upload.step2.topic', 'Topic')}
                     value={topicQuery}
                     onChange={setTopicQuery}
                     onFocus={handleTopicFocus}
@@ -249,7 +237,7 @@ const FileItemEditor = ({
                     items={filteredTopics}
                     showDropdown={showTopicDropdown}
                     disabled={!selectedCourse}
-                    placeholder={!selectedCourse ? t('documents.upload.step2.placeholderCourse', 'Select course...') : t('documents.upload.step2.placeholderTitle', 'Select topic...')}
+                    placeholder={!selectedCourse ? t('documents.upload.step2.placeholderCourse', 'Select course...') : t('documents.upload.step2.placeholderTopic', 'Select topic...')}
                     renderItem={(topic) => (
                         <div className="text-sm text-gray-900">{topic.name}</div>
                     )}

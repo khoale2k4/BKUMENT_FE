@@ -37,10 +37,11 @@ const EditCoursePage = () => {
     subjects,
     availableTopics,
     selectedSubjectId,
-    isEditMode,
-    handleInputChange,
-    handleSubjectChange,
-    handleAddSchedule,
+    isCoverUploading,
+    handleInputChange, 
+    handleSubjectChange, 
+    handleCoverImageChange,
+    handleAddSchedule, 
     handleRemoveSchedule,
     handleUpdateSchedule,
     handleSubmit,
@@ -69,8 +70,8 @@ const EditCoursePage = () => {
   return (
     <div className="max-w-5xl mx-auto p-10 bg-white min-h-screen font-sans animate-in fade-in duration-500">
       {/* Header */}
-      <button 
-        onClick={() => router.back()} 
+      <button
+        onClick={() => router.back()}
         className="mb-8 flex items-center gap-2 text-gray-500 hover:text-black font-medium transition-colors"
       >
         <ChevronLeft size={20} /> Back to Course
@@ -82,15 +83,18 @@ const EditCoursePage = () => {
         </h1>
 
         {/* 1. Basic Info */}
-        <BasicInfoSection 
+        <BasicInfoSection
           name={formData.name}
           startDate={formData.startDate}
           endDate={formData.endDate}
+          coverImageUrl={formData.coverImageUrl}
+          isUploading={isCoverUploading}
+          onUpload={handleCoverImageChange}
           onChange={handleInputChange}
         />
 
         {/* 2. Subject & Topic Selector */}
-        <SubjectTopicSection 
+        <SubjectTopicSection
           subjects={subjects}
           availableTopics={availableTopics}
           selectedSubjectId={selectedSubjectId}
@@ -101,13 +105,13 @@ const EditCoursePage = () => {
         />
 
         {/* 3. Description */}
-        <DescriptionSection 
+        <DescriptionSection
           description={formData.description}
           onChange={(val) => handleInputChange('description', val)}
         />
 
         {/* 4. Schedule Manager */}
-        <ScheduleSection 
+        <ScheduleSection
           schedules={formData.schedules}
           onAdd={handleAddSchedule}
           onRemove={handleRemoveSchedule}
@@ -117,11 +121,10 @@ const EditCoursePage = () => {
 
       {/* Footer Actions */}
       <div className="mt-20 flex justify-end">
-        <button 
+        <button
           disabled={submitting}
-          className={`px-10 py-3 bg-[#FF6636] text-white font-bold rounded-sm transition-all shadow-md ${
-            submitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#e55b30] hover:shadow-lg active:scale-95'
-          }`}
+          className={`px-10 py-3 bg-[#FF6636] text-white font-bold rounded-sm transition-all shadow-md ${submitting ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#e55b30] hover:shadow-lg active:scale-95'
+            }`}
           onClick={handleSubmit}
         >
           {submitting ? 'Updating...' : 'Save Changes'}

@@ -4,7 +4,11 @@ import { RootState } from "@/lib/redux/store";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as courseService from "@/lib/services/course.service";
 import * as profileService from "@/lib/services/profile.service";
-
+import { Topic, Subject, Schedule, Course } from "../../../types/course";
+import * as ratingService from "@/lib/services/rating.service"; // <-- THÊM IMPORT RATING SERVICE
+import { showToast } from "./toastSlice";
+import { Rating, CreateRatingPayload } from "@/lib/services/rating.service";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 export interface SearchFilters {
   keyword?: string; // Từ khóa tìm kiếm chung (có thể dùng để tìm theo tên gia sư, tên lớp, mô tả, v.v.)
   subjectName?: string;
@@ -12,40 +16,6 @@ export interface SearchFilters {
   format?: string;
   page?: number; // Thêm page vào filters để hỗ trợ phân trang
   size?: number; // Thêm size vào filters để hỗ trợ phân trang
-}
-
-// Thêm Interface cho Topic và Subject (từ API mới)
-export interface Topic {
-  id: string;
-  name: string;
-}
-
-export interface Subject {
-  id: string;
-  name: string;
-  topics: Topic[];
-}
-
-interface Schedule {
-  dayOfWeek: string;
-  startTime: string; // HH:MM:SS
-  endTime: string; // HH:MM:SS
-}
-
-interface Course {
-  id: string;
-  name: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  schedules: Schedule[];
-  status: string;
-  tutorId: string;
-  tutorName: string;
-  tutorAvatar: string;
-  topicName: string;
-  subjectName: string;
-  userStatus: string;
 }
 
 interface TutorInfo {
@@ -69,6 +39,7 @@ interface TutorInfo {
 export interface TutorData {
   tutor: TutorInfo;
   matchingClasses: Course[];
+  totalMatchingClasses?: number;
 }
 
 // Interface cho State của Slice này
@@ -97,6 +68,15 @@ interface TutorFindingState {
   enrollSuccess: boolean;
   currentPage: number;
   totalPages: number;
+  totalCourses: number; // Thêm tổng số khóa học vào state để hiển thị trên UI
+
+  tutorRatings: Rating[];
+  tutorRatingSummary: { averageScore: number; totalReviews: number } | null;
+  myTutorRating: Rating | null;
+  loadingRatings: boolean;
+  ratingsCurrentPage: number;
+  ratingsTotalPages: number;
+  isRatingSubmitting: boolean;
 }
 
 const initialState: TutorFindingState = {
@@ -129,32 +109,25 @@ const initialState: TutorFindingState = {
   enrollSuccess: false,
   currentPage: 1,
   totalPages: 1,
+  totalCourses: 0,
+
+  tutorRatings: [],
+  tutorRatingSummary: { averageScore: 0, totalReviews: 0 },
+  myTutorRating: null,
+  loadingRatings: false,
+  ratingsCurrentPage: 1,
+  ratingsTotalPages: 1,
+  isRatingSubmitting: false,
 };
 
 // --- Async Thunks ---
-
+// const currentUser = useAppSelector((state) => state.profile.user);
+// const currentUserId = currentUser?.id;
 // 1. Hàm Get Danh sách Môn học & Chủ đề (API Mới)
 export const getSearchSubjects = createAsyncThunk(
   "tutorFinding/getSearchSubjects",
   async (_, { getState, rejectWithValue }) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth?.token;
-      // const response = await fetch(API_ENDPOINTS.LMS.GET_SUBJECTS, {
-      //   method: "GET",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     ...(token && { Authorization: `Bearer ${token}` }),
-      //   },
-      // });
-
-      // const data = await response.json();
-      // //   console.log("Subjects API response:", data); // Debug log để xem cấu trúc dữ liệu trả về
-
-      // if (data.code !== 1000) {
-      //   throw new Error(data.message || "Failed to fetch subjects");
-      // }
-      // return data.result as Subject[];
       return await courseService.getSearchSubjects(); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -167,37 +140,6 @@ export const searchTutors = createAsyncThunk(
   "tutorFinding/searchTutors",
   async (filters: SearchFilters, { getState, rejectWithValue }) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth?.token;
-
-      // // 1. Tự động xây dựng Query String động bằng URLSearchParams
-      // // Nó sẽ tự động mã hóa UTF-8 tiếng Việt thành định dạng %C6%A1... chuẩn HTTP
-      // const queryParams = new URLSearchParams();
-
-      // if (filters.subjectName)
-      //   queryParams.append("subjectName", filters.subjectName);
-      // if (filters.topicName) queryParams.append("topicName", filters.topicName);
-      // if (filters.format) queryParams.append("format", filters.format);
-      // if (filters.keyword) queryParams.append("keyword", filters.keyword);
-      // const queryString = queryParams.toString();
-      // const url = `${API_ENDPOINTS.LMS.SEARCH_CLASSES}${queryString ? `?${queryString}` : ""}`;
-      // // 2. Gửi Request
-      // const response = await fetch(url, {
-      //   method: "GET",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     // Tùy chọn: Gửi token nếu API search yêu cầu đăng nhập, nếu là public thì bỏ đoạn này đi
-      //     ...(token && { Authorization: `Bearer ${token}` }),
-      //   },
-      // });
-
-      // const data = await response.json();
-      // console.log("Search Classs API response:", data); // Debug log để xem cấu trúc dữ liệu trả về
-
-      // // 3. Xử lý dữ liệu trả về
-      // if (data.code !== 1000)
-      //   throw new Error(data.message || "Failed to search tutors");
-      // return data.result as TutorData[];
       return await courseService.searchTutors(filters); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -213,27 +155,6 @@ export const getAllStudyingClasses = createAsyncThunk(
     { getState, rejectWithValue },
   ) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      // // Chèn page và size vào URL
-      // const response = await fetch(
-      //   `http://localhost:8888/api/v1/lms/classes/my-class?page=${page}&size=${size}`,
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       ...(token && { Authorization: `Bearer ${token}` }),
-      //     },
-      //   },
-      // );
-
-      // const data = await response.json();
-      // console.log("API Response for getAllStudyingClasses:", data); // Debug log
-      // if (data.code !== 1000) throw new Error(data.message);
-
-      // // Trả về toàn bộ cục result (chứa cả data và totalPages)
-      // return data.result;
       return await courseService.getAllStudyingClasses(page, size); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -246,27 +167,6 @@ export const getClassDetailsById = createAsyncThunk(
   "tutorFinding/getClassDetailsById",
   async (classId: string, { getState, rejectWithValue }) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      // const response = await fetch(
-      //   `http://localhost:8888/api/v1/lms/classes/${classId}`, // Sử dụng classId được truyền vào
-      //   {
-      //     method: "GET",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       ...(token && { Authorization: `Bearer ${token}` }),
-      //     },
-      //   },
-      // );
-
-      // const data = await response.json();
-      // console.log("API Response for getClassDetailsById:", data);
-
-      // if (data.code !== 1000) throw new Error(data.message || "Failed to fetch class details");
-
-      // // Trả về object Course chi tiết
-      // return data.result as Course;
       return await courseService.getClassDetailsById(classId); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -280,34 +180,6 @@ export const enrollInClass = createAsyncThunk(
   "tutorFinding/enrollInClass",
   async (classId: string, { getState, rejectWithValue }) => {
     try {
-      // const state = getState() as RootState;
-      // const token = state.auth.token || sessionStorage.getItem("accessToken");
-
-      // if (!token) {
-      //   return rejectWithValue("Vui lòng đăng nhập để đăng ký lớp học.");
-      // }
-
-      // const response = await fetch(
-      //   `http://localhost:8888/api/v1/lms/classes/${classId}/enroll`,
-      //   {
-      //     method: "POST", // Thường Enroll là POST
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       Authorization: `Bearer ${token}`,
-      //     },
-      //     // body: JSON.stringify({}), // Thêm body nếu Backend yêu cầu (ví dụ gửi ghi chú cho gia sư)
-      //   }
-      // );
-
-      // const data = await response.json();
-      // console.log("API Response for enrollInClass:", data);
-
-      // if (data.code !== 1000) {
-      //   throw new Error(data.message || "Đăng ký tham gia lớp học thất bại.");
-      // }
-
-      // // Trả về kết quả thành công
-      // return data.result;
       return await courseService.enrollInClass(classId); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
       return rejectWithValue(error.message);
@@ -356,6 +228,156 @@ export const rejectTutorApplication = createAsyncThunk(
   },
 );
 
+export const getTutorRatingsAsync = createAsyncThunk(
+  "tutorFinding/getTutorRatings",
+  async (
+    { tutorId, page, size }: { tutorId: string; page: number; size: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      // HÀM NÀY: Phải trả về nguyên cục phân trang (có chứa content và totalPages)
+      return await ratingService.getRatingsByTutorId(tutorId, page, size);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
+
+export const getTutorRatingSummaryAsync = createAsyncThunk(
+  "tutorFinding/getTutorRatingSummary",
+  async (tutorId: string, { rejectWithValue }) => {
+    try {
+      return await ratingService.getTutorRatingSummary(tutorId);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
+
+export const getMyTutorRatingAsync = createAsyncThunk(
+  "tutorFinding/getMyTutorRating",
+  async (
+    { tutorId, userId }: { tutorId: string; userId: string },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await ratingService.getMyRatingForTutor(tutorId, userId);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
+
+export const createRatingAsync = createAsyncThunk(
+  "tutorFinding/createRating",
+  async (
+    payload: CreateRatingPayload,
+    { dispatch, getState, rejectWithValue },
+  ) => {
+    try {
+      const result = await ratingService.createRating(payload);
+      dispatch(
+        showToast({
+          type: "success",
+          title: "Thành công",
+          message: "Cảm ơn bạn đã đánh giá!",
+        }),
+      );
+
+      // 1. Dùng getState() để lấy toàn bộ dữ liệu Redux
+      const state = getState() as RootState;
+      // 2. Chọt vào đúng kho profile để lấy user ID
+      const currentUserId = state.profile.user?.id;
+
+      dispatch(getTutorRatingSummaryAsync(payload.tutorId));
+
+      // 3. Nếu có ID thì mới gọi hàm getMyTutor...
+      if (currentUserId) {
+        dispatch(
+          getMyTutorRatingAsync({
+            tutorId: payload.tutorId,
+            userId: String(currentUserId),
+          }),
+        );
+      }
+      return result;
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || "Đánh giá thất bại";
+      dispatch(showToast({ type: "error", title: "Lỗi", message: errorMsg }));
+      return rejectWithValue(errorMsg);
+    }
+  },
+);
+
+export const updateRatingAsync = createAsyncThunk(
+  "tutorFinding/updateRating",
+  async (
+    { ratingId, payload }: { ratingId: string; payload: CreateRatingPayload },
+    { dispatch, getState, rejectWithValue },
+  ) => {
+    try {
+      const result = await ratingService.updateRating(ratingId, payload);
+      dispatch(
+        showToast({
+          type: "success",
+          title: "Thành công",
+          message: "Đã cập nhật đánh giá!",
+        }),
+      );
+
+      // 1. Dùng getState() để lấy toàn bộ dữ liệu Redux
+      const state = getState() as RootState;
+      // 2. Chọt vào đúng kho profile để lấy user ID
+      const currentUserId = state.profile.user?.id;
+
+      dispatch(getTutorRatingSummaryAsync(payload.tutorId));
+
+      // 3. Nếu có ID thì mới gọi hàm getMyTutor...
+      if (currentUserId) {
+        dispatch(
+          getMyTutorRatingAsync({
+            tutorId: payload.tutorId,
+            userId: String(currentUserId),
+          }),
+        );
+      }
+      return result;
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || "Cập nhật thất bại";
+      dispatch(showToast({ type: "error", title: "Lỗi", message: errorMsg }));
+      return rejectWithValue(errorMsg);
+    }
+  },
+);
+
+export const deleteRatingAsync = createAsyncThunk(
+  "tutorFinding/deleteRating",
+  async (
+    { ratingId, tutorId }: { ratingId: string; tutorId: string },
+    { dispatch, rejectWithValue },
+  ) => {
+    try {
+      await ratingService.deleteRating(ratingId);
+      dispatch(
+        showToast({
+          type: "success",
+          title: "Thành công",
+          message: "Đã xóa đánh giá!",
+        }),
+      );
+
+      dispatch(getTutorRatingSummaryAsync(tutorId));
+      // dispatch(getMyTutorRatingAsync({ tutorId, userId: "me" }));
+
+      return ratingId;
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.message || "Xóa thất bại";
+      dispatch(showToast({ type: "error", title: "Lỗi", message: errorMsg }));
+      return rejectWithValue(errorMsg);
+    }
+  },
+);
+
 // --- Slice ---
 
 const tutorFindingSlice = createSlice({
@@ -390,6 +412,17 @@ const tutorFindingSlice = createSlice({
       .addCase(searchTutors.fulfilled, (state, action) => {
         state.loading = false;
         state.tutors = action.payload.data || []; // Gán data.result trả về vào list tutors
+        // Lấy mảng data trả về từ API
+        const rawData = action.payload.data || [];
+
+        // Map qua từng gia sư và đếm số lượng matchingClasses
+        state.tutors = rawData.map((item: any) => {
+          const matchCount = item.matchingClasses?.length || 0;
+          return {
+            ...item,
+            totalMatchingClasses: matchCount, // Lưu lại con số vừa đếm được
+          };
+        });
         state.currentPage = action.payload.currentPage || 1;
         state.totalPages = action.payload.totalPages || 1;
       })
@@ -506,22 +539,24 @@ const tutorFindingSlice = createSlice({
         state.error = action.payload as string;
       });
 
-      builder
+    builder
       .addCase(approveTutorApplication.pending, (state) => {
         // Bạn có thể không cần set loading = true ở đây nếu không muốn giật UI
-        // state.loading = true; 
+        // state.loading = true;
         state.error = null;
       })
       .addCase(approveTutorApplication.fulfilled, (state, action) => {
         // state.loading = false;
-        
+
         // Tuyệt chiêu: Lấy tutorId mà bạn đã truyền vào thunk thông qua action.meta.arg
-        const tutorId = action.meta.arg; 
+        const tutorId = action.meta.arg;
 
         // Tìm gia sư đó trong state và cập nhật trạng thái thành APPROVED
-        const tutorIndex = state.tutors.findIndex((t) => t.tutor.id === tutorId);
+        const tutorIndex = state.tutors.findIndex(
+          (t) => t.tutor.id === tutorId,
+        );
         if (tutorIndex !== -1) {
-          state.tutors[tutorIndex].tutor.status = 'APPROVED';
+          state.tutors[tutorIndex].tutor.status = "APPROVED";
         }
       })
       .addCase(approveTutorApplication.rejected, (state, action) => {
@@ -538,16 +573,81 @@ const tutorFindingSlice = createSlice({
       })
       .addCase(rejectTutorApplication.fulfilled, (state, action) => {
         // Lấy thông tin tutorId và reason đã truyền vào thunk
-        const { tutorId} = action.meta.arg;
+        const { tutorId } = action.meta.arg;
 
         // Tìm gia sư đó trong state và cập nhật trạng thái thành REJECTED + gắn lý do
-        const tutorIndex = state.tutors.findIndex((t) => t.tutor.id === tutorId);
+        const tutorIndex = state.tutors.findIndex(
+          (t) => t.tutor.id === tutorId,
+        );
         if (tutorIndex !== -1) {
-          state.tutors[tutorIndex].tutor.status = 'REJECTED';
+          state.tutors[tutorIndex].tutor.status = "REJECTED";
         }
       })
       .addCase(rejectTutorApplication.rejected, (state, action) => {
         state.error = action.payload as string;
+      });
+
+    builder
+      .addCase(getTutorRatingsAsync.pending, (state) => {
+        state.loadingRatings = true;
+      })
+      .addCase(getTutorRatingsAsync.fulfilled, (state, action) => {
+        state.loadingRatings = false;
+        state.tutorRatings = action.payload?.content || [];
+        state.ratingsTotalPages = action.payload?.totalPages || 1;
+      })
+      .addCase(getTutorRatingsAsync.rejected, (state) => {
+        state.loadingRatings = false;
+      });
+
+    builder.addCase(getMyTutorRatingAsync.fulfilled, (state, action) => {
+      state.myTutorRating = action.payload;
+    });
+
+    // 2. Lấy Tổng quan Đánh giá (Điểm trung bình & Tổng lượt đánh giá)
+    builder.addCase(getTutorRatingSummaryAsync.fulfilled, (state, action) => {
+      state.tutorRatingSummary = {
+        averageScore: action.payload.averageScore,
+        totalReviews: action.payload.totalReviews,
+      };
+    });
+
+    // 4. Các trạng thái khi Đăng / Sửa / Xóa đánh giá
+    builder
+      .addCase(createRatingAsync.pending, (state) => {
+        state.isRatingSubmitting = true;
+      })
+      .addCase(createRatingAsync.fulfilled, (state) => {
+        state.isRatingSubmitting = false;
+      })
+      .addCase(createRatingAsync.rejected, (state) => {
+        state.isRatingSubmitting = false;
+      });
+
+    builder
+      .addCase(updateRatingAsync.pending, (state) => {
+        state.isRatingSubmitting = true;
+      })
+      .addCase(updateRatingAsync.fulfilled, (state) => {
+        state.isRatingSubmitting = false;
+      })
+      .addCase(updateRatingAsync.rejected, (state) => {
+        state.isRatingSubmitting = false;
+      });
+
+    builder
+      .addCase(deleteRatingAsync.pending, (state) => {
+        state.isRatingSubmitting = true;
+      })
+      .addCase(deleteRatingAsync.fulfilled, (state, action) => {
+        state.isRatingSubmitting = false;
+        state.myTutorRating = null; // Cập nhật lại UI bản thân không còn đánh giá
+        state.tutorRatings = state.tutorRatings.filter(
+          (rating) => rating.id !== action.payload,
+        ); // Xóa khỏi list hiện tại
+      })
+      .addCase(deleteRatingAsync.rejected, (state) => {
+        state.isRatingSubmitting = false;
       });
   },
 });

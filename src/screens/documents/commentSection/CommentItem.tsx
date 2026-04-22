@@ -5,7 +5,12 @@ import { formatDate } from "@/lib/utils/formatDate";
 import { Comment } from "@/lib/services/comment.service";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 import { useAppDispatch } from "@/lib/redux/hooks";
-import { fetchRepliesByCommentId } from "@/lib/redux/features/documentSlice"; // Import thêm
+import { fetchReplies } from "@/lib/redux/features/commentSlice";
+
+interface User {
+    name: string;
+    avatar: string;
+}
 
 interface CommentItemProps {
     comment: Comment;
@@ -18,6 +23,8 @@ interface CommentItemProps {
     isChild?: boolean; 
 }
 
+import { useTranslation } from "react-i18next";
+
 export const CommentItem = memo(function CommentItem({
     comment,
     currentUser,
@@ -28,6 +35,7 @@ export const CommentItem = memo(function CommentItem({
     onSubmitReply,
     isChild = false
 }: CommentItemProps) {
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
     
     const [showReplies, setShowReplies] = useState(false);
@@ -38,14 +46,14 @@ export const CommentItem = memo(function CommentItem({
     const isLoadingReplies = comment.isLoadingReplies || false;
 
     const handleToggleReplies = () => {
-        if (!showReplies && replies.length === 0) {
-            dispatch(fetchRepliesByCommentId({ parentId: comment.id.toString(), page: 0, size: 5 }));
+        if (!showReplies && (replies.length === 0 || repliesPage === 0)) {
+            dispatch(fetchReplies({ parentId: comment.id.toString(), page: 0, size: 5 }));
         }
         setShowReplies(!showReplies);
     };
     
     const handleLoadMoreReplies = () => {
-        dispatch(fetchRepliesByCommentId({ parentId: comment.id.toString(), page: repliesPage + 1, size: 5 }));
+        dispatch(fetchReplies({ parentId: comment.id.toString(), page: repliesPage + 1, size: 5 }));
     }
 
     return (
@@ -71,7 +79,7 @@ export const CommentItem = memo(function CommentItem({
                     >
                         <MessageCircle size={20} />
                         <span className="text-sm font-medium">
-                            {showReplies ? 'Ẩn phản hồi' : `Xem ${numberOfChildComment} phản hồi`}
+                            {showReplies ? t('common.actions.hideReplies') : t('common.actions.viewReplies', { count: numberOfChildComment })}
                         </span>
                     </button>
                 )}
@@ -80,7 +88,7 @@ export const CommentItem = memo(function CommentItem({
                     onClick={() => onReplyClick(comment.id, comment.user)}
                     className="text-sm font-medium hover:text-gray-900 transition"
                 >
-                    Reply
+                    {t('common.actions.reply')}
                 </button>}
             </div>
 
@@ -102,7 +110,7 @@ export const CommentItem = memo(function CommentItem({
                     {isLoadingReplies && repliesPage === 0 ? (
                         <div className="flex items-center gap-2 text-sm text-gray-500 py-2">
                             <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-                            Đang tải...
+                            {t('common.loading')}
                         </div>
                     ) : replies.length > 0 ? (
                         <>
@@ -126,12 +134,14 @@ export const CommentItem = memo(function CommentItem({
                                     disabled={isLoadingReplies}
                                     className="text-sm text-blue-600 font-medium hover:underline disabled:opacity-50 mt-2"
                                 >
-                                    {isLoadingReplies ? "Đang tải..." : "Xem thêm phản hồi"}
+                                    {isLoadingReplies ? t('common.loading') : t('common.actions.loadMoreReplies')}
                                 </button>
                             )}
                         </>
                     ) : (
-                        <div className="text-sm text-gray-500 py-2">Chưa có phản hồi nào.</div>
+                        <div className="text-sm text-gray-500 py-2">
+                            {t('layout.header.notifications.noReplies')}
+                        </div>
                     )}
                 </div>
             )}
