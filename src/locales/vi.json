@@ -828,7 +828,8 @@
       "requireRejectReason": "Vui lòng nhập lý do từ chối!",
       "confirmApprove": "Bạn có chắc chắn muốn DUYỆT hồ sơ của gia sư {{name}}?",
       "viewUserDetailAlert": "Xem chi tiết user: {{id}}",
-      "viewMoreBtn": "Xem thêm"
+      "viewMoreBtn": "Xem thêm",
+      "messageBtn": "Gửi tin nhắn"
     },
     "filters": {
       "online": "Trực tuyến",
