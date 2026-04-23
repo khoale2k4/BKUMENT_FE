@@ -35,16 +35,16 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
   console.log("userStatus từ Redux:", currentCourse?.userStatus);
 
   const handleCancel = async (id: string) => {
-    if (window.confirm(t('classroom.overview.cancelConfirm'))) {
+    if (window.confirm(t("classroom.overview.cancelConfirm"))) {
       setIsCanceling(true);
       const result = await dispatch(cancelClass(id));
       setIsCanceling(false);
 
       if (cancelClass.fulfilled.match(result)) {
-        alert(t('classroom.overview.cancelSuccess'));
-        router.push('/profile');
+        alert(t("classroom.overview.cancelSuccess"));
+        router.push("/profile");
       } else {
-        alert(t('common.error.prefix') + result.payload);
+        alert(t("common.error.prefix") + result.payload);
       }
     }
   };
@@ -55,9 +55,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
     setIsEnrolling(false);
 
     if (enrollInClass.fulfilled.match(result)) {
-      alert(t('classroom.overview.enrollSuccess'));
+      alert(t("classroom.overview.enrollSuccess"));
     } else {
-      alert(t('classroom.overview.enrollFail') + result.payload);
+      alert(t("classroom.overview.enrollFail") + result.payload);
     }
   };
 
@@ -70,6 +70,11 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
 
   console.log("userstatus của lớp:", currentCourse.userStatus);
   console.log("mo ta lop hoc truoc khi render:", currentCourse.description);
+
+  // if (currentCourse.description === "<p></p>") {
+  //   const localizedNoDescription = t("classroom.overview.noDescription");
+  //   currentCourse.description = localizedNoDescription;
+  // }
 
   // 2. Cấu hình Parser để "bắt" thẻ img và thay bằng AuthenticatedImage
   const parseOptions: HTMLReactParserOptions = {
@@ -88,9 +93,15 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
 
   return (
     <div className="bg-[#f9f9f9] rounded-2xl p-8 border border-gray-100 shadow-sm animate-in fade-in duration-500 flex flex-col min-h-[300px] justify-between">
-      
       <div className="space-y-6 text-gray-700 leading-relaxed text-[16px]">
-        <p>{currentCourse.description || t('classroom.overview.noDescription')}</p>
+        {currentCourse.description != "<p></p>" &&
+          parse(currentCourse.description, parseOptions)}
+
+        {currentCourse.description === "<p></p>" && (
+          <p className="text-gray-500 italic">
+            {t("classroom.overview.noDescription")}
+          </p>
+        )}
       </div>
 
       <div className="flex justify-end mt-8 pt-6 border-t border-gray-200">
@@ -106,10 +117,16 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
                   ? "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
                   : "bg-white border border-red-200 text-red-500 hover:bg-red-50 hover:border-red-500 active:scale-95"
               }`}
-          >
-            {isCanceling ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
-            {isAlreadyCancelled ? t('classroom.overview.status.cancelled') : t('classroom.overview.status.cancelAction')}
-          </button>
+            >
+              {isCanceling ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Trash2 size={16} />
+              )}
+              {isAlreadyCancelled
+                ? t("classroom.overview.status.cancelled")
+                : t("classroom.overview.status.cancelAction")}
+            </button>
           </>
         )}
 
@@ -126,13 +143,18 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
                   ? "bg-gray-100 border border-gray-200 text-gray-400 cursor-not-allowed"
                   : "bg-orange-500 border border-orange-500 text-white hover:bg-orange-600 active:scale-95"
               }`}
-          >
-            {isEnrolling ? <Loader2 size={16} className="animate-spin" /> : <UserPlus size={16} />}
-            {isAlreadyCancelled 
-                ? t('classroom.overview.status.cancelled') 
-                : (!isEnrollingStatus ? t('classroom.overview.status.closed') : t('classroom.overview.status.enrollAction'))
-            }
-          </button>
+            >
+              {isEnrolling ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <UserPlus size={16} />
+              )}
+              {isAlreadyCancelled
+                ? t("classroom.overview.status.cancelled")
+                : !isEnrollingStatus
+                  ? t("classroom.overview.status.closed")
+                  : t("classroom.overview.status.enrollAction")}
+            </button>
           </>
         )}
 
@@ -140,14 +162,14 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
         {currentCourse.userStatus == "APPROVED" && (
           <div className="flex items-center gap-2.5 px-6 py-2.5 bg-green-50 border border-green-200 text-green-700 rounded-full font-semibold text-sm shadow-sm cursor-default">
             <CheckCircle size={18} className="text-green-600" />
-            <span>{t('classroom.overview.status.member')}</span>
+            <span>{t("classroom.overview.status.member")}</span>
           </div>
-        )}  
+        )}
 
-        { currentCourse.userStatus === 'PENDING'  && (
+        {currentCourse.userStatus === "PENDING" && (
           <div className="flex items-center gap-2.5 px-6 py-2.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-full font-semibold text-sm shadow-sm cursor-wait">
             <Clock size={18} className="text-amber-600 animate-pulse" />
-            <span>{t('classroom.overview.status.pending')}</span>
+            <span>{t("classroom.overview.status.pending")}</span>
           </div>
         )}
       </div>
