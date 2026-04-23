@@ -3,9 +3,13 @@ import { UNDERSCORE_GLOBAL_ERROR_ROUTE } from "next/dist/shared/lib/entry-consta
 import { RegisterTutorRequest } from "./redux/features/profileSlice";
 // https://api.bkument.io.vn/
 // http://143.198.80.199:8888/api/v1
+// const API_BASE_URL =
+//   process.env.NEXT_PUBLIC_API_URL || "https://api.bkument.io.vn/api/v1";
 const API_BASE_URL = "https://api.bkument.io.vn/api/v1";
 // http://143.198.80.199:8099
 const SOCKET_URL = "http://143.198.80.199:8099";
+// const SOCKET_URL =
+//   process.env.NEXT_PUBLIC_SOCKET_URL || "http://143.198.80.199:8099";
 
 //http://143.198.80.199:8888/api/v1
 const IDENTITY = "/identity";
@@ -87,9 +91,7 @@ export const API_ENDPOINTS = {
     // http://143.198.80.199:8888/api/v1/profile/universities/search?query=HC&page=1&size=10
 
     SEARCH_UNIVERSITIES: (query: string, page: number, size: number) =>
-      buildUrl(
-        `${PROFILE}/universities/search?q=${query}&page=${page}&size=${size}`,
-      ),
+      buildUrl(`${PROFILE}/search?q=${query}&page=${page}&size=${size}`),
     MY_DOCUMENTS: (page: number, size: number) =>
       buildUrl(`${DOCUMENT}/my-documents?page=${page}&size=${size}`),
     USER_DOCUMENTS: (userId: string, page: number, size: number) =>
