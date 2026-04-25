@@ -163,3 +163,19 @@ export const enrollInClass = async (classId: string) => {
   );
   return response.data.result;
 };
+
+export const getTrendingClasses = async (page: number, size: number) => {
+  const response = await httpClient.get(
+    API_ENDPOINTS.LMS.GET_TRENDING_CLASSES(page, size),
+  );
+  console.log("API Response for trending classes:", response.data.result); // Debug log
+  return response.data.result;
+};
+
+export const getRecommendedClasses = async (page: number, size: number) => {
+  const response = await httpClient.get(
+    API_ENDPOINTS.LMS.GET_RECOMMENDED_CLASSES(page, size),
+  );
+  console.log("API Response for recommended classes:", response.data.result); // Debug log
+  return response.data.result;
+};

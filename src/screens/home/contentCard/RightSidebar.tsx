@@ -3,7 +3,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-import { Star, BookOpen, Calendar, UserCircle } from "lucide-react";
+import { Star, Calendar, UserCircle, Flame, Sparkles } from "lucide-react";
 import clsx from "clsx";
 import { AppRoute } from "@/lib/appRoutes";
 import { PersonMayKnow } from "@/lib/services/article.service";
@@ -11,11 +11,16 @@ import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
+// @ts-ignore
 import "swiper/css";
+// @ts-ignore
 import "swiper/css/pagination";
+
 interface RightSidebarProps {
   peopleMayKnow: PersonMayKnow[];
-  tutors: any; // Thay 'any' bằng interface Tutor thực tế của bạn
+  tutors: any;
+  trendingCourses: any[]; // Thêm data khóa học thịnh hành
+  recommendedCourses: any[]; // Thêm data khóa học gợi ý
   followingIds: string[];
   followingLoading: Set<string>;
   onFollow: (person: PersonMayKnow) => void;
@@ -26,6 +31,8 @@ interface RightSidebarProps {
 export default function RightSidebar({
   peopleMayKnow,
   tutors,
+  trendingCourses = [],
+  recommendedCourses = [],
   followingIds,
   followingLoading,
   onFollow,
@@ -34,12 +41,129 @@ export default function RightSidebar({
 }: RightSidebarProps) {
   const { t } = useTranslation();
   const router = useRouter();
-  const promoCourses = [...(tutors.data || tutors)]
-    .flatMap((item: any) => item.matchingClasses || [])
-    .filter(Boolean) // Lọc bỏ các giá trị null/undefined
-    .slice(0, 5); // Lấy tối đa 5 khóa học để chạy quảng cáo
 
-  console.log("🚀 ~ file: RightSidebar.tsx:34 ~ promoCourses:", promoCourses);
+  // ==============================================================
+  // COMPONENT TÁI SỬ DỤNG CHO SLIDER KHÓA HỌC
+  // ==============================================================
+  const CourseSlider = ({
+    title,
+    icon: Icon,
+    courses,
+  }: {
+    title: string;
+    icon: any;
+    courses: any[];
+  }) => {
+    if (!courses || courses.length === 0) return null;
+
+    return (
+      <div className="mt-10">
+        <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
+          <Icon size={18} className="text-orange-500 fill-orange-500" />
+          {title}
+        </h3>
+
+        <Swiper
+          modules={[Autoplay, Pagination]}
+          spaceBetween={16}
+          slidesPerView={1}
+          loop={courses.length > 1}
+          autoplay={{
+            delay: 5000,
+            disableOnInteraction: false,
+          }}
+          pagination={{
+            clickable: true,
+            dynamicBullets: true,
+          }}
+          className="w-full pb-8 promo-slider"
+        >
+          {courses.slice(0, 5).map((course: any) => {
+            const isValidTutorAvatar =
+              course.tutorAvatar && course.tutorAvatar.startsWith("http");
+            const fallbackTutorAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              course.tutorName || "Gia Sư",
+            )}&background=random&color=fff&bold=true`;
+
+            const coverImage =
+              course.coverImageUrl ||
+              "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop";
+
+            return (
+              <SwiperSlide key={course.id}>
+                <div
+                  onClick={() => router.push(`/courses/${course.id}`)}
+                  className="relative w-full h-[220px] rounded-2xl overflow-hidden cursor-pointer group shadow-sm border border-gray-100"
+                >
+                  {/* Ảnh Nền */}
+                  <AuthenticatedImage
+                    src={coverImage}
+                    alt={course.name}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+
+                  {/* Lớp phủ Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10"></div>
+
+                  {/* Nội dung */}
+                  <div className="absolute inset-0 p-5 flex flex-col justify-end">
+                    <span className="w-fit bg-orange-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-md mb-2.5 shadow-sm">
+                      {course.subjectName || course.topicName}
+                    </span>
+
+                    <h4 className="font-bold text-[16px] text-white leading-snug mb-3 line-clamp-2 group-hover:text-orange-300 transition-colors">
+                      {course.name}
+                    </h4>
+
+                    <div className="flex items-center justify-between border-t border-white/20 pt-3 mt-auto">
+                      <div className="flex items-center gap-2 text-gray-200 text-[12px] font-medium min-w-0">
+                        <img
+                          src={
+                            isValidTutorAvatar
+                              ? course.tutorAvatar
+                              : fallbackTutorAvatar
+                          }
+                          alt={course.tutorName}
+                          className="w-5 h-5 rounded-full object-cover border border-white/30 shrink-0"
+                        />
+                        <span className="truncate">{course.tutorName}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-gray-300 text-[11px] shrink-0">
+                        <Calendar size={12} />
+                        <span>
+                          {course.startDate
+                            ? new Date(course.startDate).toLocaleDateString(
+                                "vi-VN",
+                              )
+                            : "Sắp mở"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </SwiperSlide>
+            );
+          })}
+        </Swiper>
+
+        <style jsx global>{`
+          .promo-slider .swiper-pagination-bullet {
+            background-color: #d1d5db;
+            opacity: 1;
+            width: 6px;
+            height: 6px;
+            transition: all 0.3s ease;
+          }
+          .promo-slider .swiper-pagination-bullet-active {
+            background-color: #f97316;
+            width: 16px;
+            border-radius: 4px;
+          }
+        `}</style>
+      </div>
+    );
+  };
 
   return (
     <aside className="hidden xl:block w-80 pl-10 py-8 border-l border-gray-100">
@@ -132,14 +256,10 @@ export default function RightSidebar({
 
       {/* 3. TOP RATED TUTORS */}
       <div>
-        <h3 className="font-bold text-gray-900 mb-5  flex items-center gap-2">
+        <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
           <Star size={16} className="fill-orange-500 text-orange-500" />
           Top-rated tutors
         </h3>
-        {/* <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
-            <Star size={16} className="fill-orange-500 text-orange-500" />
-            Khóa học nổi bật
-          </h3> */}
         <div className="flex flex-col gap-5">
           {[...(tutors.data || tutors)]
             .sort((a: any, b: any) => {
@@ -208,121 +328,19 @@ export default function RightSidebar({
         </button>
       </div>
 
-      {promoCourses.length > 0 && (
-        <div className="mt-10">
-          {/* Tiêu đề nằm ngoài, đồng bộ style với Top-rated tutors */}
-          <h3 className="font-bold text-gray-900 mb-5 flex items-center gap-2">
-            <Star size={16} className="fill-orange-500 text-orange-500" />
-            Khóa học nổi bật
-          </h3>
+      {/* 4. TRENDING COURSES SLIDER */}
+      <CourseSlider
+        title="Khóa học thịnh hành"
+        icon={Flame}
+        courses={trendingCourses}
+      />
 
-          <Swiper
-            modules={[Autoplay, Pagination]}
-            spaceBetween={16}
-            slidesPerView={1}
-            loop={promoCourses.length > 1}
-            autoplay={{
-              delay: 5000,
-              disableOnInteraction: false,
-            }}
-            pagination={{
-              clickable: true,
-              dynamicBullets: true,
-            }}
-            // Thêm padding bottom để nhường chỗ cho dấu chấm
-            className="w-full pb-8 promo-slider"
-          >
-            {promoCourses.map((course: any) => {
-              // Xử lý avatar gia sư dự phòng trong thẻ khóa học
-              const isValidTutorAvatar =
-                course.tutorAvatar && course.tutorAvatar.startsWith("http");
-              const fallbackTutorAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                course.tutorName || "Gia Sư",
-              )}&background=random&color=fff&bold=true`;
-
-              // Nếu khóa học không có ảnh cover, dùng 1 ảnh mặc định về học tập
-              const coverImage =
-                course.coverImageUrl ||
-                "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop";
-
-              return (
-                <SwiperSlide key={course.id}>
-                  <div
-                    onClick={() => router.push(`/courses/${course.id}`)}
-                    className="relative w-full h-[220px] rounded-2xl overflow-hidden cursor-pointer group shadow-sm border border-gray-100"
-                  >
-                    {/* Ảnh Nền Khóa Học */}
-                    <AuthenticatedImage
-                      src={coverImage}
-                      alt={course.name}
-                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-
-                    {/* Lớp phủ Gradient (Làm mờ/tối ảnh để chữ nổi lên) */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10"></div>
-
-                    {/* Nội dung đè lên trên ảnh */}
-                    <div className="absolute inset-0 p-5 flex flex-col justify-end">
-                      {/* Tên môn học (Tag) */}
-                      <span className="w-fit bg-orange-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-md mb-2.5 shadow-sm">
-                        {course.subjectName}
-                      </span>
-
-                      {/* Tên khóa học */}
-                      <h4 className="font-bold text-[16px] text-white leading-snug mb-3 line-clamp-2 group-hover:text-orange-300 transition-colors">
-                        {course.name}
-                      </h4>
-
-                      {/* Thông tin Gia sư & Ngày khai giảng */}
-                      <div className="flex items-center justify-between border-t border-white/20 pt-3 mt-auto">
-                        {/* Gia sư */}
-                        <div className="flex items-center gap-2 text-gray-200 text-[12px] font-medium min-w-0">
-                          <img
-                            src={
-                              isValidTutorAvatar
-                                ? course.tutorAvatar
-                                : fallbackTutorAvatar
-                            }
-                            alt={course.tutorName}
-                            className="w-5 h-5 rounded-full object-cover border border-white/30 shrink-0"
-                          />
-                          <span className="truncate">{course.tutorName}</span>
-                        </div>
-
-                        {/* Ngày tháng */}
-                        <div className="flex items-center gap-1.5 text-gray-300 text-[11px] shrink-0">
-                          <Calendar size={12} />
-                          <span>
-                            {new Date(course.startDate).toLocaleDateString(
-                              "vi-VN",
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </SwiperSlide>
-              );
-            })}
-          </Swiper>
-
-          {/* CSS tùy chỉnh dấu chấm để hợp với nền trắng */}
-          <style jsx global>{`
-            .promo-slider .swiper-pagination-bullet {
-              background-color: #d1d5db; /* Xám nhạt */
-              opacity: 1;
-              width: 6px;
-              height: 6px;
-              transition: all 0.3s ease;
-            }
-            .promo-slider .swiper-pagination-bullet-active {
-              background-color: #f97316; /* Cam nổi bật */
-              width: 16px; /* Kéo dài dấu chấm active ra một chút cho hiện đại */
-              border-radius: 4px;
-            }
-          `}</style>
-        </div>
-      )}
+      {/* 5. RECOMMENDED COURSES SLIDER */}
+      <CourseSlider
+        title="Khóa học gợi ý cho bạn"
+        icon={Sparkles}
+        courses={recommendedCourses}
+      />
     </aside>
   );
 }
