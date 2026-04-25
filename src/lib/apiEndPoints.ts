@@ -243,6 +243,12 @@ export const API_ENDPOINTS = {
 
     REJECT_APPLICATION: (id: string) =>
       buildUrl(`${LMS}/tutors/admin/applications/${id}/reject`),
+
+    GET_TRENDING_CLASSES: (page: number, size: number) =>
+      buildUrl(`${LMS}/classes/trending?page=${page}&size=${size}`),
+
+    GET_RECOMMENDED_CLASSES: (page: number, size: number) =>
+      buildUrl(`${LMS}/classes/recommendations?page=${page}&size=${size}`),
   },
 
   REPORT: {

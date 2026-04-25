@@ -27,6 +27,10 @@ import { searchTutors } from "@/lib/redux/features/tutorFindingSlice";
 // Import 2 component vừa tách
 import PersonCard from "./contentCard/PersonalCard";
 import RightSidebar from "./contentCard/RightSidebar";
+import {
+  getRecommendedClasses,
+  getTrendingClasses,
+} from "@/lib/redux/features/tutorCourseSlice";
 
 const PAGE_SIZE = 10;
 const PEOPLE_PAGE_SIZE = 10;
@@ -55,6 +59,10 @@ export default function HomePage() {
     followingIds,
   } = useAppSelector((state) => state.articles);
 
+  const { trendingClasses, recommendedClasses } = useAppSelector(
+    (state) => state.tutorCourse,
+  );
+
   const { tutors = [] } = useAppSelector(
     (state: any) => state.tutorFinding || {},
   );
@@ -77,6 +85,8 @@ export default function HomePage() {
   useEffect(() => {
     dispatch(fetchPeopleMayKnow({ page: 0, size: 3 }));
     dispatch(searchTutors({ page: 0, size: 10 }));
+    dispatch(getTrendingClasses({ page: 0, size: 5 }));
+    dispatch(getRecommendedClasses({ page: 0, size: 5 }));
   }, [dispatch]);
 
   // Fetch Feed/Search theo Tab
@@ -456,6 +466,8 @@ export default function HomePage() {
       <RightSidebar
         peopleMayKnow={peopleMayKnow}
         tutors={tutors}
+        trendingCourses={trendingClasses} // <-- Trỏ tới mảng data trong Redux
+        recommendedCourses={recommendedClasses} // <-- Trỏ tới mảng data trong Redux
         followingIds={followingIds}
         followingLoading={followingLoading}
         onFollow={onFollow}

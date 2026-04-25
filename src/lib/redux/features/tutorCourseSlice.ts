@@ -35,6 +35,8 @@ export interface CreateNotificationRequest {
 
 interface TutorCourseState {
   classes: Course[];
+  trendingClasses: Course[];
+  recommendedClasses: Course[];
   subjects: Subject[]; // (New) Danh sách môn học tutor được dạy
   loading: boolean;
   submitting: boolean;
@@ -65,6 +67,8 @@ interface TutorCourseState {
 
 const initialState: TutorCourseState = {
   classes: [],
+  trendingClasses: [],
+  recommendedClasses: [],
   subjects: [], // (New)
   loading: false,
   submitting: false,
@@ -308,6 +312,34 @@ export const getClassDocuments = createAsyncThunk(
   },
 );
 
+export const getTrendingClasses = createAsyncThunk(
+  "tutorCourse/getTrendingClasses",
+  async (
+    { page, size }: { page: number; size: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await courseService.getTrendingClasses(page, size);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
+
+export const getRecommendedClasses = createAsyncThunk(
+  "tutorCourse/getRecommendedClasses",
+  async (
+    { page, size }: { page: number; size: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await courseService.getRecommendedClasses(page, size);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  },
+);
+
 const tutorCourseSlice = createSlice({
   name: "tutorCourse",
   initialState,
@@ -543,6 +575,37 @@ const tutorCourseSlice = createSlice({
       })
       .addCase(uploadCoverImage.rejected, (state, action) => {
         state.isCoverUploading = false;
+        state.error = action.payload as string;
+      });
+
+    builder
+      .addCase(getTrendingClasses.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getTrendingClasses.fulfilled, (state, action) => {
+        state.loading = false;
+        state.trendingClasses = action.payload.data || [];
+        state.currentPage = action.payload.currentPage;
+        state.totalPages = action.payload.totalPages || 1;
+      })
+      .addCase(getTrendingClasses.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      });
+    builder
+      .addCase(getRecommendedClasses.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getRecommendedClasses.fulfilled, (state, action) => {
+        state.loading = false;
+        state.recommendedClasses = action.payload.data || [];
+        state.currentPage = action.payload.currentPage;
+        state.totalPages = action.payload.totalPages || 1;
+      })
+      .addCase(getRecommendedClasses.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload as string;
       });
   },
