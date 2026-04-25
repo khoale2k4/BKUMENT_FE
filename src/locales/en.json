@@ -324,9 +324,13 @@
     "loading": "Loading data...",
     "justNow": "Just now",
     "time": {
-      "daysAgo": "{{count}} days ago",
+      "secondsAgo": "{{count}} seconds ago",
+      "minutesAgo": "{{count}} minutes ago",
       "hoursAgo": "{{count}} hours ago",
-      "minutesAgo": "{{count}} minutes ago"
+      "daysAgo": "{{count}} days ago",
+      "weeksAgo": "{{count}} weeks ago",
+      "monthsAgo": "{{count}} months ago",
+      "yearsAgo": "{{count}} years ago"
     },
     "pagination": {
       "previous": "Previous",

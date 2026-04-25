@@ -325,9 +325,13 @@
     "loading": "Đang tải dữ liệu...",
     "justNow": "Vừa xong",
     "time": {
-      "daysAgo": "{{count}} ngày trước",
+      "secondsAgo": "{{count}} giây trước",
+      "minutesAgo": "{{count}} phút trước",
       "hoursAgo": "{{count}} giờ trước",
-      "minutesAgo": "{{count}} phút trước"
+      "daysAgo": "{{count}} ngày trước",
+      "weeksAgo": "{{count}} tuần trước",
+      "monthsAgo": "{{count}} tháng trước",
+      "yearsAgo": "{{count}} năm trước"
     },
     "pagination": {
       "previous": "Trước",
