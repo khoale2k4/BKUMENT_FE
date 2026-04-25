@@ -62,7 +62,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                         {data?.title}
                     </h2>
                     <p className="text-gray-500 text-[15px] line-clamp-3 leading-relaxed font-normal">
-                        {data?.content}
+                        {data?.content?.startsWith('common.') ? t(data.content) : data.content}
                     </p>
                 </div>
 
@@ -84,7 +84,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                             key={idx}
                             className="bg-gray-50 text-gray-600 text-[12px] px-3 py-1 rounded-lg border border-gray-100 whitespace-nowrap hover:bg-white hover:border-gray-200 transition-colors"
                         >
-                            #{tag}
+                            #{tag.startsWith('common.') ? t(tag) : tag}
                         </span>
                     ))}
                 </div>

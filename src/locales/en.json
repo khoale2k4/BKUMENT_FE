@@ -490,14 +490,8 @@
         "report": "Report",
         "delete": "Delete Document"
       },
-      "detail": {
-        "download": "Download",
-        "description": "Description",
-        "views": "Views",
-        "downloads": "Downloads",
-        "comments": "Comments",
-        "loadMore": "Load more comments"
-      }
+      "comments": "Comments",
+      "loadMore": "Load more comments"
     },
     "upload": {
       "title": "Upload Documents",

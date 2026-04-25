@@ -491,14 +491,8 @@
         "report": "Báo cáo",
         "delete": "Xóa tài liệu"
       },
-      "detail": {
-        "download": "Tải xuống",
-        "description": "Mô tả",
-        "views": "Lượt xem",
-        "downloads": "Lượt tải",
-        "comments": "Bình luận",
-        "loadMore": "Xem thêm bình luận"
-      }
+      "comments": "Bình luận",
+      "loadMore": "Xem thêm bình luận"
     },
     "upload": {
       "title": "Tải tài liệu lên",
