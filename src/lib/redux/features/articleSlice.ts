@@ -71,7 +71,7 @@ export const fetchFeed = createAsyncThunk(
 
       content:
         category === "Documents"
-          ? dta.description || "common.placeholders.documentDescription"
+          ? dta.description || dta.summary || "common.placeholders.documentDescription"
           : dta.content || "",
 
       coverImage: dta.coverImage || dta.previewImageUrl,
@@ -81,6 +81,7 @@ export const fetchFeed = createAsyncThunk(
         dta.tags ||
         (category === "Documents" ? ["PDF", "Doc"] : ["common.tags.hot", "common.tags.daily"]),
       views: dta.views || 0,
+      recommendationReason: dta.recommendationReason,
     }));
 
     return {
@@ -110,7 +111,7 @@ export const searchKeyword = createAsyncThunk(
       title: result.title,
       time: result.createdAt || new Date().toISOString(),
 
-      content: result.description || "common.placeholders.documentDescription",
+      content: result.description || result.summary || "common.placeholders.documentDescription",
       totalItems: result.totalElements,
 
       coverImage:
@@ -121,6 +122,7 @@ export const searchKeyword = createAsyncThunk(
       tags: result.tags || ["common.tags.searchResult"],
       score: result.score,
       views: result.views || 0,
+      recommendationReason: result.recommendationReason,
     }));
 
     return {

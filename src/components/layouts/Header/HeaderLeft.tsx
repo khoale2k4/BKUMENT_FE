@@ -28,7 +28,7 @@ export default function HeaderLeft() {
             </button>
 
             <img
-                src="/images/icon-thang4.png"
+                src="/images/icon-30-4.png"
                 alt="Logo"
                 className="w-10 h-10 rounded-sm object-contain cursor-pointer hover:opacity-80 transition"
                 onClick={() => router.push(AppRoute.home)}

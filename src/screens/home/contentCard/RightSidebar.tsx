@@ -237,7 +237,7 @@ export default function RightSidebar({
                     "shrink-0 px-4 py-1.5 rounded-full border text-[13px] font-medium transition",
                     isFollowed
                       ? "bg-gray-100 text-gray-400 border-gray-200"
-                      : "border-gray-900 text-gray-900 hover:bg-gray-50 hover:shadow-sm",
+                      : "border-gray-900 text-gray-900 hover:bg-gray-50 hover:shadow-sm cursor-pointer",
                   )}
                 >
                   {isFollowed ? "Following" : "Follow"}

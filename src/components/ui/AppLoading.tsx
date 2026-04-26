@@ -29,7 +29,7 @@ export default function AppLoading({
 
             <div className="relative w-20 h-20 sm:w-24 sm:h-24 drop-shadow-md animate-loading-pulse">
                 <Image
-                    src="/images/icon-tet.png"
+                    src="/images/icon-30-4.png"
                     alt="VBook Loading"
                     fill
                     sizes="(max-w-768px) 80px, 96px"

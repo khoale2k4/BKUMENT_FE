@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
-import { FileText, User, Calendar } from 'lucide-react';
+import { Sparkles, FileText, User, Calendar } from 'lucide-react';
 
 interface RelatedDocumentProps {
     data: {
@@ -10,6 +10,10 @@ interface RelatedDocumentProps {
         coverImage?: string;
         author?: string;
         onClick: () => void;
+        recommendationReason?: {
+            type: string;
+            title: string;
+        };
     };
 }
 
@@ -21,6 +25,14 @@ export default function RelatedDocumentCard({ data }: RelatedDocumentProps) {
             className="group min-w-[280px] w-[280px] bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition cursor-pointer flex-shrink-0"
         >
             <div className="aspect-[3/4] w-full bg-gray-100 relative overflow-hidden">
+                {data.recommendationReason && (
+                    <div className="absolute top-2 left-2 z-10 flex items-center gap-1.5 px-2 py-1 bg-white/95 backdrop-blur-sm rounded-lg border border-gray-100 shadow-sm">
+                        <Sparkles size={11} className="text-gray-400" />
+                        <span className="text-[10px] text-gray-600 font-bold leading-none tracking-tight">
+                            {t(`common.recommendation.${data.recommendationReason.type}`, { title: data.recommendationReason.title || t('common.recommendation.genericItem') })}
+                        </span>
+                    </div>
+                )}
                 {data.coverImage ? (
                     <AuthenticatedImage src={data.coverImage} alt={data.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
                 ) : (

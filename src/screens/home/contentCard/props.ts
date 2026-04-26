@@ -1,3 +1,8 @@
+export interface RecommendationReason {
+    type: string;
+    title: string;
+}
+
 export interface CardProp {
     id: string,
     title: string,
@@ -9,7 +14,8 @@ export interface CardProp {
     tags: string[],
     onClick: (id: string) => void,
     token: string,
-    views: number
+    views: number,
+    recommendationReason?: RecommendationReason
 }
 
 interface Author {
