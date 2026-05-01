@@ -37,11 +37,7 @@ export default function Sidebar() {
     loading,
     unreadCount,
   } = useAppSelector((state) => state.modal.appNotifications) || {};
-
-  // 1. Lấy danh sách cuộc trò chuyện từ chatSlice
   const { conversations } = useAppSelector((state) => state.chat);
-
-  // 2. Tính toán số lượng tin nhắn (cuộc trò chuyện) chưa đọc
   const unreadMessagesCount = conversations.filter(
     (c) => c.isRead === false,
   ).length;
@@ -89,7 +85,6 @@ export default function Sidebar() {
       href: AppRoute.messages,
       count: unreadMessagesCount,
     },
-    // { icon: UserSearch, label: 'Find Tutors', href: AppRoute.tutors, count: 0 },
     {
       icon: Bell,
       label: t("layout.sidebar.notifications"),
@@ -111,7 +106,6 @@ export default function Sidebar() {
       href: "/following",
       count: 2,
     },
-    // { icon: Users, label: 'My Groups', href: '/groups', count: 0 },
   ];
 
   const renderMenuItem = (item: any, idx: number) => {
@@ -120,11 +114,14 @@ export default function Sidebar() {
       <Link
         key={idx}
         href={item.href}
+        // [SỬA]: Thêm mt-1 để các menu item thoáng hơn
         className={clsx(
-          "relative flex items-center space-x-4 p-2 rounded-lg transition group",
-          "text-[#757575] hover:text-black hover:bg-gray-50 font-medium",
-          "whitespace-nowrap",
+          "relative flex items-center space-x-4 p-2 rounded-lg transition group mt-1",
+          "text-[#757575] hover:text-black hover:bg-gray-50 font-medium whitespace-nowrap",
         )}
+        onClick={() => {
+          if (window.innerWidth < 768) dispatch(closeSidebar());
+        }} // Đóng khi chọn item trên mobile
       >
         <div className="relative shrink-0">
           <item.icon
@@ -136,14 +133,12 @@ export default function Sidebar() {
                 : "text-[#757575] group-hover:text-[#292929]",
             )}
           />
-
           {item.count > 0 && (
             <span className="absolute -top-1.5 -right-1.5 flex items-center justify-center min-w-[16px] h-4 px-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full border border-white">
               {item.count}
             </span>
           )}
         </div>
-
         <span
           className={clsx(
             isActive ? "text-[#292929]" : "text-[#757575]",
@@ -163,24 +158,19 @@ export default function Sidebar() {
         sidebarRef.current &&
         !sidebarRef.current.contains(event.target as Node)
       ) {
-        if (window.innerWidth >= 768) {
-          dispatch(closeSidebar());
-        }
+        if (window.innerWidth >= 768) dispatch(closeSidebar());
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isSidebarOpen, dispatch]);
 
   return (
     <>
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          // [SỬA]: z-index Overlay lên 60 để bao trùm cả Header (z-50)
+          className="fixed inset-0 bg-black/50 z-[60] md:hidden backdrop-blur-sm transition-opacity"
           onClick={() => dispatch(closeSidebar())}
         />
       )}
@@ -188,21 +178,25 @@ export default function Sidebar() {
       <aside
         ref={sidebarRef}
         className={clsx(
-          "fixed md:sticky top-16 left-0 z-40 h-[calc(100vh-64px)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out overflow-y-auto custom-scrollbar",
-          "overflow-hidden",
+          // [SỬA]: z-index Sidebar mobile lên 70. Đổi h-[calc...] thành h-full trên mobile để phủ hết cạnh trái.
+          "fixed md:sticky top-0 md:top-16 left-0 z-[70] md:z-40 h-full md:h-[calc(100vh-64px)] bg-white border-r border-gray-200 transition-all duration-300 ease-in-out overflow-y-auto custom-scrollbar overflow-hidden shadow-2xl md:shadow-none",
           isSidebarOpen
-            ? "translate-x-0 w-64 mr-6 md:mr-8"
+            ? "translate-x-0 w-64 mr-0 sm:mr-6 md:mr-8"
             : "-translate-x-full md:translate-x-0 md:w-0 md:border-none md:mr-0",
         )}
       >
         <div className="p-4 pb-20 space-y-1 w-64">
-          <div className="flex justify-end md:hidden mb-2">
-            <button onClick={() => dispatch(closeSidebar())} className="p-2">
-              <X />
+          <div className="flex justify-between items-center md:hidden mb-4 pb-2 border-b border-gray-100">
+            <span className="font-bold text-gray-800 ml-2">Menu</span>
+            <button
+              onClick={() => dispatch(closeSidebar())}
+              className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
+            >
+              <X size={18} />
             </button>
           </div>
 
-          <div className="mb-6 px-1">
+          <div className="mb-6 px-1 mt-2 md:mt-0">
             <Link
               href={AppRoute.documents.upload}
               className="flex items-center justify-center gap-2 w-full bg-[#292929] text-white py-2.5 rounded-full font-medium text-[15px] hover:bg-black transition shadow-sm hover:shadow-md whitespace-nowrap"
@@ -211,10 +205,9 @@ export default function Sidebar() {
               <span>{t("layout.sidebar.uploadDocument")}</span>
             </Link>
           </div>
+
           {mainMenuItems.map(renderMenuItem)}
-
-          <hr className="my-4 border-gray-100" />
-
+          <hr className="my-4 border-gray-100 mx-2" />
           {secondaryMenuItems.map(renderMenuItem)}
         </div>
       </aside>

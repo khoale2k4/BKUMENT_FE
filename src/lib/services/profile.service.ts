@@ -136,18 +136,30 @@ export const rejectTutorApplication = async (id: string, reason: string) => {
     id,
     "and reason:",
     reason, // Chỉ log reason gốc cho dễ nhìn
-  ); 
-  
+  );
+
   const response = await httpClient.post(
     API_ENDPOINTS.LMS.REJECT_APPLICATION(id),
     JSON.stringify(reason), // Tham số thứ 2: Dữ liệu (Body)
     {
       headers: {
-        'Content-Type': 'application/json'
-      }
-    }
+        "Content-Type": "application/json",
+      },
+    },
   );
-  
+
   console.log("API Response for reject tutor application:", response.data);
   return response.data.result;
+};
+
+export const searchProfiles = async (
+  keyword: string,
+  page: number,
+  size: number,
+): Promise<PaginatedUsers> => {
+  const response = await httpClient.get(
+    API_ENDPOINTS.ACCOUNT.SEARCH_PROFILES(keyword, page, size),
+  );
+  console.log("API Response for search profiles:", response.data); // Debug log
+  return response.data.result as PaginatedUsers;
 };
