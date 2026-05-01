@@ -13,6 +13,10 @@ export const updateUserInfo = async (updateData: UpdateProfileRequest): Promise<
     const response = await httpClient.patch(API_ENDPOINTS.ACCOUNT.UPDATE_USER_INFO, updateData);
     return response.data.result;
 };
+ 
+export const updateInterests = async (topicIds: string[]): Promise<void> => {
+    await httpClient.put(API_ENDPOINTS.ACCOUNT.UPDATE_INTERESTS, topicIds);
+};
 
 export const getPresignedUrl = async (fileName: string): Promise<{ url: string; assetId: string }> => {
     const response = await httpClient.get(API_ENDPOINTS.RESOURCE.GET_PRESIGNED_URL(fileName));

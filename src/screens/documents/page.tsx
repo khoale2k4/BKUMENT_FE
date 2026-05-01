@@ -323,7 +323,8 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
                                         createdAt: doc.createdAt,
                                         coverImage: doc.previewImageUrl,
                                         author: doc.university,
-                                        onClick: () => router.push(AppRoute.documents.id(doc.id))
+                                        onClick: () => router.push(AppRoute.documents.id(doc.id)),
+                                        recommendationReason: doc.recommendationReason
                                     }}
                                 />
                             ))}

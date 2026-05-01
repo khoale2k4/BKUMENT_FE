@@ -1,5 +1,6 @@
 export const AppRoute = {
   onboard: "/",
+  onboarding: "/onboarding",
   login: '/login',
   register: '/register',
   forgot_password: "/forgot-password",

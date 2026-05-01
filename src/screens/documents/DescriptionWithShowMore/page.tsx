@@ -20,7 +20,7 @@ export const DescriptionWithShowMore = ({ description }: { description?: string 
     return (
         <div className="relative">
             <p className={`text-gray-600 leading-relaxed text-justify transition-all duration-300 ${!isExpanded && isOverflowing ? 'line-clamp-4' : ''}`}>
-                {description}
+                {description.startsWith('common.') ? t(description) : description}
             </p>
             {isOverflowing && (
                 <button

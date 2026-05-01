@@ -137,7 +137,8 @@ export const fetchRelatedDocuments = createAsyncThunk(
                 downloadable: dta.downloadable,
                 university: dta.university,
                 course: dta.course,
-                createdAt: dta.createdAt
+                createdAt: dta.createdAt,
+                recommendationReason: dta.recommendationReason
             })),
             page: page,
             totalPages: response.totalPages
