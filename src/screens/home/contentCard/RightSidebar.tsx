@@ -3,7 +3,14 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
-import { Star, Calendar, UserCircle, Flame, Sparkles } from "lucide-react";
+import {
+  Star,
+  Calendar,
+  UserCircle,
+  Flame,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import clsx from "clsx";
 import { AppRoute } from "@/lib/appRoutes";
 import { PersonMayKnow } from "@/lib/services/article.service";
@@ -114,6 +121,17 @@ export default function RightSidebar({
                     <h4 className="font-bold text-[16px] text-white leading-snug mb-3 line-clamp-2 group-hover:text-orange-300 transition-colors">
                       {course.name}
                     </h4>
+
+                    {course.numberOfStudent !== undefined && (
+                      <div className="flex items-center gap-1.5 text-[12px] text-gray-300 mb-3">
+                        <Users size={14} className="text-orange-400" />
+                        <span>
+                          {course.numberOfStudent > 0
+                            ? `${course.numberOfStudent} học viên`
+                            : "Chưa có học viên"}
+                        </span>
+                      </div>
+                    )}
 
                     <div className="flex items-center justify-between border-t border-white/20 pt-3 mt-auto">
                       <div className="flex items-center gap-2 text-gray-200 text-[12px] font-medium min-w-0">

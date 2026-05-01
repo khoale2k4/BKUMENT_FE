@@ -62,6 +62,11 @@ export const API_ENDPOINTS = {
     GET_FOLLOWING: (id: string, page: number, size: number) =>
       buildUrl(`${PROFILE}/${id}/following?page=${page}&size=${size}`),
     GET_PROFILE_BY_ID: (id: string) => buildUrl(`${PROFILE}/${id}`),
+    // https://api.bkument.io.vn/api/v1/profile/search?keyword=Minh&limit=10
+    SEARCH_PROFILES: (keyword: string, page: number, size: number) =>
+      buildUrl(
+        `${PROFILE}/search?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}`,
+      ),
   },
 
   DOCUMENTS: {

@@ -8,7 +8,7 @@ import {
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as profileService from "@/lib/services/profile.service";
 import { fetchProfileById } from "@/lib/services/profile.service";
-import httpClient from '../../services/http';
+import httpClient from "../../services/http";
 // --- 1. Interfaces ---
 
 // USER PROFILES
@@ -64,7 +64,6 @@ export interface RegisterTutorRequest {
   subjectIds: string[];
 }
 
-
 export interface UpdateTutorRequest {
   introduction: string;
   name: string;
@@ -107,6 +106,10 @@ interface ProfileState {
   isViewedProfileLoading: boolean;
   viewedProfileError: string | null;
 
+  viewedListProfile: PaginatedUsers | null;
+  isViewedListProfileLoading: boolean;
+  viewedListProfileError: string | null;
+
   // Upload state
   isAvatarUploading: boolean;
   isResourceUploading: boolean;
@@ -138,8 +141,11 @@ const initialState: ProfileState = {
 
   isAvatarUploading: false,
   isResourceUploading: false,
-};
 
+  viewedListProfile: null,
+  isViewedListProfileLoading: false,
+  viewedListProfileError: null,
+};
 
 export const getMyProfile = createAsyncThunk(
   "profile/getMyProfile",
@@ -149,9 +155,7 @@ export const getMyProfile = createAsyncThunk(
       return data;
     } catch (error: any) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
-          "errors.notFound",
+        error.response?.data?.message || error.message || "errors.notFound",
       );
     }
   },
@@ -175,9 +179,20 @@ export const updateMyProfile = createAsyncThunk(
 
 export const getFollowingByProfileId = createAsyncThunk(
   "profile/getFollowingByProfileId",
-  async ({ profileId, page = 1, size = 10 }: { profileId: string; page?: number; size?: number }, { rejectWithValue }) => {
+  async (
+    {
+      profileId,
+      page = 1,
+      size = 10,
+    }: { profileId: string; page?: number; size?: number },
+    { rejectWithValue },
+  ) => {
     try {
-      return await profileService.fetchFollowingByProfileId(profileId, page, size);
+      return await profileService.fetchFollowingByProfileId(
+        profileId,
+        page,
+        size,
+      );
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -195,7 +210,11 @@ export const getFollowersByProfileId = createAsyncThunk(
     { getState, rejectWithValue },
   ) => {
     try {
-      return await profileService.fetchFollowersByProfileId(profileId, page, size);
+      return await profileService.fetchFollowersByProfileId(
+        profileId,
+        page,
+        size,
+      );
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -223,18 +242,21 @@ export const getProfileById = createAsyncThunk(
           headers: {
             ...(token && { Authorization: `Bearer ${token}` }),
           },
-        }
+        },
       );
 
       // 3. Xử lý kết quả trả về từ Axios
       if (response.data.code !== 1000) {
-        throw new Error(response.data.message || "Failed to fetch profile by ID");
+        throw new Error(
+          response.data.message || "Failed to fetch profile by ID",
+        );
       }
 
       return response.data.result as UserProfile;
     } catch (error: any) {
       // Nếu lỗi từ Axios thì message thường nằm ở error.response.data.message
-      const errorMessage = error.response?.data?.message || error.message || "errors.network";
+      const errorMessage =
+        error.response?.data?.message || error.message || "errors.network";
       return rejectWithValue(errorMessage);
     }
   },
@@ -293,6 +315,24 @@ export const updateTutorProfile = createAsyncThunk(
   async (updateData: UpdateTutorRequest, { getState, rejectWithValue }) => {
     try {
       return await profileService.updateTutor(updateData);
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  },
+);
+
+export const searchProfiles = createAsyncThunk(
+  "profile/searchProfiles",
+  async (
+    {
+      keyword,
+      page = 1,
+      size = 10,
+    }: { keyword: string; page?: number; size?: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await profileService.searchProfiles(keyword, page, size);
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -479,6 +519,21 @@ const profileSlice = createSlice({
       .addCase(registerTutorProfile.rejected, (state, action) => {
         state.isTutorRegistering = false;
         state.tutorError = action.payload as string;
+      });
+
+    // --- Search Profiles ---
+    builder
+      .addCase(searchProfiles.pending, (state) => {
+        state.isViewedListProfileLoading = true;
+        state.viewedListProfileError = null;
+      })
+      .addCase(searchProfiles.fulfilled, (state, action) => {
+        state.isViewedListProfileLoading = false;
+        state.viewedListProfile = action.payload as PaginatedUsers;
+      })
+      .addCase(searchProfiles.rejected, (state, action) => {
+        state.isViewedListProfileLoading = false;
+        state.viewedListProfileError = action.payload as string;
       });
   },
 });
