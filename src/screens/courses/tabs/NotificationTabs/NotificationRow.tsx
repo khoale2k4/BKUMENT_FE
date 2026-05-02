@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MoreVertical, Edit, Trash2 } from 'lucide-react';
-import { ClassNotification } from '@/lib/redux/features/tutorCourseSlice';
+import React, { useState, useRef, useEffect } from "react";
+import { MoreVertical, Edit, Trash2 } from "lucide-react";
+import { ClassNotification } from "@/lib/redux/features/tutorCourseSlice";
 
 interface NotificationRowProps {
   item: ClassNotification;
@@ -18,33 +18,28 @@ const NotificationRow: React.FC<NotificationRowProps> = ({ item }) => {
       }
     };
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
   // Format ngày tháng từ chuỗi ISO (VD: "2026-03-10T15:41:40.3118")
   const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: '2-digit' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "2-digit",
+    };
+    return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
   return (
     <tr className="group hover:bg-gray-50 transition-colors border-b border-gray-50 last:border-0">
-      <td className="py-4 align-top">
-        <span className="inline-block px-3 py-1 bg-[#e6f7ef] text-[#00c875] font-semibold text-sm rounded-md truncate max-w-[100px]">
-          {item.id}
-        </span>
-      </td>
-      <td className="py-4 align-top font-bold text-slate-800">
-        {item.title}
-      </td>
+      <td className="py-4 align-top font-bold text-slate-800">{item.title}</td>
       <td className="py-4 align-top text-gray-600 text-sm leading-relaxed pr-4">
         {item.message}
       </td>
-      <td className="py-4 align-top text-gray-600 text-sm">
-        {item.className}
-      </td>
+      <td className="py-4 align-top text-gray-600 text-sm">{item.className}</td>
       <td className="py-4 align-top text-gray-500 text-sm">
         {formatDate(item.sentAt)}
       </td>

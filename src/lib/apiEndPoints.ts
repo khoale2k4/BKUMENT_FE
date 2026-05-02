@@ -221,10 +221,9 @@ export const API_ENDPOINTS = {
       buildUrl(
         `${LMS}/notifications/class/${classId}?page=${page}&size=${size}`,
       ),
+    // https://api.bkument.io.vn/api/v1/document/course/d774abe1-1392-448c-861d-bcd1a5cdbaa0?page=0&size=10
     GET_CLASS_DOCUMENTS: (courseId: string, page: number, size: number) =>
-      buildUrl(
-        `${API_BASE_URL}/document/course/${courseId}?page=${page}&size=${size}`,
-      ),
+      buildUrl(`${DOCUMENT}/course/${courseId}?page=${page}&size=${size}`),
     CREATE_CLASS_NOTIFICATION: (classId: string) =>
       buildUrl(`${LMS}/notifications/class/${classId}`),
     // http://localhost:8888/api/v1/lms/classes/my-class?page=1&size=10
