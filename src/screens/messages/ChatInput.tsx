@@ -20,33 +20,27 @@ const ChatInput = () => {
 
   const handleSendMessage = () => {
     if (!text.trim() || !activeConversationId) return;
-
     dispatch(
       sendMessageAsync({
         conversationId: activeConversationId,
         message: text.trim(),
         type: "TEXT",
         tempId: DateTime.now().toString(),
+        attachedUrl: "",
       }),
     );
-
     setText("");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.nativeEvent.isComposing) {
-      return;
-    }
-
+    if (e.nativeEvent.isComposing) return;
     if (e.key === "Enter") {
       e.preventDefault();
       handleSendMessage();
     }
   };
 
-  const handleImageBtnClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleImageBtnClick = () => fileInputRef.current?.click();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,12 +54,9 @@ const ChatInput = () => {
     setIsUploading(true);
     try {
       await dispatch(
-        sendImageMessageAsync({
-          conversationId: activeConversationId,
-          file: file,
-        }),
+        sendImageMessageAsync({ conversationId: activeConversationId, file }),
       ).unwrap();
-    } catch (error) {
+    } catch {
       alert(t("chat.input.sendImageFail", "Failed to send image!"));
     } finally {
       setIsUploading(false);
@@ -74,10 +65,6 @@ const ChatInput = () => {
   };
 
   return (
-    /*
-          [THAY ĐỔI] Padding responsive: p-3 trên mobile, p-4 trên sm+.
-          Thêm `safe-area` mental note: padding-bottom tự nhiên qua p-3.
-        */
     <div className="p-3 sm:p-4 bg-white border-t border-gray-100 shrink-0">
       <input
         type="file"
@@ -87,16 +74,8 @@ const ChatInput = () => {
         onChange={handleFileChange}
       />
 
-      {/*
-              [THAY ĐỔI] `gap-2` trên mobile thay vì gap-3 để tận dụng không gian 390px.
-              `min-w-0` trên wrapper để flex child không overflow.
-              Không đặt padding quá lớn trên mobile.
-            */}
       <div className="flex items-center gap-2 sm:gap-3 bg-white border border-gray-200 rounded-full px-3 sm:px-4 py-2 shadow-sm min-w-0">
-        {/*
-                  [THAY ĐỔI] shrink-0 để icon không bị thu nhỏ/méo trên màn hình nhỏ.
-                  Bỏ `ml-` margin thừa, dùng gap của flex parent thay thế.
-                */}
+        {/* Image button */}
         <button
           onClick={handleImageBtnClick}
           disabled={isUploading}
@@ -116,16 +95,12 @@ const ChatInput = () => {
                 strokeLinejoin="round"
                 strokeWidth="1.5"
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              ></path>
+              />
             </svg>
           )}
         </button>
 
-        {/*
-                  [THAY ĐỔI] `min-w-0` để input text co giãn đúng trong flex container,
-                  không bị tràn ngang trên iPhone 12 Pro.
-                  Font size text-sm trên mobile để vừa hơn, text-[15px] trên sm+.
-                */}
+        {/* Text input */}
         <input
           type="text"
           placeholder={t("chat.input.placeholder", "Type a message...")}
@@ -135,11 +110,7 @@ const ChatInput = () => {
           className="flex-1 min-w-0 bg-transparent outline-none py-1 text-sm sm:text-[15px] text-gray-800 placeholder:text-gray-400"
         />
 
-        {/*
-                  [THAY ĐỔI] shrink-0 để nút send không bị bóp.
-                  Bỏ `ml-2` vì đã có gap từ flex parent.
-                  Icon nhỏ hơn trên mobile: w-5 h-5.
-                */}
+        {/* Send button */}
         <button
           onClick={handleSendMessage}
           disabled={!text.trim()}
@@ -156,7 +127,7 @@ const ChatInput = () => {
               strokeLinejoin="round"
               strokeWidth="1.5"
               d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-            ></path>
+            />
           </svg>
         </button>
       </div>

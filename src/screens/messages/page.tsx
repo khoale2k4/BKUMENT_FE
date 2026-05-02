@@ -20,8 +20,9 @@ export const getChatDisplayInfo = (
   t: any,
 ) => {
   if (chat.type === "GROUP") {
+    console.log("Chat info:", chat);
     return {
-      name: chat.name || t("chat.header.groupChat", "Group Chat"),
+      name: chat.conversationName || t("chat.header.groupChat", "Group Chat"),
       avatar:
         chat.conversationAvatar ||
         "https://ui-avatars.com/api/?name=Group&background=random",
