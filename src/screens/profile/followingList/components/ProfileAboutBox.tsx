@@ -114,7 +114,7 @@ const ProfileAboutBox: React.FC<ProfileAboutBoxProps> = ({ profile }) => {
         {/* [Mobile UI:] padding nhỏ hơn trên mobile */}
         <div className="lg:col-span-1 bg-white p-4 sm:p-5 rounded-xl border border-gray-100 shadow-sm h-fit">
           <h3 className="text-[14px] sm:text-[16px] font-bold text-gray-900 mb-2 sm:mb-3">
-            {t("profile.user.about.intro")}
+            {t("profile.user.about.about.intro")}
           </h3>
 
           {profile.bio && (
@@ -141,7 +141,7 @@ const ProfileAboutBox: React.FC<ProfileAboutBoxProps> = ({ profile }) => {
               <div className="flex items-start gap-2 text-gray-700 text-[13px] sm:text-[14px]">
                 <MapPin size={16} className="text-gray-400 shrink-0 mt-0.5" />
                 <span>
-                  {t("profile.user.about.livesAt")}{" "}
+                  {t("profile.user.about.about.livesAt")}{" "}
                   <span className="font-semibold">{profile.address}</span>
                 </span>
               </div>
@@ -150,9 +150,9 @@ const ProfileAboutBox: React.FC<ProfileAboutBoxProps> = ({ profile }) => {
             <div className="flex items-start gap-2 text-gray-700 text-[13px] sm:text-[14px]">
               <Award size={16} className="text-orange-400 shrink-0 mt-0.5" />
               <span>
-                {t("profile.user.about.points")}:{" "}
+                {t("profile.user.about.about.points")}:{" "}
                 <span className="font-semibold">
-                  {profile.points || 0} {t("profile.user.about.score")}
+                  {profile.points || 0} {t("profile.user.about.about.score")}
                 </span>
               </span>
             </div>
@@ -164,7 +164,7 @@ const ProfileAboutBox: React.FC<ProfileAboutBoxProps> = ({ profile }) => {
           {/* [Mobile UI:] padding nhỏ hơn trên mobile */}
           <div className="bg-white p-4 sm:p-6 rounded-xl border border-gray-100 shadow-sm">
             <h3 className="text-[14px] sm:text-[16px] font-bold text-gray-900 mb-3 sm:mb-4 pb-3 sm:pb-4 border-b border-gray-100">
-              {t("profile.user.about.contactInfo")}
+              {t("profile.user.about.about.contactInfo")}
             </h3>
 
             {/* [Mobile UI:] 1 cột trên mobile, 2 cột trên sm+ */}
@@ -172,7 +172,7 @@ const ProfileAboutBox: React.FC<ProfileAboutBoxProps> = ({ profile }) => {
               {profile.email && (
                 <div>
                   <p className="text-gray-400 text-[10px] sm:text-xs uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
-                    <Mail size={11} /> {t("profile.user.about.email")}
+                    <Mail size={11} /> {t("profile.user.about.about.email")}
                   </p>
                   {/* [Mobile UI:] break-all để email dài không tràn */}
                   <p className="text-[13px] sm:text-[14px] text-gray-900 font-medium break-all">
@@ -184,7 +184,7 @@ const ProfileAboutBox: React.FC<ProfileAboutBoxProps> = ({ profile }) => {
               {profile.phone && (
                 <div>
                   <p className="text-gray-400 text-[10px] sm:text-xs uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
-                    <Phone size={11} /> {t("profile.user.about.phone")}
+                    <Phone size={11} /> {t("profile.user.about.about.phone")}
                   </p>
                   <p className="text-[13px] sm:text-[14px] text-gray-900 font-medium">
                     {profile.phone}
@@ -195,7 +195,7 @@ const ProfileAboutBox: React.FC<ProfileAboutBoxProps> = ({ profile }) => {
               {profile.dob && (
                 <div>
                   <p className="text-gray-400 text-[10px] sm:text-xs uppercase font-bold tracking-wider mb-1 flex items-center gap-1.5">
-                    <Calendar size={11} /> {t("profile.user.about.dob")}
+                    <Calendar size={11} /> {t("profile.user.about.about.dob")}
                   </p>
                   <p className="text-[13px] sm:text-[14px] text-gray-900 font-medium">
                     {profile.dob}
