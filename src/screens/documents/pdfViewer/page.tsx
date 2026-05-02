@@ -143,9 +143,10 @@ import "react-pdf/dist/Page/TextLayer.css";
 import { useTranslation } from "react-i18next";
 import { PDFLoadingSkeleton } from "./skeleton";
 
-// Khởi tạo worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-
+// // [SỬA QUAN TRỌNG]: Đổi .mjs thành .js qua cdnjs để Safari iOS không bị lỗi chặn file thực thi
+// pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// Nhớ thêm https: vào đầu để tránh lỗi bảo mật
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 export default function PDFViewer({
   fileUrl,
   token,
@@ -158,33 +159,13 @@ export default function PDFViewer({
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  // State để kiểm tra Client-side, chặn lỗi Hydration của Next.js
   const [isMounted, setIsMounted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // ==========================================
-  // [BỔ SUNG]: KHỞI TẠO VCONSOLE DÀNH CHO MOBILE
-  // ==========================================
   useEffect(() => {
-    setIsMounted(true); // Đánh dấu Component đã render an toàn trên Client
+    setIsMounted(true);
+  }, []);
 
-    // Khởi tạo vConsole để xem log trên điện thoại
-    if (typeof window !== "undefined" && !(window as any).VConsole) {
-      const script = document.createElement("script");
-      script.src = "https://unpkg.com/vconsole@latest/dist/vconsole.min.js";
-      script.onload = () => {
-        new (window as any).VConsole();
-        console.log(
-          "✅ vConsole đã khởi tạo thành công trên trang PDF Viewer!",
-        );
-        console.log("Đang tải file PDF từ URL:", fileUrl);
-      };
-      document.body.appendChild(script);
-    }
-  }, [fileUrl]);
-  // ==========================================
-
-  // Sử dụng ResizeObserver thay cho inline ref để đo kích thước mượt mà hơn
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -200,10 +181,8 @@ export default function PDFViewer({
 
   function onDocumentLoadSuccess({ numPages }: { numPages: number }) {
     setNumPages(numPages);
-    console.log(`📄 Đã load thành công PDF: ${numPages} trang.`); // Sẽ in ra trên vConsole
   }
 
-  // Chặn không cho render PDF trên Server để tránh lỗi Hydration
   if (!isMounted) return <PDFLoadingSkeleton />;
 
   return (
@@ -241,7 +220,6 @@ export default function PDFViewer({
             >
               <Page
                 pageNumber={pageNumber}
-                // Luôn chừa lề, và set max-width để không tràn màn hình
                 width={
                   containerWidth
                     ? containerWidth - 16
@@ -250,7 +228,7 @@ export default function PDFViewer({
                 renderTextLayer={true}
                 renderAnnotationLayer={true}
                 className="bg-white max-w-full overflow-hidden"
-                // Ép thiết bị iOS (dùng pixel ratio = 3) chỉ render ở mức 2 để chống tràn RAM Safari
+                // Ép thiết bị iOS chỉ render ở mức 2 để chống tràn RAM Safari
                 devicePixelRatio={Math.min(window.devicePixelRatio || 1, 2)}
                 loading={
                   <div className="w-full bg-white animate-pulse aspect-[1/1.41]" />

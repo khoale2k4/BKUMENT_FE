@@ -1,420 +1,544 @@
-'use client';
-import { useTranslation } from 'react-i18next';
-import { Download, Eye, Share2, Bookmark, ChevronDown, ChevronUp, Flag, MoreHorizontal, Trash2 } from 'lucide-react';
-import dynamic from 'next/dynamic';
-import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-import { useEffect, useState, useRef } from 'react';
-import { clearCurrentDocument, fetchDocumentById, fetchRelatedDocuments, rateDocument } from '@/lib/redux/features/documentSlice';
-import { openConfirmModal, openReportModal, showNotification } from '@/lib/redux/features/modalSlice';
-import { deleteDocumentAsync } from '@/lib/redux/features/myDocumentSlice';
-import CommentSection from './commentSection/page';
-import { getAccessToken } from '@/lib/utils/token';
-import Pagination from '@/components/ui/Pagination';
-import ContentCard from '../home/contentCard/ContentCard';
-import ContentCardSkeleton from '../home/contentCard/ContentCardSkeleton';
-import { AppRoute } from '@/lib/appRoutes';
-import { useRouter } from 'next/navigation';
-import RelatedDocumentCard from './RelatedDocumentCard';
-import { DescriptionWithShowMore } from './DescriptionWithShowMore/page';
-import { formatDate } from '@/lib/utils/formatDate';
-import httpClient from '@/lib/services/http';
-import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
-import { showToast } from '@/lib/redux/features/toastSlice';
-import { clsx } from 'clsx';
-import StarRating from '@/components/ui/StarRating';
+"use client";
+import { useTranslation } from "react-i18next";
+import {
+  Download,
+  Eye,
+  Share2,
+  Bookmark,
+  ChevronDown,
+  ChevronUp,
+  Flag,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
+import dynamic from "next/dynamic";
+import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
+import { useEffect, useState, useRef } from "react";
+import {
+  clearCurrentDocument,
+  fetchDocumentById,
+  fetchRelatedDocuments,
+  rateDocument,
+} from "@/lib/redux/features/documentSlice";
+import {
+  openConfirmModal,
+  openReportModal,
+  showNotification,
+} from "@/lib/redux/features/modalSlice";
+import { deleteDocumentAsync } from "@/lib/redux/features/myDocumentSlice";
+import CommentSection from "./commentSection/page";
+import { getAccessToken } from "@/lib/utils/token";
+import Pagination from "@/components/ui/Pagination";
+import ContentCard from "../home/contentCard/ContentCard";
+import ContentCardSkeleton from "../home/contentCard/ContentCardSkeleton";
+import { AppRoute } from "@/lib/appRoutes";
+import { useRouter } from "next/navigation";
+import RelatedDocumentCard from "./RelatedDocumentCard";
+import { DescriptionWithShowMore } from "./DescriptionWithShowMore/page";
+import { formatDate } from "@/lib/utils/formatDate";
+import httpClient from "@/lib/services/http";
+import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
+import { showToast } from "@/lib/redux/features/toastSlice";
+import { clsx } from "clsx";
+import StarRating from "@/components/ui/StarRating";
 
-const PDFViewer = dynamic(() => import('./pdfViewer/page'), { ssr: false, });
-const WordViewer = dynamic(() => import('./wordViewer/page'), { ssr: false });
+// test on mobile
+import { PDFLoadingSkeleton } from "./pdfViewer/skeleton";
+
+const PDFViewer = dynamic(() => import("./pdfViewer/page"), { ssr: false });
+const WordViewer = dynamic(() => import("./wordViewer/page"), { ssr: false });
+
+// 2. Tắt hoàn toàn việc render PDF trên Server (ssr: false)
+const PDFViewerDynamic = dynamic(() => import("./pdfViewer/page"), {
+  // Chỉnh lại đường dẫn import './PDFViewer' cho đúng với folder của bạn
+  ssr: false,
+  loading: () => <PDFLoadingSkeleton />, // Hiển thị khung xương trong lúc đang tải
+});
 
 const Skeleton = ({ className }: { className: string }) => (
-    <div className={`bg-gray-200 animate-pulse rounded ${className}`}></div>
+  <div className={`bg-gray-200 animate-pulse rounded ${className}`}></div>
 );
 
-export default function DocumentDetailPage({ params }: { params: { id: string } }) {
-    const { t, i18n } = useTranslation();
-    const dispatch = useAppDispatch();
-    const { 
-        currentDocument, 
-        currentAuthor, 
-        detailStatus, 
-        relatedDocuments, 
-        relatedStatus, 
-        relatedPage, 
-        relatedTotalPages,
-        averageRating,
-        myRating,
-        ratingStatus
-    } = useAppSelector((state) => state.documents);
-    const currentUser = useAppSelector(state => state.profile.user);
-    const [token, setToken] = useState<string | null>(() => getAccessToken());
-    const router = useRouter();
+export default function DocumentDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { t, i18n } = useTranslation();
+  const dispatch = useAppDispatch();
+  const {
+    currentDocument,
+    currentAuthor,
+    detailStatus,
+    relatedDocuments,
+    relatedStatus,
+    relatedPage,
+    relatedTotalPages,
+    averageRating,
+    myRating,
+    ratingStatus,
+  } = useAppSelector((state) => state.documents);
+  const currentUser = useAppSelector((state) => state.profile.user);
+  const [token, setToken] = useState<string | null>(() => getAccessToken());
+  const router = useRouter();
 
-    const handleRate = (rating: number) => {
-        if (!currentDocument) return;
-        dispatch(rateDocument({ resourceId: params.id, rating }));
-    };
+  const handleRate = (rating: number) => {
+    if (!currentDocument) return;
+    dispatch(rateDocument({ resourceId: params.id, rating }));
+  };
 
-    const handleDownload = async () => {
-        if (!currentDocument) return;
+  const handleDownload = async () => {
+    if (!currentDocument) return;
 
-        try {
-            const response = await httpClient.get(currentDocument.downloadUrl, {
-                responseType: 'blob',
-            });
+    try {
+      const response = await httpClient.get(currentDocument.downloadUrl, {
+        responseType: "blob",
+      });
 
-            const blob = new Blob([response.data], { type: response.headers['content-type'] });
-            const url = window.URL.createObjectURL(blob);
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
+      const url = window.URL.createObjectURL(blob);
 
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', currentDocument.title || 'document.pdf');
-            document.body.appendChild(link);
-            link.click();
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", currentDocument.title || "document.pdf");
+      document.body.appendChild(link);
+      link.click();
 
-            link.parentNode?.removeChild(link);
-            window.URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error("Tải file thất bại:", error);
-            dispatch(showToast({
-                type: 'error',
-                title: t('common.toast.error'),
-                message: t('documents.detail.downloadFail', 'Download failed, please try again.')
-            }));
-        }
-    };
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Tải file thất bại:", error);
+      dispatch(
+        showToast({
+          type: "error",
+          title: t("common.toast.error"),
+          message: t(
+            "documents.detail.downloadFail",
+            "Download failed, please try again.",
+          ),
+        }),
+      );
+    }
+  };
 
-    const handleReport = () => {
-        if (currentDocument?.id) {
-            dispatch(openReportModal({ targetId: currentDocument.id, type: 'DOCUMENT' }));
-        }
-    };
+  const handleReport = () => {
+    if (currentDocument?.id) {
+      dispatch(
+        openReportModal({ targetId: currentDocument.id, type: "DOCUMENT" }),
+      );
+    }
+  };
 
-    const handleShare = async () => {
-        try {
-            await navigator.clipboard.writeText(window.location.href);
-            dispatch(showToast({
-                type: 'success', 
-                title: t('auth.login.success'), 
-                message: t('documents.detail.shareSuccess', 'Link copied to clipboard!') 
-            }));
-        } catch (error) {
-            console.error("Lỗi khi copy:", error);
-            dispatch(showToast({
-                type: 'error', 
-                title: t('auth.login.error'), 
-                message: t('documents.detail.shareError', 'Could not copy link at this time.') 
-            }));
-        }
-    };
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      dispatch(
+        showToast({
+          type: "success",
+          title: t("auth.login.success"),
+          message: t(
+            "documents.detail.shareSuccess",
+            "Link copied to clipboard!",
+          ),
+        }),
+      );
+    } catch (error) {
+      console.error("Lỗi khi copy:", error);
+      dispatch(
+        showToast({
+          type: "error",
+          title: t("auth.login.error"),
+          message: t(
+            "documents.detail.shareError",
+            "Could not copy link at this time.",
+          ),
+        }),
+      );
+    }
+  };
 
-    const handleDelete = () => {
-        if (!currentDocument) return;
-        dispatch(openConfirmModal({
-            title: t('documents.detail.deleteTitle', 'Delete Document'),
-            message: t('documents.detail.deleteMsg', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title: currentDocument.title }),
-            confirmText: t('documents.detail.deleteBtn', 'Delete'),
-            cancelText: t('common.confirm.cancel', 'Cancel'),
-            onConfirm: async () => {
-                try {
-                    await dispatch(deleteDocumentAsync(currentDocument.id)).unwrap();
-                    router.push(AppRoute.home);
-                } catch (error) {
-                    console.error("Xóa thất bại:", error);
-                }
-            }
-        }));
-    };
+  const handleDelete = () => {
+    if (!currentDocument) return;
+    dispatch(
+      openConfirmModal({
+        title: t("documents.detail.deleteTitle", "Delete Document"),
+        message: t(
+          "documents.detail.deleteMsg",
+          'Are you sure you want to delete "{{title}}"? This action cannot be undone.',
+          { title: currentDocument.title },
+        ),
+        confirmText: t("documents.detail.deleteBtn", "Delete"),
+        cancelText: t("common.confirm.cancel", "Cancel"),
+        onConfirm: async () => {
+          try {
+            await dispatch(deleteDocumentAsync(currentDocument.id)).unwrap();
+            router.push(AppRoute.home);
+          } catch (error) {
+            console.error("Xóa thất bại:", error);
+          }
+        },
+      }),
+    );
+  };
 
-    useEffect(() => {
-        if (params.id) {
-            dispatch(fetchDocumentById(params.id));
-            dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
-            return () => {
-                dispatch(clearCurrentDocument());
-            };
-        }
-    }, [params.id, dispatch]);
+  useEffect(() => {
+    if (params.id) {
+      dispatch(fetchDocumentById(params.id));
+      dispatch(fetchRelatedDocuments({ docId: params.id, page: 0, size: 5 }));
+      return () => {
+        dispatch(clearCurrentDocument());
+      };
+    }
+  }, [params.id, dispatch]);
 
-    const onRelatedPageChange = (newPage: number) => {
-        dispatch(fetchRelatedDocuments({ docId: params.id, page: newPage - 1, size: 5 }));
-    };
+  const onRelatedPageChange = (newPage: number) => {
+    dispatch(
+      fetchRelatedDocuments({ docId: params.id, page: newPage - 1, size: 5 }),
+    );
+  };
 
-    const renderViewer = () => {
-        if (detailStatus === 'loading' || !currentDocument) {
-            return (
-                <div className="flex items-center justify-center h-96 bg-gray-50">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                </div>
-            );
-        }
-
-        if (!currentDocument.viewUrl) return <div className="p-8 text-center text-gray-500">{t('documents.detail.noDoc', 'No document content.')}</div>;
-
-        const fileExtension = currentDocument.documentType || 'application/pdf';
-
-        if (fileExtension === 'application/pdf') {
-            return (
-                <div className="bg-gray-100 rounded-xl overflow-hidden border border-gray-200 mb-8 shadow-sm">
-                    <PDFViewer fileUrl={currentDocument.viewUrl} token={token} />
-                </div>
-            );
-        }
-
-        return (
-            <div className="flex items-center justify-center h-full text-gray-500 p-8">
-                {t('documents.detail.noViewer', 'This format does not support preview. Please download to view.')}
-            </div>
-        );
-    };
-
-    if (detailStatus === 'failed') {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center text-gray-500">{t('documents.detail.notFound', 'Document not found.')}</div>
-            </div>
-        );
+  const renderViewer = () => {
+    if (detailStatus === "loading" || !currentDocument) {
+      return (
+        <div className="flex items-center justify-center h-96 bg-gray-50">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+        </div>
+      );
     }
 
-    const isDocLoading = detailStatus === 'loading' || !currentDocument;
-    const isOwner = currentDocument?.author?.id === currentUser?.id;
+    if (!currentDocument.viewUrl)
+      return (
+        <div className="p-8 text-center text-gray-500">
+          {t("documents.detail.noDoc", "No document content.")}
+        </div>
+      );
+
+    const fileExtension = currentDocument.documentType || "application/pdf";
+
+    if (fileExtension === "application/pdf") {
+      return (
+        <div className="bg-gray-100 rounded-xl overflow-hidden border border-gray-200 mb-8 shadow-sm">
+          {/* <PDFViewer fileUrl={currentDocument.viewUrl} token={token} /> */}
+          // Sử dụng PDFViewerDynamic để tắt SSR hoàn toàn
+          <PDFViewerDynamic fileUrl={currentDocument.viewUrl} token={token} />
+        </div>
+      );
+    }
 
     return (
-        <main className="min-h-screen bg-white pb-20">
-            <div className="max-w-4xl mx-auto px-4 pt-10 pb-6">
-                <div className="flex items-center gap-2 mb-4">
-                    <span className="bg-blue-50 text-blue-600 text-xs px-2.5 py-0.5 rounded-full font-medium">
-                        {t('documents.detail.category', 'Documents')}
-                    </span>
-                    <span className="text-gray-400 text-xs">•</span>
-                    {isDocLoading ? (
-                        <Skeleton className="h-4 w-32" />
-                    ) : (
-                        <span className="text-gray-500 text-xs">{currentDocument?.title}</span>
-                    )}
-                </div>
-
-                {isDocLoading ? (
-                    <Skeleton className="h-10 w-3/4 mb-6" />
-                ) : (
-                    <div className="flex flex-col gap-2 mb-6">
-                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight text-center md:text-left">
-                            {currentDocument?.title}
-                        </h1>
-                        <div className="flex justify-center md:justify-start">
-                            <StarRating 
-                                rating={myRating} 
-                                averageRating={averageRating} 
-                                onRate={handleRate}
-                                readonly={!!myRating && myRating > 0}
-                                size="md"
-                                isLoading={ratingStatus === 'loading'}
-                            />
-                        </div>
-                    </div>
-                )}
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-gray-100 pb-8">
-                    <div className="flex items-center gap-3 justify-center sm:justify-start">
-                        {currentDocument?.author === null || !currentDocument?.author ? (
-                            <>
-                                <Skeleton className="w-12 h-12 rounded-full" />
-                                <div className="space-y-2">
-                                    <Skeleton className="h-4 w-32" />
-                                    <Skeleton className="h-3 w-48" />
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-100 shrink-0">
-                                    <AuthenticatedImage src={currentDocument.author.avatarUrl} alt={currentDocument.author.name} className="w-full h-full object-cover" />
-                                </div>
-                                <div>
-                                    <div className="font-semibold text-gray-900">{currentDocument.author.name}</div>
-                                    <div className="text-[13px] text-gray-500 font-medium flex items-center gap-2">
-                                        <span>{currentDocument?.createdAt ? formatDate(new Date(currentDocument.createdAt).toISOString()) : ''}</span>
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-
-                    <div className="flex items-center justify-center gap-3">
-                        <button
-                            disabled={isDocLoading || !currentDocument?.downloadable}
-                            onClick={handleDownload}
-                            className={clsx(
-                                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition",
-                                !isDocLoading && currentDocument?.downloadable
-                                    ? "bg-black text-white hover:opacity-80 cursor-pointer shadow-sm"
-                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            )}
-                        >
-                            <Download size={18} />
-                            <span>{t('documents.detail.download', 'Download')}</span>
-                        </button>
-                        
-                        <DocumentActionsMenu 
-                            onShare={handleShare}
-                            onReport={handleReport}
-                            onDelete={handleDelete}
-                            isOwner={isOwner}
-                            disabled={isDocLoading}
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <div className="max-w-4xl mx-auto px-4">
-                <div className="mb-8">
-                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-2">{t('documents.detail.description', 'Description')}</h3>
-                    {isDocLoading ? (
-                        <div className="space-y-2">
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-2/3" />
-                        </div>
-                    ) : (
-                        <DescriptionWithShowMore description={currentDocument?.description} />
-                    )}
-                </div>
-
-                <div className="bg-gray-100 rounded-xl overflow-hidden border border-gray-200 mb-8 shadow-sm">
-                    <div className="w-full aspect-[3/4] md:aspect-[16/9] bg-white relative">
-                        {renderViewer()}
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-center sm:justify-start gap-6 text-gray-500 text-sm border-b border-gray-100 pb-8 mb-8">
-                    {isDocLoading ? (
-                        <Skeleton className="h-5 w-40" />
-                    ) : (
-                        <>
-                            <div className="flex items-center gap-2">
-                                <Eye size={18} />
-                                <span>{currentDocument?.views?.toLocaleString()} {t('documents.detail.views', 'Views')}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Download size={18} />
-                                <span>{currentDocument?.downloadCount?.toLocaleString()} {t('documents.detail.downloads', 'Downloads')}</span>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            <div className="max-w-4xl mx-auto px-4 mb-16 border-t border-gray-100 pt-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">{t('documents.detail.related', 'Related Documents')}</h3>
-
-                {relatedStatus === 'loading' ? (
-                    <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
-                        {[1, 2, 3, 4].map(i => (
-                            <div key={i} className="min-w-[280px] w-[280px] h-[380px] bg-gray-200 animate-pulse rounded-xl flex-shrink-0" />
-                        ))}
-                    </div>
-                ) : relatedDocuments.length > 0 ? (
-                    <div className="relative group/container">
-                        <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-1 no-scrollbar scroll-smooth" id="related-docs-container">
-                            {relatedDocuments.map((doc: any) => (
-                                <RelatedDocumentCard
-                                    key={doc.id}
-                                    data={{
-                                        id: doc.id,
-                                        title: doc.title,
-                                        createdAt: doc.createdAt,
-                                        coverImage: doc.previewImageUrl,
-                                        author: doc.university,
-                                        onClick: () => router.push(AppRoute.documents.id(doc.id)),
-                                        recommendationReason: doc.recommendationReason
-                                    }}
-                                />
-                            ))}
-                            <div
-                                className="min-w-[100px] flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-50 rounded-xl border border-dashed border-gray-300 transition"
-                                onClick={() => onRelatedPageChange(relatedPage + 2)}
-                            >
-                                <span className="text-sm font-medium text-gray-500">{t('documents.detail.viewMore', 'View more')}</span>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">{t('documents.detail.noRelated', 'No related documents found.')}</div>
-                )}
-            </div>
-
-            <div className="max-w-4xl mx-auto px-4">
-                <CommentSection params={params} />
-            </div>
-        </main>
+      <div className="flex items-center justify-center h-full text-gray-500 p-8">
+        {t(
+          "documents.detail.noViewer",
+          "This format does not support preview. Please download to view.",
+        )}
+      </div>
     );
-}
+  };
 
-function DocumentActionsMenu({ onShare, onReport, onDelete, isOwner, disabled }: { 
-    onShare: () => void, 
-    onReport: () => void, 
-    onDelete: () => void, 
-    isOwner: boolean,
-    disabled: boolean
-}) {
-    const { t } = useTranslation();
-    const [isOpen, setIsOpen] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-        if (isOpen) {
-            document.addEventListener("mousedown", handleClickOutside);
-        }
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [isOpen]);
-
-    if (disabled) return <div className="w-10 h-10 bg-gray-100 animate-pulse rounded-full" />;
-
+  if (detailStatus === "failed") {
     return (
-        <div className="relative" ref={menuRef}>
-            <button 
-                onClick={() => setIsOpen(!isOpen)}
-                className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer"
-                title={t('documents.detail.actions.more', 'More')}
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          {t("documents.detail.notFound", "Document not found.")}
+        </div>
+      </div>
+    );
+  }
+
+  const isDocLoading = detailStatus === "loading" || !currentDocument;
+  const isOwner = currentDocument?.author?.id === currentUser?.id;
+
+  return (
+    <main className="min-h-screen bg-white pb-20">
+      <div className="max-w-4xl mx-auto px-4 pt-10 pb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="bg-blue-50 text-blue-600 text-xs px-2.5 py-0.5 rounded-full font-medium">
+            {t("documents.detail.category", "Documents")}
+          </span>
+          <span className="text-gray-400 text-xs">•</span>
+          {isDocLoading ? (
+            <Skeleton className="h-4 w-32" />
+          ) : (
+            <span className="text-gray-500 text-xs">
+              {currentDocument?.title}
+            </span>
+          )}
+        </div>
+
+        {isDocLoading ? (
+          <Skeleton className="h-10 w-3/4 mb-6" />
+        ) : (
+          <div className="flex flex-col gap-2 mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 leading-tight text-center md:text-left">
+              {currentDocument?.title}
+            </h1>
+            <div className="flex justify-center md:justify-start">
+              <StarRating
+                rating={myRating}
+                averageRating={averageRating}
+                onRate={handleRate}
+                readonly={!!myRating && myRating > 0}
+                size="md"
+                isLoading={ratingStatus === "loading"}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-gray-100 pb-8">
+          <div className="flex items-center gap-3 justify-center sm:justify-start">
+            {currentDocument?.author === null || !currentDocument?.author ? (
+              <>
+                <Skeleton className="w-12 h-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-3 w-48" />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-100 shrink-0">
+                  <AuthenticatedImage
+                    src={currentDocument.author.avatarUrl}
+                    alt={currentDocument.author.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">
+                    {currentDocument.author.name}
+                  </div>
+                  <div className="text-[13px] text-gray-500 font-medium flex items-center gap-2">
+                    <span>
+                      {currentDocument?.createdAt
+                        ? formatDate(
+                            new Date(currentDocument.createdAt).toISOString(),
+                          )
+                        : ""}
+                    </span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center justify-center gap-3">
+            <button
+              disabled={isDocLoading || !currentDocument?.downloadable}
+              onClick={handleDownload}
+              className={clsx(
+                "flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition",
+                !isDocLoading && currentDocument?.downloadable
+                  ? "bg-black text-white hover:opacity-80 cursor-pointer shadow-sm"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed",
+              )}
             >
-                <MoreHorizontal size={20} />
+              <Download size={18} />
+              <span>{t("documents.detail.download", "Download")}</span>
             </button>
 
-            {isOpen && (
-                <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
-                    <button
-                        onClick={() => { setIsOpen(false); onShare(); }}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                        <Share2 size={16} />
-                        {t('documents.detail.actions.share', 'Share')}
-                    </button>
-                    
-                    <button
-                        onClick={() => { setIsOpen(false); onReport(); }}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                        <Flag size={16} />
-                        {t('documents.detail.actions.report', 'Report')}
-                    </button>
-
-                    {isOwner && (
-                        <>
-                            <div className="h-px bg-gray-100 my-1 mx-2" />
-                            <button
-                                onClick={() => { setIsOpen(false); onDelete(); }}
-                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
-                            >
-                                <Trash2 size={16} />
-                                {t('documents.detail.actions.delete', 'Delete Document')}
-                            </button>
-                        </>
-                    )}
-                </div>
-            )}
+            <DocumentActionsMenu
+              onShare={handleShare}
+              onReport={handleReport}
+              onDelete={handleDelete}
+              isOwner={isOwner}
+              disabled={isDocLoading}
+            />
+          </div>
         </div>
-    );
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4">
+        <div className="mb-8">
+          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide mb-2">
+            {t("documents.detail.description", "Description")}
+          </h3>
+          {isDocLoading ? (
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+          ) : (
+            <DescriptionWithShowMore
+              description={currentDocument?.description}
+            />
+          )}
+        </div>
+
+        <div className="bg-gray-100 rounded-xl overflow-hidden border border-gray-200 mb-8 shadow-sm">
+          <div className="w-full aspect-[3/4] md:aspect-[16/9] bg-white relative">
+            {renderViewer()}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center sm:justify-start gap-6 text-gray-500 text-sm border-b border-gray-100 pb-8 mb-8">
+          {isDocLoading ? (
+            <Skeleton className="h-5 w-40" />
+          ) : (
+            <>
+              <div className="flex items-center gap-2">
+                <Eye size={18} />
+                <span>
+                  {currentDocument?.views?.toLocaleString()}{" "}
+                  {t("documents.detail.views", "Views")}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Download size={18} />
+                <span>
+                  {currentDocument?.downloadCount?.toLocaleString()}{" "}
+                  {t("documents.detail.downloads", "Downloads")}
+                </span>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 mb-16 border-t border-gray-100 pt-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">
+          {t("documents.detail.related", "Related Documents")}
+        </h3>
+
+        {relatedStatus === "loading" ? (
+          <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="min-w-[280px] w-[280px] h-[380px] bg-gray-200 animate-pulse rounded-xl flex-shrink-0"
+              />
+            ))}
+          </div>
+        ) : relatedDocuments.length > 0 ? (
+          <div className="relative group/container">
+            <div
+              className="flex gap-4 overflow-x-auto pb-6 pt-2 px-1 no-scrollbar scroll-smooth"
+              id="related-docs-container"
+            >
+              {relatedDocuments.map((doc: any) => (
+                <RelatedDocumentCard
+                  key={doc.id}
+                  data={{
+                    id: doc.id,
+                    title: doc.title,
+                    createdAt: doc.createdAt,
+                    coverImage: doc.previewImageUrl,
+                    author: doc.university,
+                    onClick: () => router.push(AppRoute.documents.id(doc.id)),
+                    recommendationReason: doc.recommendationReason,
+                  }}
+                />
+              ))}
+              <div
+                className="min-w-[100px] flex items-center justify-center flex-shrink-0 cursor-pointer hover:bg-gray-50 rounded-xl border border-dashed border-gray-300 transition"
+                onClick={() => onRelatedPageChange(relatedPage + 2)}
+              >
+                <span className="text-sm font-medium text-gray-500">
+                  {t("documents.detail.viewMore", "View more")}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="text-gray-500 text-center py-8 bg-gray-50 rounded-lg">
+            {t("documents.detail.noRelated", "No related documents found.")}
+          </div>
+        )}
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4">
+        <CommentSection params={params} />
+      </div>
+    </main>
+  );
+}
+
+function DocumentActionsMenu({
+  onShare,
+  onReport,
+  onDelete,
+  isOwner,
+  disabled,
+}: {
+  onShare: () => void;
+  onReport: () => void;
+  onDelete: () => void;
+  isOwner: boolean;
+  disabled: boolean;
+}) {
+  const { t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen]);
+
+  if (disabled)
+    return <div className="w-10 h-10 bg-gray-100 animate-pulse rounded-full" />;
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="p-2 text-gray-500 hover:text-black hover:bg-gray-100 rounded-full transition cursor-pointer"
+        title={t("documents.detail.actions.more", "More")}
+      >
+        <MoreHorizontal size={20} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-100">
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              onShare();
+            }}
+            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Share2 size={16} />
+            {t("documents.detail.actions.share", "Share")}
+          </button>
+
+          <button
+            onClick={() => {
+              setIsOpen(false);
+              onReport();
+            }}
+            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Flag size={16} />
+            {t("documents.detail.actions.report", "Report")}
+          </button>
+
+          {isOwner && (
+            <>
+              <div className="h-px bg-gray-100 my-1 mx-2" />
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  onDelete();
+                }}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"
+              >
+                <Trash2 size={16} />
+                {t("documents.detail.actions.delete", "Delete Document")}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
