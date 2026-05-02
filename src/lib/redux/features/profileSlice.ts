@@ -4,6 +4,7 @@ import {
   getUserInfo,
   updateUserInfo,
   uploadAvatarImage,
+  updateInterests as updateInterestsApi,
 } from "@/lib/services/user.service";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as profileService from "@/lib/services/profile.service";
@@ -31,6 +32,7 @@ export interface UserProfile {
   phone?: string;
   isFollowing?: boolean;
   isFollower?: boolean;
+  interestedTopics?: string[];
 }
 
 export interface UpdateProfileRequest {
@@ -172,6 +174,24 @@ export const updateMyProfile = createAsyncThunk(
         error.response?.data?.message ||
           error.message ||
           "errors.profileUpdateFailed",
+      );
+    }
+  },
+);
+
+export const updateMyInterests = createAsyncThunk(
+  "profile/updateInterests",
+  async (topicIds: string[], { dispatch, rejectWithValue }) => {
+    try {
+      await updateInterestsApi(topicIds);
+      // Immediately refresh profile to sync state
+      await dispatch(getMyProfile());
+      return topicIds;
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "errors.interestsUpdateFailed",
       );
     }
   },

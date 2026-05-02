@@ -3,7 +3,7 @@
 import { useTranslation } from 'react-i18next';
 import { formatTimeAgo } from "@/lib/utils/formatTimeAgo";
 import { CardProp } from "./props";
-import { BookmarkPlus, MoreHorizontal, Eye } from "lucide-react";
+import { BookmarkPlus, MoreHorizontal, Eye, Sparkles } from "lucide-react";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 import { useState, useRef, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
@@ -22,6 +22,14 @@ export default function ContentCard({ data }: { data: CardProp }) {
             className="group relative bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 mb-4 cursor-pointer transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-gray-200 hover:-translate-y-0.5 active:scale-[0.99]" 
             onClick={() => data?.onClick?.(data.id)}
         >
+            {data.recommendationReason && (
+                <div className="flex items-center gap-2 mb-4 px-2.5 py-1 bg-gray-50 rounded-lg w-fit border border-gray-100">
+                    <Sparkles size={13} className="text-gray-400" />
+                    <span className="text-[11px] text-gray-500 font-medium tracking-tight leading-none">
+                        {t(`common.recommendation.${data.recommendationReason.type}`, { title: data.recommendationReason.title || t('common.recommendation.genericItem') })}
+                    </span>
+                </div>
+            )}
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-gray-50 group-hover:ring-blue-50 transition-all">
@@ -62,7 +70,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                         {data?.title}
                     </h2>
                     <p className="text-gray-500 text-[15px] line-clamp-3 leading-relaxed font-normal">
-                        {data?.content}
+                        {data?.content?.startsWith('common.') ? t(data.content) : data.content}
                     </p>
                 </div>
 
@@ -84,7 +92,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
                             key={idx}
                             className="bg-gray-50 text-gray-600 text-[12px] px-3 py-1 rounded-lg border border-gray-100 whitespace-nowrap hover:bg-white hover:border-gray-200 transition-colors"
                         >
-                            #{tag}
+                            #{tag.startsWith('common.') ? t(tag) : tag}
                         </span>
                     ))}
                 </div>

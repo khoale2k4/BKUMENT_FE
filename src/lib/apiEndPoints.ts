@@ -57,6 +57,7 @@ export const API_ENDPOINTS = {
     // http://143.198.80.199:8888/api/v1/profile/universities/search?page=1&size=10
     UPDATE_TUTOR_INFO: buildUrl(`${LMS}/tutors/me`),
     FOLLOW: (id: string) => buildUrl(`${PROFILE}/${id}/follow`),
+    UPDATE_INTERESTS: buildUrl(`${PROFILE}/me/interests`),
     GET_FOLLOWERS: (id: string, page: number, size: number) =>
       buildUrl(`${PROFILE}/${id}/followers?page=${page}&size=${size}`),
     GET_FOLLOWING: (id: string, page: number, size: number) =>

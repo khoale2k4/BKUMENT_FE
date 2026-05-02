@@ -172,6 +172,16 @@
       "failTitle": "Đăng ký thất bại",
       "failMsg": "Không thể tạo tài khoản"
     },
+    "onboarding": {
+      "title": "Bạn quan tâm đến chủ đề nào?",
+      "subtitle": "Chọn các chủ đề bạn quan tâm để chúng mình cá nhân hóa nội dung và gợi ý tài liệu tốt nhất cho bạn.",
+      "loading": "Đang chuẩn bị trải nghiệm cho bạn...",
+      "success": "Cập nhật sở thích thành công!",
+      "skipSuccess": "Bạn có thể cập nhật sở thích sau.",
+      "skip": "Để sau",
+      "finish": "Bắt đầu ngay",
+      "selectedCount": "Đã chọn {{count}} chủ đề"
+    },
     "forgot": {
       "emailTitle": "Quên mật khẩu?",
       "emailDesc": "Nhập email của bạn để nhận mã xác thực đặt lại mật khẩu.",
@@ -380,6 +390,14 @@
       "documentDescription": "Tài liệu đính kèm",
       "comment": "Thêm bình luận của bạn..."
     },
+    "recommendation": {
+      "DOWNLOADED": "Vì bạn đã tải xuống tài liệu {{title}}",
+      "ENROLLED_CLASS": "Vì bạn tham gia lớp học {{title}}",
+      "INTERESTED_TOPIC": "Vì bạn quan tâm chủ đề {{title}}",
+      "TRENDING": "Tài liệu đang thịnh hành",
+      "SIMILAR": "Tài liệu tương tự",
+      "genericItem": "nội dung liên quan"
+    },
     "tags": {
       "searchResult": "Kết quả tìm kiếm",
       "hot": "Hot",
@@ -491,14 +509,8 @@
         "report": "Báo cáo",
         "delete": "Xóa tài liệu"
       },
-      "detail": {
-        "download": "Tải xuống",
-        "description": "Mô tả",
-        "views": "Lượt xem",
-        "downloads": "Lượt tải",
-        "comments": "Bình luận",
-        "loadMore": "Xem thêm bình luận"
-      }
+      "comments": "Bình luận",
+      "loadMore": "Xem thêm bình luận"
     },
     "upload": {
       "title": "Tải tài liệu lên",

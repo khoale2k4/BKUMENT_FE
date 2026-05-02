@@ -172,6 +172,16 @@
       "failTitle": "Registration Failed",
       "failMsg": "Could not create account"
     },
+    "onboarding": {
+      "title": "What are you interested in?",
+      "subtitle": "Select the topics you care about to personalize your feed and get the best recommendations.",
+      "loading": "Tailoring your experience...",
+      "success": "Interests updated successfully!",
+      "skipSuccess": "You can update your interests later in settings.",
+      "skip": "Do it later",
+      "finish": "Get Started",
+      "selectedCount": "{{count}} topics selected"
+    },
     "forgot": {
       "emailTitle": "Forgot Password?",
       "emailDesc": "Enter your email to receive an OTP code to reset your password.",
@@ -379,6 +389,14 @@
       "documentDescription": "Attached document",
       "comment": "Add your comment..."
     },
+    "recommendation": {
+      "DOWNLOADED": "Since you downloaded {{title}}",
+      "ENROLLED_CLASS": "Since you are in class {{title}}",
+      "INTERESTED_TOPIC": "Since you're interested in {{title}}",
+      "TRENDING": "Trending now",
+      "SIMILAR": "Similar documents",
+      "genericItem": "related content"
+    },
     "tags": {
       "searchResult": "Search result",
       "hot": "Hot",
@@ -490,14 +508,8 @@
         "report": "Report",
         "delete": "Delete Document"
       },
-      "detail": {
-        "download": "Download",
-        "description": "Description",
-        "views": "Views",
-        "downloads": "Downloads",
-        "comments": "Comments",
-        "loadMore": "Load more comments"
-      }
+      "comments": "Comments",
+      "loadMore": "Load more comments"
     },
     "upload": {
       "title": "Upload Documents",

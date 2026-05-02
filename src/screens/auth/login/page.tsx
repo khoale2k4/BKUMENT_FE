@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react"; // Import useState
+import { useState, useEffect } from "react"; // Import useState, useEffect
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { login, loginUser } from "@/lib/redux/features/authSlice";
@@ -22,6 +22,11 @@ export default function LoginPage() {
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const isReduxLoading = status === 'loading';
 
@@ -54,6 +59,14 @@ export default function LoginPage() {
   };
 
   const inputClassName = "text-gray-900 font-medium placeholder:text-gray-400";
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen flex bg-white flex-col items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex bg-white">

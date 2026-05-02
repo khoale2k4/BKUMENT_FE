@@ -1,6 +1,11 @@
 import { API_ENDPOINTS } from '@/lib/apiEndPoints';
 import httpClient from './http';
 
+export interface RecommendationReason {
+    type: string;
+    title: string;
+}
+
 export interface DocumentDetail {
     id: string;
     title: string;
@@ -16,6 +21,7 @@ export interface DocumentDetail {
     course?: string;
     createdAt: Date;
     views: number;
+    recommendationReason?: RecommendationReason;
 }
 
 interface Author {

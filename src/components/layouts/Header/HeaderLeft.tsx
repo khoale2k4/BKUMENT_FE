@@ -31,7 +31,7 @@ export default function HeaderLeft() {
       </button>
 
       <img
-        src="/images/icon-thang4.png"
+        src="/images/icon-30-4.png"
         alt="Logo"
         // [SỬA]: Thu nhỏ logo một chút trên mobile
         className="w-8 h-8 sm:w-10 sm:h-10 rounded-sm object-contain cursor-pointer hover:opacity-80 transition"

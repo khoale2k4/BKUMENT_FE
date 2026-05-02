@@ -276,6 +276,9 @@ export const authSlice = createSlice({
           if (savedUser) {
             state.user = JSON.parse(savedUser);
           }
+          state.status = "succeeded";
+        } else {
+          state.status = "idle";
         }
       }
     },
