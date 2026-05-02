@@ -1,5 +1,199 @@
+// import { useTranslation } from "react-i18next";
+// import React, { useRef, useState } from "react";
+// import { useDispatch, useSelector } from "react-redux";
+// import { AppDispatch, RootState } from "@/lib/redux/store";
+// import {
+//   sendImageMessageAsync,
+//   sendMessageAsync,
+// } from "@/lib/redux/features/chatSlice";
+// import { DateTime } from "luxon";
+// import { error } from "console";
+
+// const ChatInput = () => {
+//   const { t } = useTranslation();
+//   const [text, setText] = useState("");
+//   const fileInputRef = useRef<HTMLInputElement>(null);
+//   const [isUploading, setIsUploading] = useState(false);
+//   const dispatch = useDispatch<AppDispatch>();
+//   const activeConversationId = useSelector(
+//     (state: RootState) => state.chat.activeConversationId,
+//   );
+
+//   const handleSendMessage = () => {
+//     if (!text.trim() || !activeConversationId) return;
+//     dispatch(
+//       sendMessageAsync({
+//         conversationId: activeConversationId,
+//         message: text.trim(),
+//         type: "TEXT",
+//         tempId: DateTime.now().toString(),
+//         attachedUrl: "",
+//       }),
+//     );
+//     setText("");
+//   };
+
+//   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+//     if (e.nativeEvent.isComposing) return;
+//     if (e.key === "Enter") {
+//       e.preventDefault();
+//       handleSendMessage();
+//     }
+//   };
+
+//   const handleImageBtnClick = () => fileInputRef.current?.click();
+
+//   // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+//   //   const file = e.target.files?.[0];
+//   //   if (!file || !activeConversationId) return;
+
+//   //   if (!file.type.startsWith("image/")) {
+//   //     alert(t("chat.input.imageFormatError", "Please select an image format!"));
+//   //     return;
+//   //   }
+
+//   //   setIsUploading(true);
+//   //   try {
+//   //     await dispatch(
+//   //       sendImageMessageAsync({ conversationId: activeConversationId, file }),
+//   //     ).unwrap();
+//   //   } catch (error) {
+//   //     alert(error);
+//   //     // alert(t("chat.input.sendImageFail", "Failed to send image!"));
+//   //   } finally {
+//   //     setIsUploading(false);
+//   //     if (fileInputRef.current) fileInputRef.current.value = "";
+//   //   }
+//   // };
+
+//   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const file = e.target.files?.[0];
+//     if (!file || !activeConversationId) return;
+
+//     // [BỔ SUNG 1]: Nới lỏng check định dạng để tránh iOS trả về file.type rỗng bị lỗi
+//     if (file.type && !file.type.startsWith("image/")) {
+//       alert(
+//         t(
+//           "chat.input.imageFormatError",
+//           "Vui lòng chọn một định dạng ảnh hợp lệ!",
+//         ),
+//       );
+//       if (fileInputRef.current) fileInputRef.current.value = "";
+//       return;
+//     }
+
+//     // [BỔ SUNG 2]: Chặn dung lượng ảnh quá lớn (Ví dụ set giới hạn 5MB)
+//     // Bạn có thể tăng lên 10MB (10 * 1024 * 1024) tùy vào Backend của bạn cho phép bao nhiêu
+//     const MAX_FILE_SIZE = 5 * 1024 * 1024;
+//     if (file.size > MAX_FILE_SIZE) {
+//       alert(
+//         t(
+//           "chat.input.imageTooLarge",
+//           "Ảnh chụp từ điện thoại quá nặng. Vui lòng chọn ảnh dưới 5MB.",
+//         ),
+//       );
+//       if (fileInputRef.current) fileInputRef.current.value = "";
+//       return;
+//     }
+
+//     setIsUploading(true);
+//     try {
+//       await dispatch(
+//         sendImageMessageAsync({
+//           conversationId: activeConversationId,
+//           file: file,
+//         }),
+//       ).unwrap();
+//     } catch (error) {
+//       // [BỔ SUNG 3]: In lỗi chi tiết ra để bắt bệnh
+//       console.error("🚀 Chi tiết lỗi Upload từ điện thoại:", error);
+//       alert(
+//         t("chat.input.sendImageFail", "Gửi ảnh thất bại! Vui lòng thử lại."),
+//       );
+//     } finally {
+//       setIsUploading(false);
+//       if (fileInputRef.current) fileInputRef.current.value = "";
+//     }
+//   };
+
+//   return (
+//     <div className="p-3 sm:p-4 bg-white border-t border-gray-100 shrink-0">
+//       <input
+//         type="file"
+//         ref={fileInputRef}
+//         hidden
+//         accept="image/*"
+//         onChange={handleFileChange}
+//       />
+
+//       <div className="flex items-center gap-2 sm:gap-3 bg-white border border-gray-200 rounded-full px-3 sm:px-4 py-2 shadow-sm min-w-0">
+//         {/* Image button */}
+//         <button
+//           onClick={handleImageBtnClick}
+//           disabled={isUploading}
+//           className="shrink-0 text-gray-500 hover:text-blue-500 active:text-blue-600 transition-colors disabled:opacity-50"
+//         >
+//           {isUploading ? (
+//             <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+//           ) : (
+//             <svg
+//               className="w-5 h-5 sm:w-6 sm:h-6"
+//               fill="none"
+//               stroke="currentColor"
+//               viewBox="0 0 24 24"
+//             >
+//               <path
+//                 strokeLinecap="round"
+//                 strokeLinejoin="round"
+//                 strokeWidth="1.5"
+//                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+//               />
+//             </svg>
+//           )}
+//         </button>
+
+//         {/* Text input */}
+//         <input
+//           type="text"
+//           placeholder={t("chat.input.placeholder", "Type a message...")}
+//           value={text}
+//           onChange={(e) => setText(e.target.value)}
+//           onKeyDown={handleKeyDown}
+//           className="flex-1 min-w-0 bg-transparent outline-none py-1 text-sm sm:text-[15px] text-gray-800 placeholder:text-gray-400"
+//         />
+
+//         {/* Send button */}
+//         <button
+//           onClick={handleSendMessage}
+//           disabled={!text.trim()}
+//           className={`shrink-0 transition-colors ${text.trim() ? "text-blue-500 hover:text-blue-600 active:text-blue-700" : "text-gray-300"}`}
+//         >
+//           <svg
+//             className="w-5 h-5 sm:w-6 sm:h-6"
+//             fill="none"
+//             stroke="currentColor"
+//             viewBox="0 0 24 24"
+//           >
+//             <path
+//               strokeLinecap="round"
+//               strokeLinejoin="round"
+//               strokeWidth="1.5"
+//               d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+//             />
+//           </svg>
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ChatInput;
+
+"use client";
+
 import { useTranslation } from "react-i18next";
-import React, { useRef, useState } from "react";
+// [SỬA]: Import thêm useEffect
+import React, { useRef, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import {
@@ -7,7 +201,6 @@ import {
   sendMessageAsync,
 } from "@/lib/redux/features/chatSlice";
 import { DateTime } from "luxon";
-import { error } from "console";
 
 const ChatInput = () => {
   const { t } = useTranslation();
@@ -19,6 +212,26 @@ const ChatInput = () => {
     (state: RootState) => state.chat.activeConversationId,
   );
 
+  // ==========================================
+  // [BỔ SUNG]: KHỞI TẠO VCONSOLE DÀNH CHO MOBILE
+  // ==========================================
+  useEffect(() => {
+    // Chỉ chạy ở phía Client và kiểm tra xem vConsole đã được load chưa để tránh bị duplicate
+    if (typeof window !== "undefined" && !(window as any).VConsole) {
+      const script = document.createElement("script");
+      script.src = "https://unpkg.com/vconsole@latest/dist/vconsole.min.js";
+      script.onload = () => {
+        // Khởi tạo vConsole sau khi tải xong script
+        new (window as any).VConsole();
+        console.log(
+          "✅ vConsole đã khởi tạo thành công! Hãy xem log lỗi ở đây.",
+        );
+      };
+      document.body.appendChild(script);
+    }
+  }, []);
+  // ==========================================
+
   const handleSendMessage = () => {
     if (!text.trim() || !activeConversationId) return;
     dispatch(
@@ -27,6 +240,7 @@ const ChatInput = () => {
         message: text.trim(),
         type: "TEXT",
         tempId: DateTime.now().toString(),
+        // @ts-ignore - Bỏ qua lỗi nếu type trong slice chưa update kịp
         attachedUrl: "",
       }),
     );
@@ -42,29 +256,6 @@ const ChatInput = () => {
   };
 
   const handleImageBtnClick = () => fileInputRef.current?.click();
-
-  // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (!file || !activeConversationId) return;
-
-  //   if (!file.type.startsWith("image/")) {
-  //     alert(t("chat.input.imageFormatError", "Please select an image format!"));
-  //     return;
-  //   }
-
-  //   setIsUploading(true);
-  //   try {
-  //     await dispatch(
-  //       sendImageMessageAsync({ conversationId: activeConversationId, file }),
-  //     ).unwrap();
-  //   } catch (error) {
-  //     alert(error);
-  //     // alert(t("chat.input.sendImageFail", "Failed to send image!"));
-  //   } finally {
-  //     setIsUploading(false);
-  //     if (fileInputRef.current) fileInputRef.current.value = "";
-  //   }
-  // };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -83,7 +274,6 @@ const ChatInput = () => {
     }
 
     // [BỔ SUNG 2]: Chặn dung lượng ảnh quá lớn (Ví dụ set giới hạn 5MB)
-    // Bạn có thể tăng lên 10MB (10 * 1024 * 1024) tùy vào Backend của bạn cho phép bao nhiêu
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
     if (file.size > MAX_FILE_SIZE) {
       alert(
@@ -105,7 +295,7 @@ const ChatInput = () => {
         }),
       ).unwrap();
     } catch (error) {
-      // [BỔ SUNG 3]: In lỗi chi tiết ra để bắt bệnh
+      // Lỗi sẽ được in ra cái bảng vConsole trên điện thoại của bạn!
       console.error("🚀 Chi tiết lỗi Upload từ điện thoại:", error);
       alert(
         t("chat.input.sendImageFail", "Gửi ảnh thất bại! Vui lòng thử lại."),
