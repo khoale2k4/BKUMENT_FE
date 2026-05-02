@@ -114,8 +114,13 @@ export const getClassDocuments = async (
     API_ENDPOINTS.LMS.GET_CLASS_DOCUMENTS(courseId, page, size),
   );
   // Provide a fallback logic just like the original code did
+  console.log("API Response for class documents:", response.data.result); // Debug log
   response.data.result.coverImage =
     response.data.result.coverImage || response.data.result.previewImageUrl;
+  console.log(
+    "img of document after fallback logic:",
+    response.data.result.coverImage,
+  ); // Debug log after processing
   return response.data.result;
 };
 
