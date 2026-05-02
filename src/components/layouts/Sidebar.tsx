@@ -49,12 +49,12 @@ export default function Sidebar() {
       href: AppRoute.home,
       count: 0,
     },
-    {
-      icon: Book,
-      label: t("layout.sidebar.library"),
-      href: AppRoute.library,
-      count: 0,
-    },
+    // {
+    //   icon: Book,
+    //   label: t("layout.sidebar.library"),
+    //   href: AppRoute.library,
+    //   count: 0,
+    // },
     {
       icon: User,
       label: t("layout.sidebar.profile"),
@@ -100,12 +100,12 @@ export default function Sidebar() {
       href: AppRoute.blogs.write,
       count: 0,
     },
-    {
-      icon: Users,
-      label: t("layout.sidebar.following"),
-      href: "/following",
-      count: 2,
-    },
+    // {
+    //   icon: Users,
+    //   label: t("layout.sidebar.following"),
+    //   href: "/following",
+    //   count: 2,
+    // },
   ];
 
   const renderMenuItem = (item: any, idx: number) => {

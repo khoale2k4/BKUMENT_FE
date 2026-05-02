@@ -7,6 +7,7 @@ import {
   sendMessageAsync,
 } from "@/lib/redux/features/chatSlice";
 import { DateTime } from "luxon";
+import { error } from "console";
 
 const ChatInput = () => {
   const { t } = useTranslation();
@@ -42,22 +43,73 @@ const ChatInput = () => {
 
   const handleImageBtnClick = () => fileInputRef.current?.click();
 
+  // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (!file || !activeConversationId) return;
+
+  //   if (!file.type.startsWith("image/")) {
+  //     alert(t("chat.input.imageFormatError", "Please select an image format!"));
+  //     return;
+  //   }
+
+  //   setIsUploading(true);
+  //   try {
+  //     await dispatch(
+  //       sendImageMessageAsync({ conversationId: activeConversationId, file }),
+  //     ).unwrap();
+  //   } catch (error) {
+  //     alert(error);
+  //     // alert(t("chat.input.sendImageFail", "Failed to send image!"));
+  //   } finally {
+  //     setIsUploading(false);
+  //     if (fileInputRef.current) fileInputRef.current.value = "";
+  //   }
+  // };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !activeConversationId) return;
 
-    if (!file.type.startsWith("image/")) {
-      alert(t("chat.input.imageFormatError", "Please select an image format!"));
+    // [BỔ SUNG 1]: Nới lỏng check định dạng để tránh iOS trả về file.type rỗng bị lỗi
+    if (file.type && !file.type.startsWith("image/")) {
+      alert(
+        t(
+          "chat.input.imageFormatError",
+          "Vui lòng chọn một định dạng ảnh hợp lệ!",
+        ),
+      );
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    // [BỔ SUNG 2]: Chặn dung lượng ảnh quá lớn (Ví dụ set giới hạn 5MB)
+    // Bạn có thể tăng lên 10MB (10 * 1024 * 1024) tùy vào Backend của bạn cho phép bao nhiêu
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      alert(
+        t(
+          "chat.input.imageTooLarge",
+          "Ảnh chụp từ điện thoại quá nặng. Vui lòng chọn ảnh dưới 5MB.",
+        ),
+      );
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
     setIsUploading(true);
     try {
       await dispatch(
-        sendImageMessageAsync({ conversationId: activeConversationId, file }),
+        sendImageMessageAsync({
+          conversationId: activeConversationId,
+          file: file,
+        }),
       ).unwrap();
-    } catch {
-      alert(t("chat.input.sendImageFail", "Failed to send image!"));
+    } catch (error) {
+      // [BỔ SUNG 3]: In lỗi chi tiết ra để bắt bệnh
+      console.error("🚀 Chi tiết lỗi Upload từ điện thoại:", error);
+      alert(
+        t("chat.input.sendImageFail", "Gửi ảnh thất bại! Vui lòng thử lại."),
+      );
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
