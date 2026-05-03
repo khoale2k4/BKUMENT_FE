@@ -4,50 +4,49 @@ import { useTranslation } from "react-i18next";
 
 export default function Footer() {
   const { t } = useTranslation();
+
+  // Đã phân bổ lại nội dung tập trung vào: Documents, Courses, Tutors, Blog, Messages, AI, Recommendations
   const footerLinks = [
     {
-      title: t("layout.footer.myTeam"),
+      title: t("layout.footer.explore", "Khám phá"),
       links: [
-        t("layout.footer.aboutUs"),
-        t("layout.footer.scholarship"),
-        t("layout.footer.educationModel"),
-        t("layout.footer.academicPartners"),
+        t("layout.footer.documents", "Tài liệu học tập"),
+        t("layout.footer.courses", "Khóa học"),
+        t("layout.footer.findTutors", "Tìm gia sư"),
+        t("layout.footer.blog", "Blog & Bài viết"),
       ],
     },
     {
-      title: t("layout.footer.corporateTraining"),
+      title: t("layout.footer.features", "Tính năng nổi bật"),
       links: [
-        t("layout.footer.allCourses"),
-        t("layout.footer.frontend"),
-        t("layout.footer.backend"),
-        t("layout.footer.marketing"),
-        t("layout.footer.dataAnalytics"),
+        t("layout.footer.messages", "Nhắn tin & Thảo luận"),
+        t("layout.footer.aiAssistant", "Trợ lý học tập AI"),
+        t("layout.footer.recommendations", "Gợi ý cá nhân hóa"),
+        t("layout.footer.advancedSearch", "Tìm kiếm nâng cao"),
       ],
     },
     {
-      title: t("layout.footer.others"),
+      title: t("layout.footer.community", "Cộng đồng"),
       links: [
-        t("layout.footer.allCourses"),
-        t("layout.footer.frontend"),
-        t("layout.footer.backend"),
-        t("layout.footer.marketing"),
-        t("layout.footer.dataAnalytics"),
+        t("layout.footer.forums", "Diễn đàn trao đổi"),
+        t("layout.footer.events", "Sự kiện & Hội thảo"),
+        t("layout.footer.leaderboard", "Bảng xếp hạng"),
       ],
     },
     {
-      title: t("layout.footer.others"),
+      title: t("layout.footer.about", "Về Bkuments"),
       links: [
-        t("layout.footer.vacancies"),
-        t("layout.footer.socialResponsibility"),
-        t("layout.footer.contact"),
+        t("layout.footer.aboutUs", "Giới thiệu"),
+        t("layout.footer.careers", "Tuyển dụng"),
+        t("layout.footer.contact", "Liên hệ"),
       ],
     },
     {
-      title: t("layout.footer.others"),
+      title: t("layout.footer.support", "Hỗ trợ & Pháp lý"),
       links: [
-        t("layout.footer.academy"),
-        t("layout.footer.graduates"),
-        t("layout.footer.teachers"),
+        t("layout.footer.helpCenter", "Trung tâm hỗ trợ"),
+        t("layout.footer.terms", "Điều khoản dịch vụ"),
+        t("layout.footer.privacy", "Chính sách bảo mật"),
       ],
     },
   ];
@@ -65,9 +64,11 @@ export default function Footer() {
             </Link>
 
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 md:gap-8 text-xs sm:text-sm font-medium text-gray-300">
-              <span>{t("layout.footer.phone")}</span>
-              <span>{t("layout.footer.email")}</span>
-              <span>{t("layout.footer.address")}</span>
+              <span>{t("layout.footer.phone", "+84 123 456 789")}</span>
+              <span>{t("layout.footer.email", "support@bkuments.com")}</span>
+              <span>
+                {t("layout.footer.address", "Dĩ An, Bình Dương, Vietnam")}
+              </span>
             </div>
           </div>
 
@@ -80,11 +81,9 @@ export default function Footer() {
 
         <div className="border-t border-gray-800 mb-8 sm:mb-12"></div>
 
-        {/* [SỬA]: Đổi grid-cols-2 thành grid-cols-1 trên mobile, lên sm mới tách làm 2 */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-6 md:gap-8">
           {footerLinks.map((column, idx) => (
             <div key={idx}>
-              {/* [SỬA]: Đẩy margin text mb-4 thay vì mb-6 để gọn gàng hơn */}
               <h3 className="font-bold mb-4 sm:mb-6 text-base sm:text-lg capitalize text-gray-100">
                 {column.title}
               </h3>
@@ -112,9 +111,9 @@ function SocialIcon({ icon: Icon }: { icon: any }) {
   return (
     <a
       href="#"
-      className="w-8 h-8 bg-white text-black rounded flex items-center justify-center hover:bg-gray-200 transition shrink-0"
+      className="w-8 h-8 sm:w-10 sm:h-10 bg-white text-black rounded flex items-center justify-center hover:bg-gray-200 transition shrink-0"
     >
-      <Icon size={16} sm={{ size: 18 }} strokeWidth={2.5} />
+      <Icon className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
     </a>
   );
 }

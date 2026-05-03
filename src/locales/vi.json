@@ -265,7 +265,15 @@
       "teachers": "Giảng viên",
       "address": "TP. Hồ Chí Minh, Việt Nam",
       "phone": "+994 50 717 17 17",
-      "email": "vbook@gmail.com"
+      "email": "vbook@gmail.com",
+      "help": "Trợ giúp",
+      "status": "Trạng thái",
+      "about": "Giới thiệu",
+      "careers": "Cơ hội nghề nghiệp",
+      "press": "Phóng viên",
+      "privacy": "Chính sách bảo mật",
+      "rules": "Quy định",
+      "terms": "Điều khoản dịch vụ"
     }
   },
   "home": {
