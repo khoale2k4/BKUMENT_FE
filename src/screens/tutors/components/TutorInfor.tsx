@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Calendar,
@@ -47,9 +46,16 @@ export const AdminTutorInfo: React.FC<{ tutor: TutorData["tutor"] }> = ({
   tutor,
 }) => {
   const { t } = useTranslation();
+  const HARDCODED_AVATAR =
+    "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80";
   return (
     <>
       {/* CHANGE: flex-wrap để badge xuống hàng nếu tên dài trên mobile */}
+      {/* <img
+        src={tutor.avatarUrl || HARDCODED_AVATAR}
+        alt={tutor.name}
+        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover shrink-0 border border-gray-200 shadow-sm"
+      /> */}
       <div className="flex flex-wrap items-center gap-2 mb-2">
         {/* CHANGE: text-xl -> text-base sm:text-xl để giảm cỡ chữ tên trên mobile */}
         <h3 className="text-base sm:text-xl font-bold text-gray-900">
