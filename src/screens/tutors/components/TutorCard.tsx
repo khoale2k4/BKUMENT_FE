@@ -14,6 +14,8 @@ import { setPendingTargetUserId } from "@/lib/redux/features/chatSlice";
 
 import { RejectModal } from "./RejectModal";
 import { AdminTutorInfo, UserTutorInfo } from "./TutorInfor";
+
+// IMPORT COMPONENT AuthenticatedImage (Nhớ điều chỉnh lại đường dẫn cho đúng với project của bạn)
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 
 interface TutorCardProps {
@@ -54,8 +56,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
     setShowRejectModal(false);
   };
 
-  // CHANGE: Sử dụng Pravatar để tạo ảnh chân dung người thật ngẫu nhiên
-  // u=${tutor.id} giúp mỗi gia sư luôn có một ảnh cố định không bị đổi khi reload
+  // Sử dụng Pravatar làm ảnh dự phòng (gắn ID để ảnh ngẫu nhiên nhưng cố định cho mỗi tutor)
   const fallbackAvatar = `https://i.pravatar.cc/256?u=${tutor.id || "default"}`;
 
   const avatarUrl = tutor.avatar?.startsWith("http")
@@ -65,7 +66,7 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
   return (
     <>
       <div className="relative p-4 sm:p-6 bg-white border border-gray-200 rounded-3xl shadow-sm hover:shadow-md transition-shadow duration-300">
-        {/* Nút Heart — vẫn ở góc trên phải */}
+        {/* Nút Heart */}
         {!isAdminView && (
           <button className="absolute top-4 right-4 sm:top-6 sm:right-6 text-red-400 hover:text-pink-500 transition-colors z-10">
             <Heart size={22} />
@@ -78,11 +79,20 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
             {/* Cột Avatar */}
             <div className="shrink-0">
               <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm">
-                <AuthenticatedImage
-                  src={avatarUrl}
-                  alt={tutor.name}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                />
+                {/* XỬ LÝ LỖI CORS: Kiểm tra nếu là link public thì dùng img thường, ngược lại dùng AuthenticatedImage */}
+                {avatarUrl.includes("pravatar.cc") ||
+                avatarUrl.includes("ui-avatars.com") ? (
+                  <img
+                    src={avatarUrl}
+                    alt={tutor.name}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <AuthenticatedImage
+                    src={avatarUrl}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  />
+                )}
               </div>
             </div>
 
