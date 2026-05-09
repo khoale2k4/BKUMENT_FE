@@ -752,7 +752,7 @@
         "actions": "Hành động"
       },
       "addModal": {
-        "title": "Thêm thông báo đẩy",
+        "title": "Thêm thông báo mới",
         "titleLabel": "Tiêu đề",
         "messageLabel": "Nội dung",
         "cancel": "Hủy",
