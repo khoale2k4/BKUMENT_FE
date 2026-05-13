@@ -284,7 +284,8 @@
     },
     "contentCard": {
       "minRead": "{{count}} min read",
-      "save": "Save"
+      "save": "Save",
+      "noDecription": "No decription provided"
     },
     "search": {
       "fail": "Search failed. Please try again.",

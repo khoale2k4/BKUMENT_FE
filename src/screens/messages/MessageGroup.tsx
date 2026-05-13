@@ -89,7 +89,7 @@ const MessageGroup = ({ isSelf, user, messages }: MessageGroupProps) => {
         <div
           className={`${isSelf ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-900"} 
     px-4 py-2 rounded-2xl w-fit text-[15px] break-words 
-    max-w-[75%] md:max-w-[70%] lg:max-w-[65%] border border-transparent
+    max-w-[80%] md:max-w-[80%] lg:max-w-[90%] border border-transparent
     transition-opacity ${opacityClass} ${errorBorderClass}`}
         >
           {msg.content}

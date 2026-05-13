@@ -102,5 +102,7 @@ export const getUserBlogs = async (
  * Xóa blog theo ID
  */
 export const deleteBlog = async (id: string): Promise<void> => {
-  await httpClient.delete(API_ENDPOINTS.BLOGS.DELETE(id));
+  const response = await  httpClient.delete(API_ENDPOINTS.BLOGS.DELETE(id));
+  console.log("delete blog res", response);
+  
 };

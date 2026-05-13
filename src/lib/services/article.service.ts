@@ -36,7 +36,7 @@ interface PeopleMayKnowResponse {
  */
 export const searchDocuments = async (page: number, size: number): Promise<SearchResponse> => {
     const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.RECOMMENDED_DOCUMENTS(page, size));
-
+    console.log("API Response for recommended documents:", response.data); // Debug log
     return {
         content: response.data.result.content,
         totalPages: response.data.result.totalPages || 10,
@@ -48,7 +48,7 @@ export const searchDocuments = async (page: number, size: number): Promise<Searc
  */
 export const getTopDocuments = async (page: number, size: number): Promise<SearchResponse> => {
     const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.TOP_DOCUMENTS(page, size));
-
+    console.log("API Response for top documents:", response.data); // Debug log
     return {
         content: response.data.result.content,
         totalPages: response.data.result.totalPages || 10,
@@ -72,6 +72,7 @@ export const searchBlogs = async (page: number, size: number): Promise<SearchRes
  */
 export const getTopBlogs = async (page: number, size: number): Promise<SearchResponse> => {
     const response = await httpClient.get(API_ENDPOINTS.BLOGS.TOP_BLOGS(page, size));
+    console.log("API Response for top blogs:", response.data); // Debug log
 
     return {
         content: response.data.result.content,

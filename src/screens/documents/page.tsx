@@ -221,7 +221,6 @@ export default function DocumentDetailPage({
       return (
         <div className="bg-gray-100 rounded-xl overflow-hidden border border-gray-200 mb-8 shadow-sm">
           {/* <PDFViewer fileUrl={currentDocument.viewUrl} token={token} /> */}
-          // Sử dụng PDFViewerDynamic để tắt SSR hoàn toàn
           <PDFViewerDynamic fileUrl={currentDocument.viewUrl} token={token} />
         </div>
       );

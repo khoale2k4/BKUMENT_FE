@@ -1,0 +1,7 @@
+{
+    "i18n-ally.localesPaths": [
+        "src/locales",
+        "src/screens/messages",
+        "src/app/(user)/messages"
+    ]
+}

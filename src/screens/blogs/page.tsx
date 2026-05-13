@@ -113,7 +113,10 @@ export default function BlogDetailPage(params: PageProps) {
                                 if (id) dispatch(openReportModal({ targetId: id, type: 'BLOG' }));
                             }}
                             onDelete={() => {
-                                if (id) {
+                                console.log("submit delete");
+                                console.log(params.params.id);
+                                if (params.params.id) {
+                                    console.log("pass if")
                                     dispatch(openConfirmModal({
                                         title: t('blogs.detail.deleteTitle', 'Delete Blog'),
                                         message: t('blogs.detail.deleteMsg', 'Are you sure you want to delete "{{title}}"? This action cannot be undone.', { title: title }),
@@ -121,7 +124,8 @@ export default function BlogDetailPage(params: PageProps) {
                                         cancelText: t('common.confirm.cancel', 'Cancel'),
                                         onConfirm: async () => {
                                             try {
-                                                await dispatch(deleteBlogAsync(id)).unwrap();
+                                                console.log("pass tr at confirm");
+                                                await dispatch(deleteBlogAsync(params.params.id)).unwrap();
                                                 router.push(AppRoute.home);
                                             } catch (error) {
                                                 console.error("Xóa thất bại:", error);

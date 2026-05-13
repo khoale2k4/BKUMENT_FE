@@ -73,6 +73,20 @@ export interface UpdateTutorRequest {
   subjectIds: string[];
 }
 
+export interface TutorApplicationData {
+  id: string;
+  profileId: string;
+  introduction: string;
+  experience: string;
+  cvUrl: string;
+  subjectIds: string[];
+  name: string;
+  avatar: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  rejectionReason: string | null;
+  createdAt: string;
+}
+
 export interface PaginatedUsers {
   currentPage: number;
   totalPages: number;
@@ -95,6 +109,11 @@ interface ProfileState {
   isTutorUpdating: boolean;
   isTutorRegistering: boolean;
   tutorError: string | null;
+
+  // State cho Tutor Application
+  tutorApplication: TutorApplicationData | null;
+  isTutorApplicationLoading: boolean;
+  tutorApplicationError: string | null;
 
   followersData: PaginatedUsers | null;
   isFollowersLoading: boolean;
@@ -128,6 +147,10 @@ const initialState: ProfileState = {
   isTutorUpdating: false,
   isTutorRegistering: false,
   tutorError: null,
+
+  tutorApplication: null,
+  isTutorApplicationLoading: false,
+  tutorApplicationError: null,
 
   followersData: null,
   isFollowersLoading: false,
@@ -319,13 +342,24 @@ export const getMyTutorProfile = createAsyncThunk(
   },
 );
 
+export const getMyTutorApplication = createAsyncThunk(
+  "profile/getMyTutorApplication",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await profileService.getMyTutorApplication();
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch tutor application");
+    }
+  },
+);
+
 export const registerTutorProfile = createAsyncThunk(
   "profile/registerTutorProfile",
   async (payload: RegisterTutorRequest, { getState, rejectWithValue }) => {
     try {
       return await profileService.registerTutor(payload);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -539,6 +573,22 @@ const profileSlice = createSlice({
       .addCase(registerTutorProfile.rejected, (state, action) => {
         state.isTutorRegistering = false;
         state.tutorError = action.payload as string;
+      });
+
+    // --- Get My Tutor Application ---
+    builder
+      .addCase(getMyTutorApplication.pending, (state) => {
+        state.isTutorApplicationLoading = true;
+        state.tutorApplicationError = null;
+      })
+      .addCase(getMyTutorApplication.fulfilled, (state, action) => {
+        state.isTutorApplicationLoading = false;
+        state.tutorApplication = action.payload;
+      })
+      .addCase(getMyTutorApplication.rejected, (state, action) => {
+        state.isTutorApplicationLoading = false;
+        state.tutorApplicationError = action.payload as string;
+        state.tutorApplication = null;
       });
 
     // --- Search Profiles ---

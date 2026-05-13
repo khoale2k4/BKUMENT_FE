@@ -103,6 +103,8 @@ const TutorAboutTab = () => {
       // Gọi API Cập nhật
       await dispatch(updateTutorProfile(formData)).unwrap();
 
+      await dispatch(getMyTutorProfile()).unwrap(); // Cập nhật lại thông tin gia sư sau khi lưu thành công
+
       // Gọi lại API lấy danh sách môn học để UI cập nhật lại tên và Topics mới
       await dispatch(getMySubjects()).unwrap();
 

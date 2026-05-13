@@ -122,6 +122,14 @@ export const getTutorsApplication = async (
   return response.data.result;
 };
 
+export const getMyTutorApplication = async () => {
+  const response = await httpClient.get(
+    API_ENDPOINTS.LMS.GET_MY_REGISTRATION_APPLICATION(),
+  );
+  console.log("API Response for my tutor application:", response.data.result); // Debug log
+  return response.data.result;
+}
+
 export const approveTutorApplication = async (id: string) => {
   const response = await httpClient.post(
     API_ENDPOINTS.LMS.APPROVE_APPLICATION(id),

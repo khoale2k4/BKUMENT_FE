@@ -242,6 +242,9 @@ export const API_ENDPOINTS = {
       buildUrl(
         `${LMS}/tutors/admin/applications?status=${status}&page=${page}&size=${size}`,
       ),
+      //https://api.bkument.io.vn/api/v1/lms/tutors/registration/me
+    GET_MY_REGISTRATION_APPLICATION: () =>
+      buildUrl(`${LMS}/tutors/registration/me`),
 
     APPROVE_APPLICATION: (id: string) =>
       buildUrl(`${LMS}/tutors/admin/applications/${id}/approve`),
