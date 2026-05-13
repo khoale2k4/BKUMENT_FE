@@ -173,7 +173,7 @@ export const uploadConversationAvatarAsync = createAsyncThunk(
       return assetId;
     } catch (error: any) {
       console.error("Lỗi upload avatar:", error);
-      return rejectWithValue(error.message || "common.errors.updateFailed");
+      return rejectWithValue(error.response?.data?.message || error.message || "common.errors.updateFailed");
     }
   },
 );
@@ -190,7 +190,7 @@ export const uploadConversationNameAsync = createAsyncThunk(
       await dispatch(fetchConversations({ page: 0, size: 50 })).unwrap();
     } catch (error: any) {
       console.error("Lỗi update chatName:", error);
-      return rejectWithValue(error.message || "common.errors.updateFailed");
+      return rejectWithValue(error.response?.data?.message || error.message || "common.errors.updateFailed");
     }
   },
 );

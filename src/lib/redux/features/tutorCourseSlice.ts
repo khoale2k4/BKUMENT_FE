@@ -109,7 +109,7 @@ export const uploadCoverImage = createAsyncThunk(
     try {
       return await uploadAvatarImage(file);
     } catch (error: any) {
-      return rejectWithValue(error.message || "common.errors.uploadFailed");
+      return rejectWithValue(error.response?.data?.message || error.message || "common.errors.uploadFailed");
     }
   },
 );

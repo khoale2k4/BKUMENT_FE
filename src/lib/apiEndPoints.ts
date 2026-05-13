@@ -114,7 +114,7 @@ export const API_ENDPOINTS = {
 
     GET_DETAIL: (id: string | number) => buildUrl(`${BLOG}/search?q=${id}`),
 
-    UPLOAD_NEW_BLOG: buildUrl(`${BLOG}`),
+    UPLOAD_NEW_BLOG: buildUrl(`${BLOG}/`),
     MY_BLOGS: (page: number, size: number) =>
       buildUrl(`${BLOG}/my-blogs?page=${page}&size=${size}`),
     USER_BLOGS: (userId: string, page: number, size: number) =>

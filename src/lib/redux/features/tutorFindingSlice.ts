@@ -130,7 +130,7 @@ export const getSearchSubjects = createAsyncThunk(
     try {
       return await courseService.getSearchSubjects(); // Gọi trực tiếp service đã được viết sẵn
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message || "Failed to fetch search subjects");
     }
   },
 );

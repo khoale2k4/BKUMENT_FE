@@ -51,6 +51,33 @@ export const uploadImage = createAsyncThunk(
     }
 );
 
+// export const submitPost = createAsyncThunk(
+//     'blog/submitPost',
+//     async (_, { getState, rejectWithValue }) => {
+//         const state = (getState() as any).blogs as BlogState;
+
+//         if (!state.title.trim()) return rejectWithValue('errors.titleRequired');
+//         if (!state.contentHTML.trim()) return rejectWithValue('errors.contentRequired');
+
+//         const payload = {
+//             title: state.title,
+//             coverImage: state.coverImage,
+//             content: state.contentHTML,
+//             visibility: state.visibility,
+//             // type: 'POST',
+//             assetIds: state.assetIds,
+//             topicId: "string"
+//         };
+//         console.log('Redux Submit Payload at blog Slicesf:', payload);
+
+//         try {
+//             return await blogService.submitPost(payload);
+//         } catch (error: any) {
+//             return rejectWithValue(error.message || 'blogs.write.header.failMsg');
+//         }
+//     }
+// );
+
 export const submitPost = createAsyncThunk(
     'blog/submitPost',
     async (_, { getState, rejectWithValue }) => {
@@ -59,15 +86,27 @@ export const submitPost = createAsyncThunk(
         if (!state.title.trim()) return rejectWithValue('errors.titleRequired');
         if (!state.contentHTML.trim()) return rejectWithValue('errors.contentRequired');
 
+        // Regex chuẩn để nhận diện UUID
+        const uuidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+        
+        // Cắt lấy ID từ mảng URL hiện tại
+        const extractedAssetIds = state.assetIds
+            .map((url: string) => {
+                const match = url.match(uuidRegex);
+                return match ? match[0] : null; // Lấy chuỗi UUID nếu match
+            })
+            .filter((id: string | null) => id !== null); // Lọc bỏ các giá trị null
+
         const payload = {
             title: state.title,
-            coverImage: state.coverImage,
+            coverImage: state.coverImage || "", 
             content: state.contentHTML,
             visibility: state.visibility,
-            type: 'POST',
-            assetIds: state.assetIds,
+            assetIds: extractedAssetIds, // Sử dụng mảng ID vừa được trích xuất
+            topicId: "INT1005" 
         };
-        console.log('Redux Submit Payload at blog Slicesf:', payload);
+        
+        console.log('Redux Submit Payload at blog Slice:', payload);
 
         try {
             return await blogService.submitPost(payload);

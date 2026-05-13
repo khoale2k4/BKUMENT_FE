@@ -4,17 +4,18 @@ import axios from "axios";
 
 interface BlogPost {
   title: string;
-  coverImage: string | null;
+  coverImage?: string | null;
   content: string;
   visibility: "PUBLIC" | "PRIVATE";
-  type: string;
+  // type: string;
   assetIds: string[];
+  topicId: string | null;
 }
 
 interface BlogDetail {
   id: string;
   content: string;
-  coverImage: string;
+  coverImage?: string | null;
   name: string;
   authorId: string;
   createdAt: string;
@@ -54,6 +55,8 @@ export const uploadImage = async (file: File): Promise<string> => {
  * Submit blog post mới
  */
 export const submitPost = async (post: BlogPost): Promise<any> => {
+  console.log('API Payload for submitPost:', post); // Debug log
+  
   const response = await httpClient.post(
     API_ENDPOINTS.BLOGS.UPLOAD_NEW_BLOG,
     JSON.stringify(post),

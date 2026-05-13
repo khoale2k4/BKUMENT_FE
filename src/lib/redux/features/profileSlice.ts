@@ -237,7 +237,7 @@ export const getFollowingByProfileId = createAsyncThunk(
         size,
       );
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -259,7 +259,7 @@ export const getFollowersByProfileId = createAsyncThunk(
         size,
       );
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -297,10 +297,7 @@ export const getProfileById = createAsyncThunk(
 
       return response.data.result as UserProfile;
     } catch (error: any) {
-      // Nếu lỗi từ Axios thì message thường nằm ở error.response.data.message
-      const errorMessage =
-        error.response?.data?.message || error.message || "errors.network";
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.response?.data?.message || error.message || "errors.network");
     }
   },
 );
@@ -312,7 +309,7 @@ export const uploadAvatar = createAsyncThunk(
       const avatarUrl = await uploadAvatarImage(file);
       return avatarUrl;
     } catch (error: any) {
-      return rejectWithValue(error.message || "errors.avatarUploadFailed");
+      return rejectWithValue(error.response?.data?.message || error.message || "errors.avatarUploadFailed");
     }
   },
 );
@@ -324,7 +321,7 @@ export const uploadFile = createAsyncThunk(
       const fileUrl = await uploadAvatarImage(file);
       return fileUrl;
     } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to upload file");
+      return rejectWithValue(error.response?.data?.message || error.message || "Failed to upload file");
     }
   },
 );
@@ -337,7 +334,7 @@ export const getMyTutorProfile = createAsyncThunk(
     try {
       return await profileService.fetchMyTutorProfile();
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -348,7 +345,7 @@ export const getMyTutorApplication = createAsyncThunk(
     try {
       return await profileService.getMyTutorApplication();
     } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch tutor application");
+      return rejectWithValue(error.response?.data?.message || error.message || "Failed to fetch tutor application");
     }
   },
 );
@@ -370,7 +367,7 @@ export const updateTutorProfile = createAsyncThunk(
     try {
       return await profileService.updateTutor(updateData);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+       return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );
@@ -388,7 +385,7 @@ export const searchProfiles = createAsyncThunk(
     try {
       return await profileService.searchProfiles(keyword, page, size);
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message);
     }
   },
 );

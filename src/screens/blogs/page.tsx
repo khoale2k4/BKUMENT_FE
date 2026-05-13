@@ -110,10 +110,10 @@ export default function BlogDetailPage(params: PageProps) {
                                 dispatch(showToast({ type: 'success', title: t('common.toast.success', 'Success'), message: t('blogs.detail.shareSuccess', 'Link copied to clipboard!') }));
                             }}
                             onReport={() => {
-                                if (id) dispatch(openReportModal({ targetId: id, type: 'BLOG' }));
+                                if (params.params.id) dispatch(openReportModal({ targetId: params.params.id, type: 'BLOG' }));
                             }}
                             onDelete={() => {
-                                console.log("submit delete");
+                                console.log("submit delete with ID", params.params.id);
                                 console.log(params.params.id);
                                 if (params.params.id) {
                                     console.log("pass if")

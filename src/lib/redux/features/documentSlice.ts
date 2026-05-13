@@ -212,7 +212,7 @@ export const uploadFile = createAsyncThunk(
             }));
             return localId;
         } catch (err: any) {
-            const errorMessage = err.response?.data?.message || 'errors.uploadFailed';
+            const errorMessage = err.response?.data?.message || err.message || 'errors.uploadFailed';
             dispatch(updateFileStatus({ localId, updates: { status: 'error', errorMessage } }));
             dispatch(showToast({
                 type: 'error',

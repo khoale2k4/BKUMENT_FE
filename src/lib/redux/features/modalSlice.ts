@@ -93,7 +93,7 @@ export const getAppNotifications = createAsyncThunk(
       console.log("page and size in getAppNotifications:", page, size); // Debug log
       return await notificationService.fetchNotifications(page, size);
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
+      return rejectWithValue(error.response?.data?.message || error.message || "errors.getAppNotificationsFailed");
     }
   },
 );
@@ -104,7 +104,7 @@ export const getUnreadNotificationCount = createAsyncThunk(
     try {
       return await notificationService.fetchUnreadCount();
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message || "errors.getUnreadCountFailed");
     }
   },
 );
@@ -116,7 +116,7 @@ export const markAsRead = createAsyncThunk(
       await notificationService.markNotificationRead(notificationId);
       return notificationId; // Trả về ID để tự động update UI cục bộ
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message || "errors.markAsReadFailed");
     }
   },
 );
@@ -128,7 +128,7 @@ export const markAllAsRead = createAsyncThunk(
       await notificationService.markAllNotificationsRead();
       return true;
     } catch (error: any) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || error.message || "errors.markAllAsReadFailed");
     }
   },
 );

@@ -58,11 +58,11 @@ export default function ReportModal() {
             }));
             handleClose();
         } catch (error) {
-            console.error("Lỗi khi report:", error);
+            console.error("Lỗi khi report:", error );
             dispatch(showToast({ 
                 type: 'error', 
                 title: t('common.report.errorTitle'), 
-                message: t('common.report.errorMsg') 
+                message: String(error || t('common.report.errorMsg'))
             }));
         }
     };
