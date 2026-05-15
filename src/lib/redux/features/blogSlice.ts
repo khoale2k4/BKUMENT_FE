@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import * as blogService from '@/lib/services/blog.service';
 import * as documentService from '@/lib/services/document.service';
+import { showToast } from './toastSlice';
 
 interface Author {
     id: string,
@@ -116,6 +117,73 @@ export const submitPost = createAsyncThunk(
     }
 );
 
+
+export const updateBlogAsync = createAsyncThunk(
+    'myBlogs/update',
+    async (
+        { 
+            id, 
+            title, 
+            contentHTML, 
+            coverImage, 
+            visibility, 
+            assetIds = [], 
+            topicId = "INT1005" 
+        }: { 
+            id: string; 
+            title: string; 
+            contentHTML: string; 
+            coverImage: string | null; 
+            visibility: 'PUBLIC' | 'PRIVATE';
+            assetIds?: string[];
+            topicId?: string;
+        }, 
+        { dispatch, rejectWithValue }
+    ) => {
+        // 1. Validate dữ liệu đầu vào (giống submitPost)
+        if (!title.trim()) return rejectWithValue('errors.titleRequired');
+        if (!contentHTML.trim()) return rejectWithValue('errors.contentRequired');
+
+        // 2. Regex chuẩn để nhận diện UUID
+        const uuidRegex = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+        
+        // 3. Cắt lấy ID từ mảng URL hiện tại
+        const extractedAssetIds = assetIds
+            .map((url: string) => {
+                const match = url.match(uuidRegex);
+                return match ? match[0] : null; // Lấy chuỗi UUID nếu match
+            })
+            .filter((id: string | null) => id !== null); // Lọc bỏ các giá trị null
+
+        // 4. Gom thành payload chuẩn
+        const payload = {
+            title: title,
+            coverImage: coverImage || "", // Đảm bảo không gửi null
+            content: contentHTML,
+            visibility: visibility,
+            assetIds: extractedAssetIds,
+            topicId: topicId 
+        };
+
+        console.log('Redux Update Payload at blog Slice:', payload);
+
+        try {
+            // Lưu ý: Đảm bảo hàm blogService.updateBlog của bạn đã được cấu hình 
+            // để nhận thêm assetIds và topicId (hoặc nhận nguyên object payload)
+            await blogService.updateBlog(id, payload); 
+            
+            dispatch(showToast({ type: 'success', title: 'common.toast.success', message: 'blogs.detail.updateSuccess' }));
+            
+            // Trả về dữ liệu đã update để cập nhật lại Redux state
+            return { id, ...payload };
+        } catch (error: any) {
+            const message = error.response?.data?.message || error.message || 'errors.updateFailed';
+            dispatch(showToast({ type: 'error', title: 'common.toast.error', message }));
+            return rejectWithValue(message);
+        }
+    }
+);
+
 export const fetchRatingData = createAsyncThunk(
     'blog/fetchRating',
     async (resourceId: string) => {
@@ -161,7 +229,21 @@ export const blogSlice = createSlice({
         setVisibility: (state, action: PayloadAction<'PUBLIC' | 'PRIVATE'>) => {
             state.visibility = action.payload;
         },
-        resetEditor: () => ({ ...initialState, assetIds: [] })
+       resetEditor: (state) => {
+            state.id = undefined;
+            state.title = '';
+            state.author = undefined;
+            state.contentHTML = '';
+            state.coverImage = null;
+            state.visibility = 'PUBLIC';
+            state.status = 'idle';
+            state.assetIds = [];
+            state.error = null;
+            state.createdAt = null;
+            state.averageRating = null;
+            state.myRating = null;
+            state.views = null;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -182,7 +264,9 @@ export const blogSlice = createSlice({
 
         builder
             .addCase(fetchPost.fulfilled, (state, action) => {
-                // TODO: fix this
+                state.id = action.payload.id; 
+                state.visibility = action.payload.visibility || 'PUBLIC';
+                state.assetIds = action.payload.assetIds || [];
                 state.contentHTML = action.payload.content;
                 state.coverImage = action.payload.coverImage;
                 state.title = action.payload.name;
@@ -193,6 +277,22 @@ export const blogSlice = createSlice({
             })
             .addCase(fetchPost.pending, (state) => {
                 state.status = 'getting';
+            })
+            .addCase(updateBlogAsync.pending, (state) => {
+                state.status = 'submitting';
+            })
+            .addCase(updateBlogAsync.fulfilled, (state, action) => {
+                state.id = action.payload.id;
+                state.title = action.payload.title;
+                state.contentHTML = action.payload.content;
+                state.coverImage = action.payload.coverImage;
+                state.visibility = action.payload.visibility;
+                state.assetIds = action.payload.assetIds;
+                state.status = 'succeeded';
+            })
+            .addCase(updateBlogAsync.rejected, (state, action) => {
+                state.status = 'failed';
+                state.error = action.payload as string;
             });
 
         builder.addCase(fetchRatingData.fulfilled, (state, action) => {

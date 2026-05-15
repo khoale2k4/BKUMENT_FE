@@ -72,6 +72,7 @@ export const submitPost = async (post: BlogPost): Promise<any> => {
 
 export const fetchPostById = async (blogId: string) => {
   const response = await httpClient.get(API_ENDPOINTS.BLOGS.GET_DETAIL(blogId));
+  console.log("thong tin chi tiet blog ", response.data.result); // Debug log
   return response.data.result.content[0];
 };
 
@@ -107,5 +108,10 @@ export const getUserBlogs = async (
 export const deleteBlog = async (id: string): Promise<void> => {
   const response = await  httpClient.delete(API_ENDPOINTS.BLOGS.DELETE(id));
   console.log("delete blog res", response);
-  
+};
+
+// Sửa hàm cũ lại thành nhận payload
+export const updateBlog = async (id: string, payload: any) => {
+    const response = await httpClient.put(API_ENDPOINTS.BLOGS.UPDATE_BLOG(id), payload);
+    return response.data;
 };

@@ -12,6 +12,7 @@ import { getSearchSubjects } from '@/lib/redux/features/tutorFindingSlice';
 import ProfileField from './ProfileField';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { useTranslation } from 'react-i18next'; // <-- Import hook dịch thuật
+import { showToast } from '@/lib/redux/features/toastSlice';
 
 const TutorAboutTab = () => {
   const dispatch = useAppDispatch();
@@ -94,7 +95,13 @@ const TutorAboutTab = () => {
   const handleSave = async () => {
     if (!formData.name || !formData.introduction || formData.subjectIds.length === 0) {
       // Dùng t() cho cả thông báo alert
-      alert(t('profile.tutor.about.validationError', "Vui lòng nhập tên, lời giới thiệu và chọn ít nhất 1 môn học."));
+      //alert(t('profile.tutor.about.validationError', "Vui lòng nhập tên, lời giới thiệu và chọn ít nhất 1 môn học."));
+      
+      dispatch(showToast({
+        type: 'error',
+        title: t('common.report.errorTitle'),
+        message: t('profile.tutor.about.validationError')
+      }));
       return;
     }
 
@@ -111,7 +118,12 @@ const TutorAboutTab = () => {
       setIsEditing(false);
     } catch (error) {
       console.error("Cập nhật thất bại:", error);
-      alert(t('profile.tutor.about.updateError', "Đã xảy ra lỗi khi cập nhật."));
+      // alert(t('profile.tutor.about.updateError', "Đã xảy ra lỗi khi cập nhật."));
+      dispatch(showToast({
+        type: 'error',
+        title: t('common.report.errorTitle'),
+        message: t('profile.tutor.about.updateError')
+      }));
     } finally {
       setIsSaving(false);
     }

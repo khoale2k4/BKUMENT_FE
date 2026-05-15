@@ -4,6 +4,7 @@ import { IconPlus, IconX } from '@tabler/icons-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { setCoverImage, uploadImage } from '@/lib/redux/features/blogSlice';
 import { AuthenticatedImage } from '../../../components/ui/AuthenticatedImage';
+import { showToast } from '@/lib/redux/features/toastSlice';
 
 export default function PostCoverImage() {
     const { t } = useTranslation();
@@ -21,7 +22,12 @@ export default function PostCoverImage() {
             const url = await dispatch(uploadImage(file)).unwrap();
             dispatch(setCoverImage(url));
         } catch (err) {
-            alert(t('blogs.write.cover.failed', 'Upload failed'));
+           // alert(t('blogs.write.cover.failed', 'Upload failed'));
+        dispatch(showToast({ 
+                         type: 'error', 
+                         title: t('common.report.errorTitle'), 
+                         message: t('common.error.prefix') + (err as Error).message 
+                     }));
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = '';

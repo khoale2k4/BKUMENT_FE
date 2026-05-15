@@ -7,6 +7,7 @@ import { cancelClass } from "@/lib/redux/features/tutorCourseSlice";
 import { enrollInClass } from "@/lib/redux/features/tutorFindingSlice";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { showToast } from "@/lib/redux/features/toastSlice";
 
 // 1. Import thư viện parser và component AuthenticatedImage
 import parse, { Element, HTMLReactParserOptions } from "html-react-parser";
@@ -41,10 +42,18 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
       setIsCanceling(false);
 
       if (cancelClass.fulfilled.match(result)) {
-        alert(t("classroom.overview.cancelSuccess"));
+         dispatch(showToast({ 
+                       type: 'success', 
+                       title: t('common.report.successTitle'), 
+                       message: t('classroom.overview.cancelSuccess') 
+                   }));
         router.push("/profile");
       } else {
-        alert(t("common.error.prefix") + result.payload);
+      dispatch(showToast({ 
+                       type: 'error', 
+                       title: t('common.report.errorTitle'), 
+                       message: t('common.error.prefix') + result.payload 
+                   }));
       }
     }
   };
@@ -55,9 +64,18 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
     setIsEnrolling(false);
 
     if (enrollInClass.fulfilled.match(result)) {
-      alert(t("classroom.overview.enrollSuccess"));
+      dispatch(showToast({ 
+                       type: 'success', 
+                       title: t('common.report.successTitle'), 
+                       message: t('classroom.overview.enrollSuccess') 
+                   }));
+      router.push("/profile");
     } else {
-      alert(t("classroom.overview.enrollFail") + result.payload);
+      dispatch(showToast({ 
+                       type: 'error', 
+                       title: t('common.report.errorTitle'), 
+                       message: t('common.error.prefix') + result.payload 
+                   }));
     }
   };
 

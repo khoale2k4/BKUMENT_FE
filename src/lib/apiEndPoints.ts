@@ -122,6 +122,7 @@ export const API_ENDPOINTS = {
     TOP_BLOGS: (page: number, size: number) =>
       buildUrl(`${BLOG}/top-blog?page=${page}&size=${size}`),
     DELETE: (id: string) => buildUrl(`${BLOG}/${id}`),
+    UPDATE_BLOG: (id: string) => buildUrl(`${BLOG}/${id}`),
     // // http://143.198.80.199:8888/api/v1/blog/user/6b2348e2-4629-4a1a-a66c-275444f5061f?page=0&size=10
     // GET_USER_BLOGS: (userId: string, page: number, size: number) =>
     //   buildUrl(`${BLOG}/user/${userId}?page=${page}&size=${size}`),

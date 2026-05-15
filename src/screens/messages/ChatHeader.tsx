@@ -12,6 +12,7 @@ import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 import { useRouter } from "next/navigation";
 import { Check, Pencil, X } from "lucide-react";
 import MembersListModal from "./MembersListModal";
+import { showToast } from "@/lib/redux/features/toastSlice";
 
 interface ChatHeaderProps {
   activeChat: Conversation;
@@ -56,12 +57,18 @@ const ChatHeader = ({
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      alert(
-        t(
-          "chat.header.imageTooLarge",
-          "Dung lượng ảnh quá lớn. Vui lòng chọn ảnh dưới 5MB.",
-        ),
-      );
+      // alert(
+      //   t(
+      //     "chat.header.imageTooLarge",
+      //     "Dung lượng ảnh quá lớn. Vui lòng chọn ảnh dưới 5MB.",
+      //   ),
+      // );
+
+      dispatch(showToast({ 
+                      type: 'warning', 
+                      title: "Cảnh báo", 
+                      message: t('chat.header.imageTooLarge') 
+                  }));
       return;
     }
 
@@ -70,19 +77,30 @@ const ChatHeader = ({
       await dispatch(
         uploadConversationAvatarAsync({ conversationId: activeChat.id, file }),
       ).unwrap();
-      alert(
-        t(
-          "chat.header.updateAvatarSuccess",
-          "Cập nhật ảnh đại diện thành công!",
-        ),
-      );
+      // alert(
+      //   t(
+      //     "chat.header.updateAvatarSuccess",
+      //     "Cập nhật ảnh đại diện thành công!",
+      //   ),
+      // );
+      dispatch(showToast({ 
+                      type: 'success', 
+                      title: t('common.report.successTitle'), 
+                      message: t('chat.header.updateAvatarSuccess') 
+                  }));
     } catch {
-      alert(
-        t(
-          "chat.header.updateAvatarFail",
-          "Cập nhật ảnh thất bại. Vui lòng thử lại sau.",
-        ),
-      );
+      // alert(
+      //   t(
+      //     "chat.header.updateAvatarFail",
+      //     "Cập nhật ảnh thất bại. Vui lòng thử lại sau.",
+      //   ),
+      // );
+
+      dispatch(showToast({ 
+                      type: 'error', 
+                      title: t('common.report.errorTitle'), 
+                      message: t('chat.header.updateAvatarFail') 
+                  }));
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -137,12 +155,17 @@ const ChatHeader = ({
       if (targetId) {
         router.push(`/people/${targetId}`);
       } else {
-        alert(
-          t(
-            "chat.header.errorFindUser",
-            "Could not find information for this user.",
-          ),
-        );
+        // alert(
+        //   t(
+        //     "chat.header.errorFindUser",
+        //     "Could not find information for this user.",
+        //   ),
+        // );
+        dispatch(showToast({ 
+          type: 'error', 
+          title: t('common.report.errorTitle'), 
+          message: t('chat.header.errorFindUser') 
+        }));
       }
     }
   };

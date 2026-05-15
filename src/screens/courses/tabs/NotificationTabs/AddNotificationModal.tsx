@@ -3,6 +3,7 @@ import { X, Loader2, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { createClassNotification } from '@/lib/redux/features/tutorCourseSlice';
+import { showToast } from '@/lib/redux/features/toastSlice';
 
 interface AddNotificationModalProps {
   courseId: string;
@@ -33,7 +34,12 @@ const AddNotificationModal: React.FC<AddNotificationModalProps> = ({ courseId, i
       setMessage('');
       onClose();
     } else {
-      alert(t('classroom.create.messages.error') + result.payload);
+      //alert(t('classroom.create.messages.error') + result.payload);
+      dispatch(showToast({
+                            type: 'error',
+                            title: "Lỗi",
+                            message: t('classroom.create.messages.error')
+                          }));
     }
   };
 
