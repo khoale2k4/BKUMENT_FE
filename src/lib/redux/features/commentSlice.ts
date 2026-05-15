@@ -56,7 +56,7 @@ export const submitComment = createAsyncThunk(
 
             return { newComment, replyId: payload.replyId };
         } catch (error: any) {
-            return rejectWithValue(error.message || 'common.errors.sendFailed');
+            return rejectWithValue(error.response?.data?.message || error.message || 'common.errors.sendFailed');
         }
     }
 );

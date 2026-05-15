@@ -10,6 +10,7 @@ import {
   getMySubjects,
   uploadCoverImage,
 } from "@/lib/redux/features/tutorCourseSlice";
+import { showToast } from "@/lib/redux/features/toastSlice";
 
 interface UseCourseFormProps {
   initialData?: any;
@@ -127,12 +128,17 @@ export const useCourseForm = ({
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.topicId) {
-      alert(
-        t(
-          "classroom.create.messages.validation",
-          "Please enter course name and select a topic.",
-        ),
-      );
+      // alert(
+      //   t(
+      //     "classroom.create.messages.validation",
+      //     "Please enter course name and select a topic.",
+      //   ),
+      // );
+                  dispatch(showToast({ 
+                      type: 'warning', 
+                      title: "Cảnh báo", 
+                      message: t('classroom.create.messages.validation') 
+                  }));
       return;
     }
 
@@ -151,12 +157,22 @@ export const useCourseForm = ({
       createClass.fulfilled.match(resultAction) ||
       updateClass.fulfilled.match(resultAction)
     ) {
-      alert(
-        isEditMode ? "Cập nhật lớp học thành công!" : "Tạo lớp học thành công!",
-      );
+      // alert(
+      //   isEditMode ? "Cập nhật lớp học thành công!" : "Tạo lớp học thành công!",
+      // );
+   dispatch(showToast({ 
+                      type: 'warning', 
+                      title: "Cảnh báo", 
+                      message: t('classroom.create.messages.validation') 
+                  }));
       router.push("/profile");
     } else {
-      alert("Lỗi: " + resultAction.payload);
+      //alert("Lỗi: " + resultAction.payload);
+    dispatch(showToast({
+                      type: 'error',
+                      title: "Lỗi",
+                      message: t('classroom.create.messages.error')
+                    }));
     }
   };
 

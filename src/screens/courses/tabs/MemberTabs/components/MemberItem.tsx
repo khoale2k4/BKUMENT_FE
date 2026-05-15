@@ -4,6 +4,7 @@ import { Check, X, UserMinus, Loader2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch } from '@/lib/redux/hooks';
 import { approveMember } from '@/lib/redux/features/tutorCourseSlice';
+import { showToast } from '@/lib/redux/features/toastSlice';
 
 export interface CourseMember {
   id: string; // Đây chính là enrollmentId
@@ -31,7 +32,12 @@ const MemberItem: React.FC<MemberItemProps> = ({ member }) => {
     
     if (approveMember.fulfilled.match(resultAction)) {
     } else {
-      alert(t('common.error.prefix') + resultAction.payload);
+      //alert(t('common.error.prefix') + resultAction.payload);
+      dispatch(showToast({
+                            type: 'error',
+                            title: "Lỗi",
+                            message: t('classroom.create.messages.error')
+                          }));
       setIsProcessing(false); 
     }
   };

@@ -223,7 +223,7 @@ export const sendImageMessageAsync = createAsyncThunk(
       return result;
     } catch (error: any) {
       console.error("Lỗi gửi tin nhắn ảnh:", error);
-      return rejectWithValue(error.message || "common.errors.sendFailed");
+      return rejectWithValue(error.response?.data?.message || error.message || "common.errors.sendFailed");
     }
   },
 );

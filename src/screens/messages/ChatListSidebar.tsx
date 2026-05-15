@@ -17,7 +17,7 @@ import { getChatDisplayInfo } from "./page";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
 import { Loader2, ArrowLeft, Search, X, Users } from "lucide-react";
 import CreateGroupModal from "./CreateGroupModal";
-
+import { showToast } from "@/lib/redux/features/toastSlice";
 interface ChatListSidebarProps {
   isOpen: boolean;
   currentUserId: string;
@@ -111,9 +111,14 @@ const ChatListSidebar = ({
         t("chat.sidebar.errorCreate", "Could not create conversation."),
         error,
       );
-      alert(
-        t("chat.sidebar.errorCreate", "Đã xảy ra lỗi khi tạo cuộc trò chuyện."),
-      );
+      // alert(
+      //   t("chat.sidebar.errorCreate", "Đã xảy ra lỗi khi tạo cuộc trò chuyện."),
+      // );
+      dispatch(showToast({
+        type: 'error',
+        title: t('common.report.errorTitle'),
+        message: t('chat.sidebar.errorCreate')
+      }));
     } finally {
       setIsCreating(false);
     }

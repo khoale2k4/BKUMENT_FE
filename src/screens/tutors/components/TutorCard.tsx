@@ -11,12 +11,11 @@ import {
 } from "@/lib/redux/features/tutorFindingSlice";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { setPendingTargetUserId } from "@/lib/redux/features/chatSlice";
-
 import { RejectModal } from "./RejectModal";
 import { AdminTutorInfo, UserTutorInfo } from "./TutorInfor";
-
-// IMPORT COMPONENT AuthenticatedImage (Nhớ điều chỉnh lại đường dẫn cho đúng với project của bạn)
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage";
+import { showToast } from "@/lib/redux/features/toastSlice";
+import router from "next/router";
 
 interface TutorCardProps {
   data: TutorData;
@@ -47,7 +46,12 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
 
   const handleConfirmReject = () => {
     if (!rejectionReason.trim()) {
-      alert(t("tutors.card.requireRejectReason"));
+     // alert(t("tutors.card.requireRejectReason"));
+     dispatch(showToast({
+      type: 'error',
+      title: t('common.report.errorTitle'),
+      message: t('tutors.card.requireRejectReason')
+     }));
       return;
     }
     dispatch(
@@ -134,10 +138,9 @@ const TutorCard: React.FC<TutorCardProps> = ({ data }) => {
                   </>
                 ) : (
                   <button
-                    onClick={() =>
-                      alert(
-                        t("tutors.card.viewUserDetailAlert", { id: tutor.id }),
-                      )
+                    onClick={() => 
+                      { const targetId = tutor.profileId || tutor.id; 
+                    router.push(`/people/${targetId}`);}
                     }
                     className="w-full py-2.5 bg-slate-900 hover:bg-black text-white text-xs sm:text-sm font-bold rounded-xl transition-all active:scale-95 shadow-sm"
                   >
