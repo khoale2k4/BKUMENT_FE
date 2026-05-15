@@ -6,19 +6,18 @@ import { IconArrowLeft, IconEye, IconCalendar, IconUser, IconShare3 } from '@tab
 import { useRouter } from 'next/navigation';
 // 1. Import Redux hooks
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { useEffect } from 'react';
+import { useEffect, use } from 'react';
 import { fetchPost, rateBlog } from '@/lib/redux/features/blogSlice';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { openConfirmModal, openReportModal } from '@/lib/redux/features/modalSlice';
 import { deleteBlogAsync } from '@/lib/redux/features/myBlogSlice';
 import { showToast } from '@/lib/redux/features/toastSlice';
-import { IconDots, IconTrash, IconFlag, IconShare } from '@tabler/icons-react';
+import { IconDots, IconTrash, IconFlag, IconShare,IconEdit } from '@tabler/icons-react';
 import { Eye } from 'lucide-react';
 import { AppRoute } from '@/lib/appRoutes';
 import { useState, useRef } from 'react';
 import StarRating from '@/components/ui/StarRating';
 import CommentSection from '../documents/commentSection/page';
-
 import parse, { HTMLReactParserOptions, Element } from 'html-react-parser';
 import { formatDate } from '@/lib/utils/formatDate';
 
@@ -29,10 +28,13 @@ interface PageProps {
 
 }
 
-export default function BlogDetailPage(params: PageProps) {
+export default function BlogDetailPage({ params }: PageProps) {
     const { t, i18n } = useTranslation();
     const router = useRouter();
     const dispatch = useAppDispatch();
+
+    // const resolvedParams = use(props.params);
+    // const blogId = resolvedParams.id;
 
     const {
         id,
@@ -77,8 +79,8 @@ export default function BlogDetailPage(params: PageProps) {
     };
 
     useEffect(() => {
-        dispatch(fetchPost(params.params.id));
-    }, [dispatch]);
+        dispatch(fetchPost(params.id));
+    }, [dispatch, params.id]);
 
     if (status === 'getting' || status === 'idle') {
         return (
@@ -110,12 +112,18 @@ export default function BlogDetailPage(params: PageProps) {
                                 dispatch(showToast({ type: 'success', title: t('common.toast.success', 'Success'), message: t('blogs.detail.shareSuccess', 'Link copied to clipboard!') }));
                             }}
                             onReport={() => {
-                                if (params.params.id) dispatch(openReportModal({ targetId: params.params.id, type: 'BLOG' }));
+                                if (params.id) dispatch(openReportModal({ targetId: params.id, type: 'BLOG' }));
                             }}
+                            onUpdate={() => {
+                                         // Chuyển hướng sang trang Edit (Thay đổi đường dẫn nếu route của bạn khác)
+                                         console.log("change to update page with ID", params.id);
+                                         if (params.id) router.push(`/blogs/edit/${params.id}`); 
+                                         
+                                        }}
                             onDelete={() => {
-                                console.log("submit delete with ID", params.params.id);
-                                console.log(params.params.id);
-                                if (params.params.id) {
+                                console.log("submit delete with ID", params.id);
+                                console.log(params.id);
+                                if (id) {
                                     console.log("pass if")
                                     dispatch(openConfirmModal({
                                         title: t('blogs.detail.deleteTitle', 'Delete Blog'),
@@ -125,7 +133,7 @@ export default function BlogDetailPage(params: PageProps) {
                                         onConfirm: async () => {
                                             try {
                                                 console.log("pass tr at confirm");
-                                                await dispatch(deleteBlogAsync(params.params.id)).unwrap();
+                                                await dispatch(deleteBlogAsync(params.id)).unwrap();
                                                 router.push(AppRoute.home);
                                             } catch (error) {
                                                 console.error("Xóa thất bại:", error);
@@ -249,15 +257,16 @@ export default function BlogDetailPage(params: PageProps) {
                     </div>
                 </div>
 
-                <CommentSection params={{ id: params.params.id }} />
+                <CommentSection params={{ id: params.id }} />
             </article>
         </div>
     );
 }
 
-function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
+function BlogActionsMenu({ onShare, onReport, onUpdate, onDelete, isOwner }: {
     onShare: () => void,
     onReport: () => void,
+    onUpdate: () => void,
     onDelete: () => void,
     isOwner: boolean
 }) {
@@ -309,6 +318,15 @@ function BlogActionsMenu({ onShare, onReport, onDelete, isOwner }: {
                     {isOwner && (
                         <>
                             <div className="h-px bg-gray-100 my-1 mx-2" />
+
+                            <button
+                                onClick={() => { setIsOpen(false); onUpdate(); }}
+                                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-blue-600 hover:bg-blue-50 transition-colors font-medium"
+                            >
+                                <IconEdit size={16} />
+                                {t('blogs.detail.actions.update', 'Update Blog')}
+                            </button>
+
                             <button
                                 onClick={() => { setIsOpen(false); onDelete(); }}
                                 className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium"

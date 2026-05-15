@@ -11,7 +11,7 @@ import FontFamily from '@tiptap/extension-font-family';
 import Placeholder from '@tiptap/extension-placeholder';
 import { Link } from '@mantine/tiptap';
 import { RichTextEditor } from '@mantine/tiptap';
-import { useAppDispatch } from '@/lib/redux/hooks';
+import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
 import { setContent, uploadImage } from '@/lib/redux/features/blogSlice';
 import EditorToolbar from './EditorToolbar';
 import { TiptapAuthImage } from './TiptapAuthImage';
@@ -25,6 +25,8 @@ const SecureImageExtension = TiptapImage.extend({
 export default function TiptapEditor() {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
+
+    const { contentHTML } = useAppSelector((state) => state.blogs);
     const [isUploading, setIsUploading] = useState(false);
     const editorInputRef = useRef<HTMLInputElement>(null);
 
@@ -53,19 +55,17 @@ export default function TiptapEditor() {
 
     const editor = useEditor({
         extensions: [
-            StarterKit, Underline, Link, Highlight, TextStyle, FontFamily,
-            TiptapImage.configure({
-                inline: false,
-                allowBase64: false,
-                HTMLAttributes: {
-                    class: 'editor-image',
-                },
-            }),
+            StarterKit, 
+            Underline, 
+            Link, 
+            Highlight, 
+            TextStyle, 
+            FontFamily,
             TextAlign.configure({ types: ['heading', 'paragraph'] }),
             Placeholder.configure({ placeholder: t('blogs.write.editorPlaceholder', 'Tell your story...') }),
             SecureImageExtension.configure({ inline: false }),
         ],
-        content: '',
+        content: contentHTML || '',
         immediatelyRender: false,
         onUpdate: ({ editor }) => {
             dispatch(setContent(editor.getHTML()));
@@ -93,6 +93,16 @@ export default function TiptapEditor() {
             }
         },
     });
+
+    useEffect(() => {
+        // Nếu editor đã sẵn sàng và contentHTML trên Redux đã bị reset về chuỗi rỗng
+        if (editor && contentHTML === '') {
+            // Ép Tiptap Editor xóa sạch nội dung hiện tại
+            editor.commands.setContent('');
+        }
+    }, [contentHTML, editor]);
+
+
 
     return (
         <div className="prose prose-lg max-w-none prose-p:text-gray-700 prose-headings:font-bold prose-a:text-blue-600">

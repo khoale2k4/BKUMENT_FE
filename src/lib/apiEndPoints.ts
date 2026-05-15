@@ -261,7 +261,7 @@ export const API_ENDPOINTS = {
   },
 
   REPORT: {
-    CREATE: buildUrl(`${SOCIAL}/reports`),
+    CREATE: buildUrl(`${SOCIAL}/social/reports`),
     GET_AVERAGE_RATING: (resourceId: string) =>
       buildUrl(`${SOCIAL}/ratings/resource/${resourceId}/average`),
     SUBMIT_RATING: buildUrl(`${SOCIAL}/ratings/resource`),
