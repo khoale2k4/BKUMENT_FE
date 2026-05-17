@@ -217,7 +217,8 @@
       "notifications": "Notifications",
       "writeBlog": "Write Blog",
       "following": "Following",
-      "uploadDocument": "Upload Document"
+      "uploadDocument": "Upload Document",
+      "subjectSuggetion" : "Subject Suggestions"
     },
     "header": {
       "write": "Write",

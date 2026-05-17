@@ -25,7 +25,7 @@ export default function ReportModal() {
     const { t } = useTranslation();
     const dispatch = useAppDispatch();
     
-    const { isOpen, targetId } = useAppSelector((state) => state.modal.reportModal);
+    const { isOpen, targetId,type } = useAppSelector((state) => state.modal.reportModal);
 
     const [selectedReason, setSelectedReason] = useState<string>("");
     const [otherReason, setOtherReason] = useState("");
@@ -43,7 +43,8 @@ export default function ReportModal() {
 
         const reportPayload: CreateReportPayload = {
             targetId,
-            type: "DOCUMENT",
+           // type: type || "DOCUMENT",
+            type: type,
             reason: selectedReason,
             detail: otherReason,
         };

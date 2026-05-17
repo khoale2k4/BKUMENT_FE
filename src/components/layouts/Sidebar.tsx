@@ -15,6 +15,7 @@ import {
   Book,
   File,
   UploadCloud,
+  Lightbulb,
 } from "lucide-react";
 import { useAppSelector, useAppDispatch } from "@/lib/redux/hooks";
 import { closeSidebar } from "@/lib/redux/features/layoutSlide";
@@ -101,8 +102,8 @@ export default function Sidebar() {
       count: 0,
     },
     {
-      icon: Users,
-      label: t("Subject Suggestions"),
+      icon: Lightbulb,
+      label: t("layout.sidebar.subjectSuggetion"),
       href: "/subjectsuggestion",
       count: 2,
     },

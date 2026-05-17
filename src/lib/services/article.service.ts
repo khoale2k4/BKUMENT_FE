@@ -109,3 +109,13 @@ export const unFollowUser = async (profileId: string): Promise<string> => {
     const response = await httpClient.delete(API_ENDPOINTS.ACCOUNT.FOLLOW(profileId));
     return response.data.result;
 };
+
+export const getReportedBlogs = async (page: number, size: number) => {
+    const response = await httpClient.get(API_ENDPOINTS.BLOGS.GET_REPORTED_BLOGS(page, size));
+    return response.data.result;
+};
+
+export const getReportedDocuments = async (page: number, size: number) => {
+    const response = await httpClient.get(API_ENDPOINTS.BLOGS.GET_REPORTED_DOCUMENTS(page, size));
+    return response.data.result;        
+};

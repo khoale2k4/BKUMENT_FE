@@ -217,7 +217,8 @@
       "notifications": "Thông báo",
       "writeBlog": "Viết bài",
       "following": "Đang theo dõi",
-      "uploadDocument": "Tải tài liệu lên"
+      "uploadDocument": "Tải tài liệu lên",
+      "subjectSuggetion" : "Gợi ý môn học"
     },
     "header": {
       "write": "Viết bài",

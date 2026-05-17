@@ -15,14 +15,25 @@ import { showToast } from "@/lib/redux/features/toastSlice";
 import { deleteDocumentAsync } from "@/lib/redux/features/myDocumentSlice";
 import { Flag, Share2, Trash2 } from "lucide-react";
 import { clsx } from "clsx";
+import { AlertCircle } from "lucide-react";
+import ReportListModal, { ReportItem } from "./ReportListModal";
 
-export default function ContentCard({ data }: { data: CardProp }) {
+export default function ContentCard({ data }: { data: CardProp & { reportList?: ReportItem[], reportCount?: number } }) {
   const { t } = useTranslation();
+  console.log("Rendering ContentCard with data:", data); // Debug log
   const timeRead =
     Math.ceil((data?.content?.split(" ")?.length || 0) / 200) || 1;
 
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const handleOpenReportList = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsReportModalOpen(true);
+  };
+
   return (
-    <div
+
+      <>
+          <div
       className="group relative bg-white border border-gray-100 rounded-2xl p-5 sm:p-6 mb-4 cursor-pointer transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:border-gray-200 hover:-translate-y-0.5 active:scale-[0.99]"
       onClick={() => data?.onClick?.(data.id)}
     >
@@ -100,8 +111,21 @@ export default function ContentCard({ data }: { data: CardProp }) {
       </div>
 
       <div className="flex items-center justify-between pt-2">
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
-          {data?.tags?.slice(0, 3).map((tag, idx) => (
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+            {(data?.reportCount ?? 0) > 0 && (
+              <button
+                onClick={handleOpenReportList}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 border border-red-100 rounded-full text-red-600 transition-colors cursor-pointer"
+              >
+                <div className="bg-red-500 text-white rounded-full p-0.5">
+                  <AlertCircle size={12} strokeWidth={3} />
+                </div>
+                <span className="text-[13px] font-semibold leading-none">
+                  {data.reportCount} {data.reportCount === 1 ? 'Report' : 'Reports'}
+                </span>
+              </button>
+            )}
+            {data?.tags?.slice(0, 3).map((tag, idx) => (
             <span
               key={idx}
               className="bg-gray-50 text-gray-600 text-[12px] px-3 py-1 rounded-lg border border-gray-100 whitespace-nowrap hover:bg-white hover:border-gray-200 transition-colors"
@@ -109,7 +133,7 @@ export default function ContentCard({ data }: { data: CardProp }) {
               #{tag.startsWith("common.") ? t(tag) : tag}
             </span>
           ))}
-        </div>
+          </div>
 
         <div className="flex items-center gap-2">
           <button
@@ -123,6 +147,16 @@ export default function ContentCard({ data }: { data: CardProp }) {
         </div>
       </div>
     </div>
+
+    {isReportModalOpen && (
+        <ReportListModal 
+          isOpen={isReportModalOpen} 
+          onClose={() => setIsReportModalOpen(false)} 
+          reportList={data.reportList || []} 
+        />
+      )}
+      
+      </>
   );
 }
 

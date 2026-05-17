@@ -126,6 +126,12 @@ export const API_ENDPOINTS = {
     // // http://143.198.80.199:8888/api/v1/blog/user/6b2348e2-4629-4a1a-a66c-275444f5061f?page=0&size=10
     // GET_USER_BLOGS: (userId: string, page: number, size: number) =>
     //   buildUrl(`${BLOG}/user/${userId}?page=${page}&size=${size}`),
+//https://api.bkument.io.vn/api/v1/social/reports/blogs?page=0&size=20
+    GET_REPORTED_BLOGS: (page: number, size: number) =>
+      buildUrl(`${SOCIAL}/reports/blogs?page=${page}&size=${size}`),  
+    // https://api.bkument.io.vn/api/v1/social/reports/documents?page=0&size=20
+    GET_REPORTED_DOCUMENTS: (page: number, size: number) =>
+      buildUrl(`${SOCIAL}/reports/documents?page=${page}&size=${size}`),
   },
 
   RESOURCE: {
@@ -277,7 +283,7 @@ export const API_ENDPOINTS = {
 
 
   REPORT: {
-    CREATE: buildUrl(`${SOCIAL}/social/reports`),
+    CREATE: buildUrl(`${SOCIAL}/reports`),
     GET_AVERAGE_RATING: (resourceId: string) =>
       buildUrl(`${SOCIAL}/ratings/resource/${resourceId}/average`),
     SUBMIT_RATING: buildUrl(`${SOCIAL}/ratings/resource`),
