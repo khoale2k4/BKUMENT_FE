@@ -18,6 +18,8 @@ export interface CardProp {
   token: string;
   views: number;
   recommendationReason?: RecommendationReason;
+  reportCount?: number;
+  reportList?:[];
 }
 
 interface Author {

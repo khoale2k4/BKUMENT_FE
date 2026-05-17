@@ -43,35 +43,103 @@ const initialState: ArticleState = {
   followingIds: [],
 };
 
+// export const fetchFeed = createAsyncThunk(
+//   "articles/fetch",
+//   async (
+//     { category, page }: { category: string; page: number },
+//     { getState },
+//   ) => {
+//     const state = (getState() as any).articles as ArticleState;
+
+//     let data;
+//     if (category === "Documents") {
+//       data = await articleService.searchDocuments(page, state.pageSize);
+//       if (data.content.length === 0) {
+//         data = await articleService.getTopDocuments(page, state.pageSize);
+//       }
+//     } else {
+//       data = await articleService.getTopBlogs(page, state.pageSize);
+//     }
+
+//     const items = data.content;
+
+//     const mappedItems = items.map((dta: any) => ({
+//       id: dta.id || Math.random(),
+//       author: dta.author,
+//       title: dta.name || dta.title,
+//       time: dta.createdAt,
+
+//       content:
+//         category === "Documents"
+//           ? dta.description || dta.summary || "common.placeholders.documentDescription"
+//           : dta.content || "",
+
+//       coverImage: dta.coverImage || dta.previewImageUrl,
+//       type: category === "Documents" ? "DOC" : "BLOG",
+
+//       tags:
+//         dta.tags ||
+//         (category === "Documents" ? ["PDF", "Doc"] : ["common.tags.hot", "common.tags.daily"]),
+//       views: dta.views || 0,
+//       recommendationReason: dta.recommendationReason,
+//     }));
+
+//     return {
+//       items: mappedItems,
+//       page: page,
+//       totalPages: data.totalPages,
+//     };
+//   },
+// );
+
 export const fetchFeed = createAsyncThunk(
   "articles/fetch",
   async (
     { category, page }: { category: string; page: number },
     { getState },
   ) => {
-    const state = (getState() as any).articles as ArticleState;
+    // 1. Lấy toàn bộ state để truy cập auth và articles
+    const rootState = getState() as any; 
+    const state = rootState.articles as ArticleState;
+    const currentRole = rootState.auth?.currentRole; // Lấy role hiện tại
 
     let data;
-    if (category === "Documents") {
-      data = await articleService.searchDocuments(page, state.pageSize);
-      if (data.content.length === 0) {
-        data = await articleService.getTopDocuments(page, state.pageSize);
+
+    // 2. Rẽ nhánh theo Role
+    if (currentRole === "ADMIN") {
+      console.log("Fetching reported items for ADMIN");
+      // Logic cho ADMIN: Lấy danh sách bị report
+      if (category === "Documents") {
+        data = await articleService.getReportedDocuments(page, state.pageSize);
+      } else {
+        data = await articleService.getReportedBlogs(page, state.pageSize);
       }
     } else {
-      data = await articleService.getTopBlogs(page, state.pageSize);
+      // Logic cho USER bình thường: Lấy danh sách Feed
+      console.log("Fetching regular feed for USER");
+      if (category === "Documents") {
+        data = await articleService.searchDocuments(page, state.pageSize);
+        if (data.content.length === 0) {
+          data = await articleService.getTopDocuments(page, state.pageSize);
+        }
+      } else {
+        data = await articleService.getTopBlogs(page, state.pageSize);
+      }
     }
 
     const items = data.content;
 
+    // 3. Map dữ liệu chuẩn hóa cho Redux store
     const mappedItems = items.map((dta: any) => ({
       id: dta.id || Math.random(),
       author: dta.author,
       title: dta.name || dta.title,
       time: dta.createdAt,
 
+      // Lưu ý: data trả về từ Admin có trường "content" cho document, nên cần thêm dta.content
       content:
         category === "Documents"
-          ? dta.description || dta.summary || "common.placeholders.documentDescription"
+          ? dta.description || dta.summary || dta.content || "common.placeholders.documentDescription"
           : dta.content || "",
 
       coverImage: dta.coverImage || dta.previewImageUrl,
@@ -82,6 +150,10 @@ export const fetchFeed = createAsyncThunk(
         (category === "Documents" ? ["PDF", "Doc"] : ["common.tags.hot", "common.tags.daily"]),
       views: dta.views || 0,
       recommendationReason: dta.recommendationReason,
+
+      // 👉 Bổ sung thêm 2 trường này cho Admin (Nếu là USER thì nó sẽ tự map thành 0 và [])
+      reportCount: dta.reportCount || 0,
+      reportList: dta.reportList || [],
     }));
 
     return {
@@ -90,7 +162,7 @@ export const fetchFeed = createAsyncThunk(
       totalPages: data.totalPages,
     };
   },
-);
+);  
 
 export const searchKeyword = createAsyncThunk(
   "articles/search",
