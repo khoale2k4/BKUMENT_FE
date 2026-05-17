@@ -258,7 +258,23 @@ export const API_ENDPOINTS = {
 
     GET_RECOMMENDED_CLASSES: (page: number, size: number) =>
       buildUrl(`${LMS}/classes/recommendations?page=${page}&size=${size}`),
+
+    // https://api.bkument.io.vn/api/v1/lms/suggestions?page=1&size=20
+    GET_SUBJECTS_SUGGESTION: (page: number, size: number) =>
+      buildUrl(`${LMS}/suggestions?page=${page}&size=${size}`),
+// https://api.bkument.io.vn/api/v1/lms/suggestions/me?page=1&size=20
+    GET_MY_SUBJECTS_SUGGESTION:(page: number, size: number) =>
+      buildUrl(`${LMS}/suggestions/me?page=${page}&size=${size}`),
+// https://api.bkument.io.vn/api/v1/lms/suggestions
+    SUBMIT_SUBJECT_SUGGESTION: buildUrl(`${LMS}/suggestions`),
+// https://api.bkument.io.vn/api/v1/lms/suggestions/717ebedb-4923-4a0d-817c-e1b9c2345d98/reject
+    REJECT_SUBJECT_SUGGESTION: (id: string) =>
+      buildUrl(`${LMS}/suggestions/${id}/reject`),
+// https://api.bkument.io.vn/api/v1/lms/suggestions/717ebedb-4923-4a0d-817c-e1b9c2345d98/approve
+    APPROVE_SUBJECT_SUGGESTION: (id: string) =>
+      buildUrl(`${LMS}/suggestions/${id}/approve`), 
   },
+
 
   REPORT: {
     CREATE: buildUrl(`${SOCIAL}/social/reports`),

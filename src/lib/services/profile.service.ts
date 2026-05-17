@@ -5,6 +5,7 @@ import {
   RegisterTutorRequest,
   UpdateTutorRequest,
   UserProfile,
+  PaginatedSuggestions,
 } from "../redux/features/profileSlice";
 import { API_ENDPOINTS } from "../apiEndPoints";
 import httpClient from "./http";
@@ -170,4 +171,96 @@ export const searchProfiles = async (
   );
   console.log("API Response for search profiles:", response.data); // Debug log
   return response.data.result as PaginatedUsers;
+};
+
+export const getMySubjectsSuggestion = async (page: number, size: number): Promise<PaginatedSuggestions> => {
+  const response = await httpClient.get(
+    API_ENDPOINTS.LMS.GET_MY_SUBJECTS_SUGGESTION(page, size),
+  );
+  console.log("API Response for my subjects suggestion:", response.data.result); // Debug log
+  return response.data.result as PaginatedSuggestions;
+};
+
+export interface SubjectSuggestionPayload {
+  type: "TOPIC" | "SUBJECT";
+  proposedName: string;
+  parentSubjectId?: string; // Chỉ cần khi type là TOPIC
+  reason: string;
+};
+
+export interface ReviewSuggestionPayload {
+  finalId?: string;
+  finalName?: string;
+  parentSubjectId?: string;
+  rejectionReason?: string;
+  note?: string;
+}
+
+
+// Hàm phê duyệt (Approve)
+export const ApproveSubjectSuggestion = async (
+  id: string, 
+  payload: ReviewSuggestionPayload
+): Promise<void> => {
+  const response = await httpClient.post(
+    API_ENDPOINTS.LMS.APPROVE_SUBJECT_SUGGESTION(id),
+    JSON.stringify(payload),
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  console.log(`API Response for approve suggestion ${id}:`, response.data);
+
+  if (response.data.code !== 1000) {
+    throw new Error(response.data.message || "Failed to approve subject suggestion");
+  }
+};
+
+// Hàm từ chối (Reject)
+export const RejectSubjectSuggestion = async (
+  id: string, 
+  payload: ReviewSuggestionPayload
+): Promise<void> => {
+  const response = await httpClient.post(
+    API_ENDPOINTS.LMS.REJECT_SUBJECT_SUGGESTION(id),
+    JSON.stringify(payload),
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  console.log(`API Response for reject suggestion ${id}:`, response.data);
+
+  if (response.data.code !== 1000) {
+    throw new Error(response.data.message || "Failed to reject subject suggestion");
+  }
+};
+
+export const SubmitSubjectSuggestion = async (payload: SubjectSuggestionPayload): Promise<void> => {
+  const response = await httpClient.post(
+    API_ENDPOINTS.LMS.SUBMIT_SUBJECT_SUGGESTION,
+    JSON.stringify(payload), // Tham số thứ 2: Dữ liệu (Body)
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },  
+  );
+  console.log("API Response for submit subject suggestion:", response.data); // Debug log
+  if (response.data.code !== 1000) {
+    throw new Error(response.data.message || "Failed to submit subject suggestion");
+  }
+}
+
+export const fetchSubjectSuggestion = async (page: number, size: number) => {
+  const response = await httpClient.get(
+    API_ENDPOINTS.LMS.GET_SUBJECTS_SUGGESTION(page, size),
+  );
+  console.log("API Response for fetch subject suggestion:", response.data);
+  return response.data.result;
 };

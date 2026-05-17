@@ -100,12 +100,12 @@ export default function Sidebar() {
       href: AppRoute.blogs.write,
       count: 0,
     },
-    // {
-    //   icon: Users,
-    //   label: t("layout.sidebar.following"),
-    //   href: "/following",
-    //   count: 2,
-    // },
+    {
+      icon: Users,
+      label: t("Subject Suggestions"),
+      href: "/subjectsuggestion",
+      count: 2,
+    },
   ];
 
   const renderMenuItem = (item: any, idx: number) => {

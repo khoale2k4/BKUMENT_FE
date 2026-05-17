@@ -8,7 +8,7 @@ import {
 } from "@/lib/services/user.service";
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import * as profileService from "@/lib/services/profile.service";
-import { fetchProfileById } from "@/lib/services/profile.service";
+import { fetchProfileById, ReviewSuggestionPayload, SubjectSuggestionPayload } from "@/lib/services/profile.service";
 import httpClient from "../../services/http";
 // --- 1. Interfaces ---
 
@@ -95,6 +95,25 @@ export interface PaginatedUsers {
   data: UserProfile[];
 }
 
+export interface SubjectSuggestionItem {
+  id: string;
+  type: "SUBJECT" | "TOPIC";
+  proposedName: string;
+  parentSubjectName: string | null;
+  reason: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  rejectionReason: string | null;
+  createdAt: string;
+}
+
+export interface PaginatedSuggestions {
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalElements: number;
+  data: SubjectSuggestionItem[];
+}
+
 // PROFILE STATE CHUNG
 interface ProfileState {
   // State cho User
@@ -134,6 +153,18 @@ interface ProfileState {
   // Upload state
   isAvatarUploading: boolean;
   isResourceUploading: boolean;
+
+  // 
+  isSubmittingSuggestion: boolean;
+  suggestionError: string | null;
+
+  // suggestionsData: PaginatedSuggestions | null;
+  suggestionsData: PaginatedSuggestions | null;
+  isSuggestionsLoading: boolean;
+  suggestionsError: string | null;
+  //
+  allSuggestionsData: PaginatedSuggestions | null;
+  isAllSuggestionsLoading: boolean;
 }
 
 const initialState: ProfileState = {
@@ -170,7 +201,20 @@ const initialState: ProfileState = {
   viewedListProfile: null,
   isViewedListProfileLoading: false,
   viewedListProfileError: null,
+
+  isSubmittingSuggestion: false,
+  suggestionError: null,
+  
+  //
+  suggestionsData: null,
+  isSuggestionsLoading: false,
+  suggestionsError: null,
+  //
+  allSuggestionsData: null,
+  isAllSuggestionsLoading: false,
 };
+
+
 
 export const getMyProfile = createAsyncThunk(
   "profile/getMyProfile",
@@ -390,6 +434,82 @@ export const searchProfiles = createAsyncThunk(
   },
 );
 
+export const getSubjectsSuggestions = createAsyncThunk( 
+  "profile/getSubjectsSuggestions",
+  async (
+    { page, size }: { page: number; size: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      return await profileService.getMySubjectsSuggestion(page, size);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const submitSubjectReviewSuggestion = createAsyncThunk(
+  "profile/submitSubjectReviewSuggestion",
+  async (
+    payload: SubjectSuggestionPayload,
+    { rejectWithValue }
+  ) => {
+    try {
+      return await profileService.SubmitSubjectSuggestion(payload);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const approveSubjectSuggestion = createAsyncThunk(
+  "profile/approveSubjectSuggestion",
+  async (
+    { suggestionId, payload }: { suggestionId: string; payload: ReviewSuggestionPayload },
+    { rejectWithValue }
+  ) => {
+    try {
+      return await profileService.ApproveSubjectSuggestion(suggestionId, payload);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const rejectSubjectSuggestion = createAsyncThunk(
+  "profile/rejectSubjectSuggestion",
+  async (
+    { suggestionId, payload }: { suggestionId: string; payload: ReviewSuggestionPayload },
+    { rejectWithValue }
+  ) => {
+    try {
+      return await profileService.RejectSubjectSuggestion(suggestionId, payload);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+  }
+);
+
+export const getAllSubjectSuggestion = createAsyncThunk(
+  "profile/getAllSubjectSuggestion",
+  async (
+    { page, size }: { page: number; size: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      return await profileService.fetchSubjectSuggestion(page, size);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || error.message);
+    }
+    }
+);
+
+
+
+
+    
+
+
 // --- 3. Slice ---
 
 const profileSlice = createSlice({
@@ -601,6 +721,46 @@ const profileSlice = createSlice({
       .addCase(searchProfiles.rejected, (state, action) => {
         state.isViewedListProfileLoading = false;
         state.viewedListProfileError = action.payload as string;
+      });
+
+      builder
+      .addCase(getSubjectsSuggestions.pending, (state) => {
+        state.isSuggestionsLoading = true;
+        state.suggestionsError = null;
+      })
+      .addCase(getSubjectsSuggestions.fulfilled, (state, action) => {
+        state.isSuggestionsLoading = false;
+        // Chú ý: API trả về trong action.payload.result
+        state.suggestionsData = action.payload;
+      })
+      .addCase(getSubjectsSuggestions.rejected, (state, action) => {
+        state.isSuggestionsLoading = false;
+        state.suggestionsError = action.payload as string;
+      });
+
+      builder
+      .addCase(submitSubjectReviewSuggestion.pending, (state) => {
+        state.isSubmittingSuggestion = true;
+        state.suggestionError = null;
+      })
+      .addCase(submitSubjectReviewSuggestion.fulfilled, (state) => {
+        state.isSubmittingSuggestion = false;
+      })
+      .addCase(submitSubjectReviewSuggestion.rejected, (state, action) => {
+        state.isSubmittingSuggestion = false;
+        state.suggestionError = action.payload as string;
+      });
+
+      builder
+      .addCase(getAllSubjectSuggestion.pending, (state) => {
+        state.isAllSuggestionsLoading = true;
+      })
+      .addCase(getAllSubjectSuggestion.fulfilled, (state, action) => {
+        state.isAllSuggestionsLoading = false;
+        state.allSuggestionsData = action.payload.result || action.payload; 
+      })
+      .addCase(getAllSubjectSuggestion.rejected, (state, action) => {
+        state.isAllSuggestionsLoading = false;
       });
   },
 });
