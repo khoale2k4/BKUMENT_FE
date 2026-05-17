@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Star, ShieldCheck, Loader2, BookOpen, CheckCircle2, Save, Edit3, Camera } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/lib/redux/hooks';
-
+import { getSubjectsSuggestions } from '@/lib/redux/features/profileSlice';
 // Các Actions từ Redux
 import { getMyTutorProfile, updateTutorProfile, UpdateTutorRequest, uploadAvatar } from '@/lib/redux/features/profileSlice';
 import { getMySubjects } from '@/lib/redux/features/tutorCourseSlice';
@@ -13,10 +13,12 @@ import ProfileField from './ProfileField';
 import { AuthenticatedImage } from '@/components/ui/AuthenticatedImage';
 import { useTranslation } from 'react-i18next'; // <-- Import hook dịch thuật
 import { showToast } from '@/lib/redux/features/toastSlice';
+import SubjectSuggestionList from './SubjectSuggestionList';
 
 const TutorAboutTab = () => {
   const dispatch = useAppDispatch();
   const { t } = useTranslation(); // <-- Khởi tạo hàm t()
+  const { suggestionsData, isSuggestionsLoading } = useAppSelector((state) => state.profile);
 
   // 1. Lấy dữ liệu từ Redux
   const { tutor, isTutorLoading, isAvatarUploading } = useAppSelector((state) => state.profile);
@@ -41,6 +43,14 @@ const TutorAboutTab = () => {
       fileInputRef.current?.click();
     }
   };
+
+  useEffect(() => {
+  dispatch(getSubjectsSuggestions({ page: 0, size: 20 }));
+}, [dispatch]);
+
+const handleRefreshUserSuggestions = () => {
+  dispatch(getSubjectsSuggestions({ page: 0, size: 20 }));
+};
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -358,6 +368,16 @@ const TutorAboutTab = () => {
           </>
         )}
       </div>
+
+      {!isEditing && (
+  <SubjectSuggestionList 
+    mode="USER"
+    allSubjects={allSubjects} 
+    data={suggestionsData} 
+    isLoading={isSuggestionsLoading} 
+    onRefresh={handleRefreshUserSuggestions} 
+  />
+)}
 
     </div>
   );
