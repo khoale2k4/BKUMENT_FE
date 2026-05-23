@@ -25,4 +25,5 @@ export interface FileUploadItem {
     status: UploadStatus;
     errorMessage?: string;
     visibility: VisibilityStatus;
+    isAnalyzingFast?: boolean;
 }

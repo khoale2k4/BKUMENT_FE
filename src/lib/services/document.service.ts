@@ -52,8 +52,11 @@ interface AnalyseDocumentBody {
 }
 
 interface AnalyseDocumentResponse {
-    keywords: string[],
     docId: string;
+}
+
+interface AnalyseDocumentFastResponse {
+    keywords: string[];
     summary: string | undefined;
 }
 
@@ -86,12 +89,17 @@ export const saveDocumentMetadata = async (metadata: FileUploadMetadata): Promis
 };
 
 export const analyseDocument = async (body: AnalyseDocumentBody): Promise<AnalyseDocumentResponse> => {
-    const res = await httpClient.get(API_ENDPOINTS.DOCUMENTS.ANALYSE_DOCUMENT(body.assetId, body.fileName), {
-        timeout: 600000
-    });
-
+    const res = await httpClient.get(API_ENDPOINTS.DOCUMENTS.ANALYSE_DOCUMENT(body.assetId, body.fileName));
     return res.data.result;
 };
+
+export const analyseDocumentFast = async (docId: string): Promise<AnalyseDocumentFastResponse> => {
+    const res = await httpClient.get(API_ENDPOINTS.DOCUMENTS.ANALYSE_DOCUMENT_FAST(docId), {
+        timeout: 600000
+    });
+    return res.data.result;
+};
+
 
 export const getRelatedDocuments = async (id: string, page: number, size: number): Promise<any> => {
     const response = await httpClient.get(API_ENDPOINTS.DOCUMENTS.RELATED_DOCUMENTS(id, page, size));

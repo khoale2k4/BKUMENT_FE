@@ -192,7 +192,7 @@ export const uploadFile = createAsyncThunk(
 
             dispatch(updateFileStatus({ localId, updates: { status: 'analyzing', progress: 100 } }));
 
-            const { docId, keywords, summary } = await documentService.analyseDocument({
+            const { docId } = await documentService.analyseDocument({
                 assetId: fileId,
                 fileName: file.name
             });
@@ -204,7 +204,42 @@ export const uploadFile = createAsyncThunk(
                 updates: {
                     status: 'success',
                     progress: 100,
-                    docId,
+                    docId
+                }
+            }));
+            return localId;
+        } catch (err: any) {
+            const errorMessage = err.response?.data?.message || err.message || 'errors.uploadFailed';
+            dispatch(updateFileStatus({ localId, updates: { status: 'error', errorMessage } }));
+            dispatch(showToast({
+                type: 'error',
+                title: 'common.toast.error',
+                message: errorMessage
+            }));
+            return rejectWithValue({ localId, errorMessage });
+        }
+    }
+);
+
+export const fastAnalyseDocument = createAsyncThunk(
+    'documents/fastAnalyseDocument',
+    async (localId: string, { getState, dispatch, rejectWithValue }) => {
+        const state = getState() as { documents: DocumentState };
+        const file = state.documents.upload.files.find(f => f.localId === localId);
+        
+        if (!file || !file.docId) {
+            return rejectWithValue('File not found or missing docId');
+        }
+
+        try {
+            dispatch(updateFileStatus({ localId, updates: { isAnalyzingFast: true } }));
+            
+            const { keywords, summary } = await documentService.analyseDocumentFast(file.docId);
+
+            dispatch(updateFileStatus({
+                localId,
+                updates: {
+                    isAnalyzingFast: false,
                     keywords,
                     summary,
                     description: summary
@@ -212,8 +247,8 @@ export const uploadFile = createAsyncThunk(
             }));
             return localId;
         } catch (err: any) {
-            const errorMessage = err.response?.data?.message || err.message || 'errors.uploadFailed';
-            dispatch(updateFileStatus({ localId, updates: { status: 'error', errorMessage } }));
+            dispatch(updateFileStatus({ localId, updates: { isAnalyzingFast: false } }));
+            const errorMessage = err.response?.data?.message || err.message || 'Hệ thống AI đang bận, vui lòng thử lại sau';
             dispatch(showToast({
                 type: 'error',
                 title: 'common.toast.error',

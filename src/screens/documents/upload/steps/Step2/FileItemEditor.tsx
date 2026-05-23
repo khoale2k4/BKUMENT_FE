@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next";
 import React, { useState, useEffect, useRef } from "react";
 import { FileUploadItem } from "@/types/FileUpload";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
-import { searchCourses, searchUniversities, type Course } from "@/lib/redux/features/documentSlice";
+import { searchCourses, searchUniversities, type Course, fastAnalyseDocument } from "@/lib/redux/features/documentSlice";
+import { Sparkles, Loader2 } from "lucide-react";
 import AutocompleteField from "@/components/documents/upload/AutocompleteField";
 import TagManager from "@/components/documents/upload/TagManager";
 import VisibilityToggle from "@/components/documents/upload/VisibilityToggle";
@@ -25,6 +26,14 @@ const FileItemEditor = ({
     const { universities, universitiesStatus, courses, coursesStatus } = useAppSelector(
         (state) => state.documents
     );
+
+    const hasAIResult = file.keywords && file.keywords.length > 0 && file.description;
+
+    const handleFastAnalyse = () => {
+        if (!file.isAnalyzingFast) {
+            dispatch(fastAnalyseDocument(file.localId));
+        }
+    };
 
     const [hasUniversitiesFetched, setHasUniversitiesFetched] = useState(false);
     const [hasCoursesFetched, setHasCoursesFetched] = useState(false);
@@ -196,6 +205,24 @@ const FileItemEditor = ({
             )}
 
             <div className="p-6 space-y-6 overflow-visible">
+                <div className="flex justify-end items-center mb-2">
+                    {!hasAIResult ? (
+                        <button
+                            onClick={handleFastAnalyse}
+                            disabled={file.isAnalyzingFast}
+                            className={`flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-all ${
+                                file.isAnalyzingFast ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                            }`}
+                        >
+                            {file.isAnalyzingFast ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                            {file.isAnalyzingFast ? 'Đang phân tích...' : '✨ Phân tích AI tự động'}
+                        </button>
+                    ) : (
+                        <span className="text-sm font-semibold text-green-600 flex items-center gap-2 bg-green-50 px-3 py-1.5 rounded-md">
+                            <Sparkles className="w-4 h-4" /> Đã phân tích AI
+                        </span>
+                    )}
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                     <label className="md:col-span-3 text-base font-bold text-black">{t('documents.upload.step2.fileTitle')}:</label>
                     <div className="md:col-span-9">
@@ -252,16 +279,19 @@ const FileItemEditor = ({
                             onChange={(e) => onUpdate("description", e.target.value)}
                             rows={4}
                             placeholder={t('documents.upload.step2.placeholderDesc', 'Briefly describe the document contents...')}
-                            className="w-full px-4 py-2.5 border border-black rounded-lg outline-none focus:ring-2 focus:ring-black/20 text-sm resize-none transition-all"
+                            disabled={file.isAnalyzingFast}
+                            className={`w-full px-4 py-2.5 border border-black rounded-lg outline-none focus:ring-2 focus:ring-black/20 text-sm resize-none transition-all ${file.isAnalyzingFast ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                         />
                     </div>
                 </div>
 
-                <TagManager
-                    tags={file.keywords || []}
-                    onAdd={(tag) => onUpdate("keywords", [...(file.keywords || []), tag])}
-                    onRemove={(tag) => onUpdate("keywords", (file.keywords || []).filter(t => t !== tag))}
-                />
+                <div className={file.isAnalyzingFast ? 'opacity-50 pointer-events-none' : ''}>
+                    <TagManager
+                        tags={file.keywords || []}
+                        onAdd={(tag) => onUpdate("keywords", [...(file.keywords || []), tag])}
+                        onRemove={(tag) => onUpdate("keywords", (file.keywords || []).filter(t => t !== tag))}
+                    />
+                </div>
 
                 <AutocompleteField
                     label={t('documents.upload.step2.university', 'University')}

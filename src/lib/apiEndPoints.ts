@@ -83,6 +83,8 @@ export const API_ENDPOINTS = {
         }`,
       ),
 
+    ANALYSE_DOCUMENT_FAST: (docId: string) => buildUrl(`${DOCUMENT}/analyze/fast/${docId}`),
+
     GET_DETAIL: (id: string | number) => buildUrl(`${DOCUMENT}/search?q=${id}`),
 
     RELATED_DOCUMENTS: (id: string, page: number, size: number) =>
