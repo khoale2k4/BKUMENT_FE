@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/lib/apiEndPoints";
-import { setAccessToken, removeAccessToken } from "@/lib/utils/token";
+import { setAccessToken, removeAccessToken, getRefreshToken, setRefreshToken, removeRefreshToken } from "@/lib/utils/token";
 import httpClient from "./http";
 import axios from "axios"; // Import thẳng từ thư viện gốc
 interface LoginCredentials {
@@ -25,6 +25,7 @@ export interface RegisterPayload {
 
 interface LoginResponse {
   token: string;
+  refreshToken: string;
   user: {
     name: string;
     email: string;
@@ -55,12 +56,15 @@ export const login = async (
 
   if (data.code === 1000) {
     const token = data.result.token;
+    const refreshTokenValue = data.result.refreshToken;
 
     // Tự động lưu token vào localStorage
     setAccessToken(token);
+    if (refreshTokenValue) setRefreshToken(refreshTokenValue);
 
     return {
       token,
+      refreshToken: refreshTokenValue,
       user: {
         name: credentials.username,
         email: credentials.username,
@@ -107,21 +111,24 @@ export const logout = async (token: string): Promise<any> => {
 
   // Xóa token khỏi localStorage
   removeAccessToken();
+  removeRefreshToken();
 
   return data;
 };
 
 export const refreshToken = async () => {
-  // Lấy token cũ (nếu API của bạn yêu cầu gửi token cũ lên)
-  const oldToken = localStorage.getItem("accessToken");
+  const currentRefreshToken = getRefreshToken();
+
+  if (!currentRefreshToken) {
+    throw new Error("No refresh token available");
+  }
 
   const response = await fetch(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {
-    method: "POST", // Hoặc GET tùy backend
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(oldToken && { Authorization: `Bearer ${oldToken}` }),
     },
-    // body: ... (Nếu backend cần body)
+    body: JSON.stringify({ token: currentRefreshToken }),
   });
 
   const data = await response.json();
@@ -129,7 +136,7 @@ export const refreshToken = async () => {
     throw new Error(data.message);
   }
 
-  return data.result; // Trả về { token: "..." }
+  return data.result; // Trả về { token: "...", refreshToken: "..." }
 };
 
 // Sửa getUniversities thành fetchUniversities

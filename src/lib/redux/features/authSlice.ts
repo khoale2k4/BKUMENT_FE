@@ -309,6 +309,7 @@ export const authSlice = createSlice({
 
       if (typeof window !== "undefined") {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
         localStorage.removeItem("currentRole");
         localStorage.removeItem("vbook_onboarded");
         const currentPath = window.location.pathname + window.location.search;
@@ -385,6 +386,7 @@ export const authSlice = createSlice({
         state.currentRole = null;
         if (typeof window !== "undefined") {
           localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
           localStorage.removeItem("currentRole");
           localStorage.removeItem("vbook_onboarded");
           const currentPath = window.location.pathname + window.location.search;
@@ -404,6 +406,7 @@ export const authSlice = createSlice({
         state.currentRole = null;
         if (typeof window !== "undefined") {
           localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
           localStorage.removeItem("currentRole");
           localStorage.removeItem("vbook_onboarded");
           const currentPath = window.location.pathname + window.location.search;
@@ -447,6 +450,7 @@ export const authSlice = createSlice({
 
         if (typeof window !== "undefined") {
           localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
           localStorage.removeItem("currentRole");
           localStorage.removeItem("vbook_onboarded");
           const currentPath = window.location.pathname + window.location.search;
