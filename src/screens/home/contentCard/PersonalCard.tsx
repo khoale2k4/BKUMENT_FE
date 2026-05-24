@@ -52,14 +52,16 @@ export default function PersonCard({
           <p className="text-sm font-semibold text-gray-900 group-hover:text-black truncate leading-snug">
             {person.fullName}
           </p>
+
           {person.university && (
             <p className="text-xs text-gray-500 truncate mt-0.5">
               {person.university}
             </p>
           )}
           <p className="text-xs text-gray-400 mt-0.5">
-            {person.followerCount ?? 0} {t("home.people.followers")}
+            {person.followerCount ?? 0} {t("home.people.followers")}  
           </p>
+
         </div>
       </button>
 
