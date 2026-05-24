@@ -33,4 +33,6 @@ export interface Course {
   coverImageUrl: string;
   userStatus?: string; // Có thể có hoặc không tùy API
   numberOfStudent?: number; // Có thể có hoặc không tùy API
+  averageRating?: number; // Có thể có hoặc không tùy API
+  totalReviews?: number; // Có thể có hoặc không tùy API
 }

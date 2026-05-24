@@ -70,13 +70,13 @@ interface TutorFindingState {
   totalPages: number;
   totalCourses: number; // Thêm tổng số khóa học vào state để hiển thị trên UI
 
-  tutorRatings: Rating[];
-  tutorRatingSummary: { averageScore: number; totalReviews: number } | null;
-  myTutorRating: Rating | null;
-  loadingRatings: boolean;
-  ratingsCurrentPage: number;
-  ratingsTotalPages: number;
-  isRatingSubmitting: boolean;
+  // classRatings: Rating[];
+  // classRatingSummary: { averageScore: number; totalReviews: number } | null;
+  // myClassRating: Rating | null;
+  // loadingRatings: boolean;
+  // ratingsCurrentPage: number;
+  // ratingsTotalPages: number;
+  // isRatingSubmitting: boolean;
 }
 
 const initialState: TutorFindingState = {
@@ -111,13 +111,13 @@ const initialState: TutorFindingState = {
   totalPages: 1,
   totalCourses: 0,
 
-  tutorRatings: [],
-  tutorRatingSummary: { averageScore: 0, totalReviews: 0 },
-  myTutorRating: null,
-  loadingRatings: false,
-  ratingsCurrentPage: 1,
-  ratingsTotalPages: 1,
-  isRatingSubmitting: false,
+  // classRatings: [],
+  // classRatingSummary: { averageScore: 0, totalReviews: 0 },
+  // myClassRating: null,
+  // loadingRatings: false,
+  // ratingsCurrentPage: 1,
+  // ratingsTotalPages: 1,
+  // isRatingSubmitting: false,
 };
 
 // --- Async Thunks ---
@@ -228,155 +228,6 @@ export const rejectTutorApplication = createAsyncThunk(
   },
 );
 
-export const getTutorRatingsAsync = createAsyncThunk(
-  "tutorFinding/getTutorRatings",
-  async (
-    { tutorId, page, size }: { tutorId: string; page: number; size: number },
-    { rejectWithValue },
-  ) => {
-    try {
-      // HÀM NÀY: Phải trả về nguyên cục phân trang (có chứa content và totalPages)
-      return await ratingService.getRatingsByTutorId(tutorId, page, size);
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
-    }
-  },
-);
-
-export const getTutorRatingSummaryAsync = createAsyncThunk(
-  "tutorFinding/getTutorRatingSummary",
-  async (tutorId: string, { rejectWithValue }) => {
-    try {
-      return await ratingService.getTutorRatingSummary(tutorId);
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
-    }
-  },
-);
-
-export const getMyTutorRatingAsync = createAsyncThunk(
-  "tutorFinding/getMyTutorRating",
-  async (
-    { tutorId, userId }: { tutorId: string; userId: string },
-    { rejectWithValue },
-  ) => {
-    try {
-      return await ratingService.getMyRatingForTutor(tutorId, userId);
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || error.message);
-    }
-  },
-);
-
-export const createRatingAsync = createAsyncThunk(
-  "tutorFinding/createRating",
-  async (
-    payload: CreateRatingPayload,
-    { dispatch, getState, rejectWithValue },
-  ) => {
-    try {
-      const result = await ratingService.createRating(payload);
-      dispatch(
-        showToast({
-          type: "success",
-          title: "Thành công",
-          message: "Cảm ơn bạn đã đánh giá!",
-        }),
-      );
-
-      // 1. Dùng getState() để lấy toàn bộ dữ liệu Redux
-      const state = getState() as RootState;
-      // 2. Chọt vào đúng kho profile để lấy user ID
-      const currentUserId = state.profile.user?.id;
-
-      dispatch(getTutorRatingSummaryAsync(payload.tutorId));
-
-      // 3. Nếu có ID thì mới gọi hàm getMyTutor...
-      if (currentUserId) {
-        dispatch(
-          getMyTutorRatingAsync({
-            tutorId: payload.tutorId,
-            userId: String(currentUserId),
-          }),
-        );
-      }
-      return result;
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "Đánh giá thất bại";
-      dispatch(showToast({ type: "error", title: "Lỗi", message: errorMsg }));
-      return rejectWithValue(errorMsg);
-    }
-  },
-);
-
-export const updateRatingAsync = createAsyncThunk(
-  "tutorFinding/updateRating",
-  async (
-    { ratingId, payload }: { ratingId: string; payload: CreateRatingPayload },
-    { dispatch, getState, rejectWithValue },
-  ) => {
-    try {
-      const result = await ratingService.updateRating(ratingId, payload);
-      dispatch(
-        showToast({
-          type: "success",
-          title: "Thành công",
-          message: "Đã cập nhật đánh giá!",
-        }),
-      );
-
-      // 1. Dùng getState() để lấy toàn bộ dữ liệu Redux
-      const state = getState() as RootState;
-      // 2. Chọt vào đúng kho profile để lấy user ID
-      const currentUserId = state.profile.user?.id;
-
-      dispatch(getTutorRatingSummaryAsync(payload.tutorId));
-
-      // 3. Nếu có ID thì mới gọi hàm getMyTutor...
-      if (currentUserId) {
-        dispatch(
-          getMyTutorRatingAsync({
-            tutorId: payload.tutorId,
-            userId: String(currentUserId),
-          }),
-        );
-      }
-      return result;
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "Cập nhật thất bại";
-      dispatch(showToast({ type: "error", title: "Lỗi", message: errorMsg }));
-      return rejectWithValue(errorMsg);
-    }
-  },
-);
-
-export const deleteRatingAsync = createAsyncThunk(
-  "tutorFinding/deleteRating",
-  async (
-    { ratingId, tutorId }: { ratingId: string; tutorId: string },
-    { dispatch, rejectWithValue },
-  ) => {
-    try {
-      await ratingService.deleteRating(ratingId);
-      dispatch(
-        showToast({
-          type: "success",
-          title: "Thành công",
-          message: "Đã xóa đánh giá!",
-        }),
-      );
-
-      dispatch(getTutorRatingSummaryAsync(tutorId));
-      // dispatch(getMyTutorRatingAsync({ tutorId, userId: "me" }));
-
-      return ratingId;
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "Xóa thất bại";
-      dispatch(showToast({ type: "error", title: "Lỗi", message: errorMsg }));
-      return rejectWithValue(errorMsg);
-    }
-  },
-);
 
 // --- Slice ---
 
@@ -587,68 +438,68 @@ const tutorFindingSlice = createSlice({
         state.error = action.payload as string;
       });
 
-    builder
-      .addCase(getTutorRatingsAsync.pending, (state) => {
-        state.loadingRatings = true;
-      })
-      .addCase(getTutorRatingsAsync.fulfilled, (state, action) => {
-        state.loadingRatings = false;
-        state.tutorRatings = action.payload?.content || [];
-        state.ratingsTotalPages = action.payload?.totalPages || 1;
-      })
-      .addCase(getTutorRatingsAsync.rejected, (state) => {
-        state.loadingRatings = false;
-      });
+    // builder
+    //   .addCase(getClassRatingsAsync.pending, (state) => {
+    //     state.loadingRatings = true;
+    //   })
+    //   .addCase(getClassRatingsAsync.fulfilled, (state, action) => {
+    //     state.loadingRatings = false;
+    //     state.tutorRatings = action.payload?.content || [];
+    //     state.ratingsTotalPages = action.payload?.totalPages || 1;
+    //   })
+    //   .addCase(getClassRatingsAsync.rejected, (state) => {
+    //     state.loadingRatings = false;
+    //   });
 
-    builder.addCase(getMyTutorRatingAsync.fulfilled, (state, action) => {
-      state.myTutorRating = action.payload;
-    });
+    // builder.addCase(getMyClassRatingAsync.fulfilled, (state, action) => {
+    //   state.myTutorRating = action.payload;
+    // });
 
-    // 2. Lấy Tổng quan Đánh giá (Điểm trung bình & Tổng lượt đánh giá)
-    builder.addCase(getTutorRatingSummaryAsync.fulfilled, (state, action) => {
-      state.tutorRatingSummary = {
-        averageScore: action.payload.averageScore,
-        totalReviews: action.payload.totalReviews,
-      };
-    });
+    // // 2. Lấy Tổng quan Đánh giá (Điểm trung bình & Tổng lượt đánh giá)
+    // builder.addCase(getClassRatingSummaryAsync.fulfilled, (state, action) => {
+    //   state.tutorRatingSummary = {
+    //     averageScore: action.payload.averageScore,
+    //     totalReviews: action.payload.totalReviews,
+    //   };
+    // });
 
-    // 4. Các trạng thái khi Đăng / Sửa / Xóa đánh giá
-    builder
-      .addCase(createRatingAsync.pending, (state) => {
-        state.isRatingSubmitting = true;
-      })
-      .addCase(createRatingAsync.fulfilled, (state) => {
-        state.isRatingSubmitting = false;
-      })
-      .addCase(createRatingAsync.rejected, (state) => {
-        state.isRatingSubmitting = false;
-      });
+    // // 4. Các trạng thái khi Đăng / Sửa / Xóa đánh giá
+    // builder
+    //   .addCase(createRatingAsync.pending, (state) => {
+    //     state.isRatingSubmitting = true;
+    //   })
+    //   .addCase(createRatingAsync.fulfilled, (state) => {
+    //     state.isRatingSubmitting = false;
+    //   })
+    //   .addCase(createRatingAsync.rejected, (state) => {
+    //     state.isRatingSubmitting = false;
+    //   });
 
-    builder
-      .addCase(updateRatingAsync.pending, (state) => {
-        state.isRatingSubmitting = true;
-      })
-      .addCase(updateRatingAsync.fulfilled, (state) => {
-        state.isRatingSubmitting = false;
-      })
-      .addCase(updateRatingAsync.rejected, (state) => {
-        state.isRatingSubmitting = false;
-      });
+    // builder
+    //   .addCase(updateRatingAsync.pending, (state) => {
+    //     state.isRatingSubmitting = true;
+    //   })
+    //   .addCase(updateRatingAsync.fulfilled, (state) => {
+    //     state.isRatingSubmitting = false;
+    //   })
+    //   .addCase(updateRatingAsync.rejected, (state) => {
+    //     state.isRatingSubmitting = false;
+    //   });
 
-    builder
-      .addCase(deleteRatingAsync.pending, (state) => {
-        state.isRatingSubmitting = true;
-      })
-      .addCase(deleteRatingAsync.fulfilled, (state, action) => {
-        state.isRatingSubmitting = false;
-        state.myTutorRating = null; // Cập nhật lại UI bản thân không còn đánh giá
-        state.tutorRatings = state.tutorRatings.filter(
-          (rating) => rating.id !== action.payload,
-        ); // Xóa khỏi list hiện tại
-      })
-      .addCase(deleteRatingAsync.rejected, (state) => {
-        state.isRatingSubmitting = false;
-      });
+    // builder
+    //   .addCase(deleteRatingAsync.pending, (state) => {
+    //     state.isRatingSubmitting = true;
+    //   })
+    //   .addCase(deleteRatingAsync.fulfilled, (state, action) => {
+    //     state.isRatingSubmitting = false;
+    //     state.myTutorRating = null; // Cập nhật lại UI bản thân không còn đánh giá
+    //     state.tutorRatings = state.tutorRatings.filter(
+    //       (rating) => rating.id !== action.payload,
+    //     ); // Xóa khỏi list hiện tại
+    //   })
+    //   .addCase(deleteRatingAsync.rejected, (state) => {
+    //     state.isRatingSubmitting = false;
+    //   });
   },
 });
 

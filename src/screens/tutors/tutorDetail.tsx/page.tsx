@@ -5,13 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { Loader2, ChevronLeft, Star, MessageSquare } from "lucide-react"; // <-- Thêm Star và MessageSquare
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import { getClassesByTutorId } from "@/lib/redux/features/tutorCourseSlice";
-import {
-  getTutorRatingSummaryAsync,
-  getTutorRatingsAsync,
-} from "@/lib/redux/features/tutorFindingSlice";
 import CourseCard from "../../profile/tabs/MyClass/CourseCard";
 import Pagination from "@/components/ui/Pagination";
-import TutorRatingSection from "../components/TutorRatingSection";
 import { useTranslation } from "react-i18next";
 
 const TutorDetailPage = () => {
@@ -30,8 +25,6 @@ const TutorDetailPage = () => {
     totalPages,
   } = useAppSelector((state) => state.tutorCourse);
 
-  const { tutorRatings, tutorRatingSummary, myTutorRating, loadingRatings } =
-    useAppSelector((state) => state.tutorFinding);
 
   // GỌI API LẦN ĐẦU KHI VÀO TRANG
   useEffect(() => {
@@ -113,8 +106,6 @@ const TutorDetailPage = () => {
                 </div>
             )}
 
-            {/* --- PHẦN 2: ĐÁNH GIÁ TỪ HỌC VIÊN --- */}
-            <TutorRatingSection tutorId={tutorId} />
         </div>
     );
 };

@@ -4,13 +4,14 @@ import React, { useEffect, useState } from "react";
 import { Loader2, MessageSquare } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/lib/redux/hooks";
 import {
-  getTutorRatingSummaryAsync,
-  getTutorRatingsAsync,
-  getMyTutorRatingAsync, // <-- Khôi phục lại hàm này
+  getClassRatingSummaryAsync,
+  getClassRatingsAsync,
+  getMyClassRatingAsync, // <-- Khôi phục lại hàm này
   deleteRatingAsync,
   createRatingAsync,
   updateRatingAsync,
-} from "@/lib/redux/features/tutorFindingSlice";
+  clearClassRatings,
+} from "@/lib/redux/features/tutorCourseSlice";
 
 // Import các Component con
 import RatingSummary from "./RatingSummary";
@@ -18,21 +19,21 @@ import RatingForm from "./RatingForm";
 import RatingItem from "./RatingItem";
 import Pagination from "@/components/ui/Pagination";
 
-interface TutorRatingSectionProps {
-  tutorId: string;
+interface ClassRatingSectionProps {
+  classId: string;
 }
 
-const TutorRatingSection: React.FC<TutorRatingSectionProps> = ({ tutorId }) => {
+const ClassRatingSection: React.FC<ClassRatingSectionProps> = ({ classId }) => {
   const dispatch = useAppDispatch();
 
   const {
-    tutorRatings,
-    tutorRatingSummary,
-    myTutorRating, // <-- Đánh giá của chính mình từ Redux state
+    classRatings,
+    classRatingSummary,
+    myClassRating, // <-- Đánh giá của chính mình từ Redux state
     loadingRatings,
     isRatingSubmitting,
     ratingsTotalPages,
-  } = useAppSelector((state) => state.tutorFinding);
+  } = useAppSelector((state) => state.tutorCourse);
 
   const currentUser = useAppSelector((state) => state.profile.user);
   const currentUserId = currentUser?.id;
@@ -44,48 +45,55 @@ const TutorRatingSection: React.FC<TutorRatingSectionProps> = ({ tutorId }) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-
-  // GỌI API
+  
+  // EFFECT 1: Fetch tổng quan và Đánh giá của mình (Chạy khi classId đổi)
   useEffect(() => {
-    if (tutorId) {
-      dispatch(getTutorRatingSummaryAsync(tutorId));
+    if (classId) {
+      // 1. Dọn dẹp data của lớp cũ trước khi lấy lớp mới (Giải quyết Vấn đề 1)
+      dispatch(clearClassRatings());
 
-      // Gọi API lấy đánh giá của cá nhân mình
+      // 2. Fetch data mới
+      dispatch(getClassRatingSummaryAsync(classId));
+
       if (currentUserId) {
-        console.log(
-          "Fetching my rating for tutorId:",
-          tutorId,
-          "userId:",
-          currentUserId,
-        );
-        dispatch(getMyTutorRatingAsync({ tutorId, userId: currentUserId }));
+        dispatch(getMyClassRatingAsync({ classId: classId, userId: currentUserId }));
       }
-
-      dispatch(getTutorRatingsAsync({ tutorId, page: currentPage, size: 5 }));
     }
-  }, [dispatch, tutorId, currentPage, currentUserId]);
+
+    // Hàm Cleanup: Sẽ tự động chạy khi component bị hủy (người dùng rời khỏi trang)
+    return () => {
+      dispatch(clearClassRatings());
+    };
+  }, [dispatch, classId, currentUserId]);
+
+  // EFFECT 2: Fetch danh sách đánh giá chung (Chạy khi classId HOẶC trang thay đổi)
+  useEffect(() => {
+    if (classId) {
+      dispatch(getClassRatingsAsync({ classId: classId, page: currentPage, size: 5 }));
+    }
+  }, [dispatch, classId, currentPage]);
 
   // --- HANDLERS ---
   const handleDeleteRating = async (rating: any) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa đánh giá này không?")) {
       await dispatch(
-        deleteRatingAsync({ ratingId: String(rating.id), tutorId }),
+        deleteRatingAsync({ ratingId: String(rating.id), classId }),
       );
       setCurrentPage(0); // Reset về trang 1
     }
   };
 
   const handleSubmitRating = async (score: number, comment: string) => {
-    if (myTutorRating && isEditing) {
+    if (myClassRating && isEditing) {
       await dispatch(
         updateRatingAsync({
-          ratingId: String(myTutorRating.id),
-          payload: { tutorId, score, comment },
+          ratingId: String(myClassRating.id),
+          payload: { classId, score, comment },
         }),
       );
       setIsEditing(false);
     } else {
-      await dispatch(createRatingAsync({ tutorId, score, comment }));
+      await dispatch(createRatingAsync({ classId, score, comment }));
       setCurrentPage(0); // Đăng xong đưa về trang 1
     }
   };
@@ -105,16 +113,16 @@ const TutorRatingSection: React.FC<TutorRatingSectionProps> = ({ tutorId }) => {
 
       {/* Component 1: Tổng quan Điểm số */}
       <RatingSummary
-        averageScore={tutorRatingSummary?.averageScore}
-        totalRatings={tutorRatingSummary?.totalReviews}
+        averageScore={classRatingSummary?.averageScore}
+        totalRatings={classRatingSummary?.totalReviews}
       />
 
       {/* Component 2: Khung Nhập Liệu (Ẩn nếu đã đánh giá và đang không bấm nút Sửa) */}
-      {(!myTutorRating || isEditing) && (
+      {(!myClassRating || isEditing) && (
         <RatingForm
           isEditing={isEditing}
-          initialScore={myTutorRating?.score}
-          initialComment={myTutorRating?.comment}
+          initialScore={myClassRating?.score}
+          initialComment={myClassRating?.comment}
           isSubmitting={isRatingSubmitting}
           onSubmit={handleSubmitRating}
           onCancel={() => setIsEditing(false)}
@@ -122,9 +130,9 @@ const TutorRatingSection: React.FC<TutorRatingSectionProps> = ({ tutorId }) => {
       )}
 
       {/* Component 3: Bình luận của cá nhân (Ẩn nếu đang trong chế độ Edit) */}
-      {myTutorRating && !isEditing && (
+      {myClassRating && !isEditing && (
         <RatingItem
-          rating={myTutorRating}
+          rating={myClassRating}
           isMine={true}
           displayName={displayName}
           isSubmitting={isRatingSubmitting}
@@ -138,15 +146,15 @@ const TutorRatingSection: React.FC<TutorRatingSectionProps> = ({ tutorId }) => {
         <div className="flex justify-center py-10">
           <Loader2 className="animate-spin text-orange-500" size={32} />
         </div>
-      ) : tutorRatings.length === 0 && !myTutorRating ? (
+      ) : classRatings.length === 0 && !myClassRating ? (
         <div className="text-center py-10 text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-          Gia sư này chưa có đánh giá nào.
+          Lớp học này chưa có đánh giá nào.
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          {tutorRatings.map((rating) => {
+          {classRatings.map((rating) => {
             // Tránh render lại đánh giá của mình nếu API danh sách chung cũng trả về
-            if (myTutorRating && rating.id === myTutorRating.id) return null;
+            if (myClassRating && rating.id === myClassRating.id) return null;
 
             return <RatingItem key={rating.id} rating={rating} />;
           })}
@@ -167,4 +175,4 @@ const TutorRatingSection: React.FC<TutorRatingSectionProps> = ({ tutorId }) => {
   );
 };
 
-export default TutorRatingSection;
+export default ClassRatingSection;
