@@ -12,6 +12,7 @@ import { showToast } from "@/lib/redux/features/toastSlice";
 // 1. Import thư viện parser và component AuthenticatedImage
 import parse, { Element, HTMLReactParserOptions } from "html-react-parser";
 import { AuthenticatedImage } from "@/components/ui/AuthenticatedImage"; // <-- Điều chỉnh đường dẫn này nếu cần
+import ClassRatingSection from "@/screens/tutors/components/ClassRatingSection";
 
 interface OverviewTabProps {
   courseId: string;
@@ -110,7 +111,9 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
   };
 
   return (
-    <div className="bg-[#f9f9f9] rounded-2xl p-8 border border-gray-100 shadow-sm animate-in fade-in duration-500 flex flex-col min-h-[300px] justify-between">
+     <>
+
+         <div className="bg-[#f9f9f9] rounded-2xl p-8 border border-gray-100 shadow-sm animate-in fade-in duration-500 flex flex-col min-h-[300px] justify-between">
       <div className="space-y-6 text-gray-700 leading-relaxed text-[16px]">
         {currentCourse.description != "<p></p>" &&
           parse(currentCourse.description, parseOptions)}
@@ -191,7 +194,10 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ courseId }) => {
           </div>
         )}
       </div>
+
     </div>
+     <ClassRatingSection classId={courseId} />
+     </>
   );
 };
 

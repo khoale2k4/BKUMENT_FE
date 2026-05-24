@@ -2,7 +2,7 @@ import { API_ENDPOINTS } from "@/lib/apiEndPoints";
 import httpClient from "./http";
 
 export interface CreateRatingPayload {
-  tutorId: string;
+  classId: string;
   comment: string;
   score: number;
 }
@@ -10,7 +10,7 @@ export interface CreateRatingPayload {
 export interface Rating {
   id: string | number;
   userId: string;
-  tutorId: string;
+  classId: string;
   comment: string;
   score: number;
   createdAt: string;
@@ -21,45 +21,45 @@ export const createRating = async (
   payload: CreateRatingPayload,
 ): Promise<Rating> => {
   const response: any = await httpClient.post(
-    API_ENDPOINTS.RATINGS.RATING_TUTOR,
+    API_ENDPOINTS.RATINGS.RATING_CLASSES,
     payload,
   );
   return response.data || response;
 };
 
-export const getRatingsByTutorId = async (
-  tutorId: string,
+export const getRatingsByClassId = async (
+  classId: string,
   page: number,
   size: number,
 ): Promise<{ content: Rating[]; totalPages: number }> => {
   const response: any = await httpClient.get(
-    API_ENDPOINTS.RATINGS.GET_TUTOR_RATINGS(tutorId, page, size),
+    API_ENDPOINTS.RATINGS.GET_CLASSES_RATINGS(classId, page, size),
   );
   return response.data.result || response;
 };
 
-export const getTutorRatingSummary = async (
-  tutorId: string,
+export const getClassesRatingSummary = async (
+  classId: string,
 ): Promise<{
   totalReviews: number;
   averageScore: number;
   totalRatings: number;
 }> => {
   const response: any = await httpClient.get(
-    API_ENDPOINTS.RATINGS.GET_TUTOR_RATING_SUMMARY(tutorId),
+    API_ENDPOINTS.RATINGS.GET_CLASSES_RATING_SUMMARY(classId),
   );
   console.log("diem tong:", response);
   return response.data.result || response;
 };
 
-export const getMyRatingForTutor = async (
-  tutorId: string,
+export const getMyRatingForClass = async (
+  classId: string,
   userId: string,
 ): Promise<Rating | null> => {
   const response: any = await httpClient.get(
-    API_ENDPOINTS.RATINGS.GET_MY_TUTOR_RATING(tutorId, userId),
+    API_ENDPOINTS.RATINGS.GET_MY_CLASSES_RATING(classId, userId),
   );
-  console.log("MyRatingForTutor:", response);
+  console.log("MyRatingForClass:", response);
   return response.data.result || null;
 };
 
@@ -68,7 +68,7 @@ export const updateRating = async (
   payload: CreateRatingPayload,
 ): Promise<Rating> => {
   const response: any = await httpClient.put(
-    API_ENDPOINTS.RATINGS.UPDATE_RATING_TUTOR_BY_REVIEWID(ratingId),
+    API_ENDPOINTS.RATINGS.UPDATE_RATING_CLASSES_BY_REVIEWID(ratingId),
     payload,
   );
   return response.data || response;
@@ -76,6 +76,6 @@ export const updateRating = async (
 
 export const deleteRating = async (ratingId: string): Promise<void> => {
   await httpClient.delete(
-    API_ENDPOINTS.RATINGS.DELETE_RATING_TUTOR_BY_REVIEWID(ratingId),
+    API_ENDPOINTS.RATINGS.DELETE_RATING_CLASSES_BY_REVIEWID(ratingId),
   );
 };

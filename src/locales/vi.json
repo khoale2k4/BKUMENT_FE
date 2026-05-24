@@ -86,7 +86,8 @@
       "noCancelledTeaching": "Danh sách khóa học đã hủy trống.",
       "noActiveStudying": "Bạn chưa tham gia khóa học nào.",
       "noCancelledStudying": "Không có khóa học nào bị hủy.",
-      "errorLoading": "Lỗi tải dữ liệu khóa học"
+      "errorLoading": "Lỗi tải dữ liệu khóa học",
+      "reviews": "lượt đánh giá"
     },
     "status": {
       "ENROLLING": "Đang tuyển sinh",

@@ -86,7 +86,8 @@
       "noCancelledTeaching": "Cancelled courses list is empty.",
       "noActiveStudying": "You haven't joined any courses yet.",
       "noCancelledStudying": "No cancelled courses.",
-      "errorLoading": "Error loading course data"
+      "errorLoading": "Error loading course data",
+      "reviews": "reviews"
     },
     "status": {
       "ENROLLING": "Enrolling",

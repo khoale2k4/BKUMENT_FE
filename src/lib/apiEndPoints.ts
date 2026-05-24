@@ -183,22 +183,23 @@ export const API_ENDPOINTS = {
   },
 
   RATINGS: {
-    // http://143.198.80.199:8888/api/v1/social/ratings/tutor
-    RATING_TUTOR: buildUrl(`${SOCIAL}/ratings/tutor`),
-    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/9810c099-4de0-4c4c-89d1-0bbb6fc4b291?page=0&size=10
-    GET_TUTOR_RATINGS: (tutorId: string, page: number, size: number) =>
-      buildUrl(`${SOCIAL}/ratings/tutor/${tutorId}?page=${page}&size=${size}`),
-    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/0c099-4de0-4c4c-89d1-0bbb6fc4b291/summary
-    GET_TUTOR_RATING_SUMMARY: (tutorId: string) =>
-      buildUrl(`${SOCIAL}/ratings/tutor/${tutorId}/summary`),
-    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/0c099-4de0-4c4c-89d1-0bbb6fc4b291/user/477d787d-2c55-4383-b79b-8f3347ede4e8
-    GET_MY_TUTOR_RATING: (tutorId: string, userId: string) =>
-      buildUrl(`${SOCIAL}/ratings/tutor/${tutorId}/user/${userId}`),
-    // http://143.198.80.199:8888/api/v1/social/ratings/tutor/23232
-    UPDATE_RATING_TUTOR_BY_REVIEWID: (reviewId: string) =>
-      buildUrl(`${SOCIAL}/ratings/tutor/${reviewId}`),
-    DELETE_RATING_TUTOR_BY_REVIEWID: (reviewId: string) =>
-      buildUrl(`${SOCIAL}/ratings/tutor/${reviewId}`),
+   // https://api.bkument.io.vn/api/v1/social/ratings/classes
+    RATING_CLASSES: buildUrl(`${SOCIAL}/ratings/classes`),
+// https://api.bkument.io.vn/api/v1/social/ratings/classes/3dff109f-5aaf-4f40-b039-f4ec5ed22d65?page=0&size=10
+    GET_CLASSES_RATINGS: (classId: string, page: number, size: number) =>
+      buildUrl(`${SOCIAL}/ratings/classes/${classId}?page=${page}&size=${size}`),
+ // https://api.bkument.io.vn/api/v1/social/ratings/classes/3dff109f-5aaf-4f40-b039-f4ec5ed22d65/summary   
+    GET_CLASSES_RATING_SUMMARY: (classId: string) =>
+      buildUrl(`${SOCIAL}/ratings/classes/${classId}/summary`),
+// https://api.bkument.io.vn/api/v1/social/ratings/classes/3dff109f-5aaf-4f40-b039-f4ec5ed22d65/user/477d787d-2c55-4383-b79b-8f3347ede4e8
+    GET_MY_CLASSES_RATING: (classId: string, userId: string) =>
+      buildUrl(`${SOCIAL}/ratings/classes/${classId}/user/${userId}`),
+// https://api.bkument.io.vn/api/v1/social/ratings/classes/23dc0568-cbf0-4029-b01a-7a2aa715f43c
+    UPDATE_RATING_CLASSES_BY_REVIEWID: (reviewId: string) =>
+      buildUrl(`${SOCIAL}/ratings/classes/${reviewId}`),
+// https://api.bkument.io.vn/api/v1/social/ratings/classes/23dc0568-cbf0-4029-b01a-7a2aa715f43c
+    DELETE_RATING_CLASSES_BY_REVIEWID: (reviewId: string) =>
+      buildUrl(`${SOCIAL}/ratings/classes/${reviewId}`),
   },
 
   HOME: {
