@@ -215,21 +215,21 @@ const ChatInput = () => {
   // ==========================================
   // [BỔ SUNG]: KHỞI TẠO VCONSOLE DÀNH CHO MOBILE
   // ==========================================
-  useEffect(() => {
-    // Chỉ chạy ở phía Client và kiểm tra xem vConsole đã được load chưa để tránh bị duplicate
-    if (typeof window !== "undefined" && !(window as any).VConsole) {
-      const script = document.createElement("script");
-      script.src = "https://unpkg.com/vconsole@latest/dist/vconsole.min.js";
-      script.onload = () => {
-        // Khởi tạo vConsole sau khi tải xong script
-        new (window as any).VConsole();
-        console.log(
-          "✅ vConsole đã khởi tạo thành công! Hãy xem log lỗi ở đây.",
-        );
-      };
-      document.body.appendChild(script);
-    }
-  }, []);
+  // useEffect(() => {
+  //   // Chỉ chạy ở phía Client và kiểm tra xem vConsole đã được load chưa để tránh bị duplicate
+  //   if (typeof window !== "undefined" && !(window as any).VConsole) {
+  //     const script = document.createElement("script");
+  //     script.src = "https://unpkg.com/vconsole@latest/dist/vconsole.min.js";
+  //     script.onload = () => {
+  //       // Khởi tạo vConsole sau khi tải xong script
+  //       new (window as any).VConsole();
+  //       console.log(
+  //         "✅ vConsole đã khởi tạo thành công! Hãy xem log lỗi ở đây.",
+  //       );
+  //     };
+  //     document.body.appendChild(script);
+  //   }
+  // }, []);
   // ==========================================
 
   const handleSendMessage = () => {
@@ -240,7 +240,6 @@ const ChatInput = () => {
         message: text.trim(),
         type: "TEXT",
         tempId: DateTime.now().toString(),
-        // @ts-ignore - Bỏ qua lỗi nếu type trong slice chưa update kịp
         attachedUrl: "",
       }),
     );
