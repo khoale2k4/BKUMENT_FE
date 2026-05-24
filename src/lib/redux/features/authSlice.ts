@@ -310,6 +310,7 @@ export const authSlice = createSlice({
       if (typeof window !== "undefined") {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("currentRole");
+        localStorage.removeItem("vbook_onboarded");
         const currentPath = window.location.pathname + window.location.search;
         if (!currentPath.includes("/login")) {
           localStorage.setItem("redirectUrl", currentPath);
@@ -385,6 +386,7 @@ export const authSlice = createSlice({
         if (typeof window !== "undefined") {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("currentRole");
+          localStorage.removeItem("vbook_onboarded");
           const currentPath = window.location.pathname + window.location.search;
           if (!currentPath.includes("/login")) {
             localStorage.setItem("redirectUrl", currentPath);
@@ -403,6 +405,7 @@ export const authSlice = createSlice({
         if (typeof window !== "undefined") {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("currentRole");
+          localStorage.removeItem("vbook_onboarded");
           const currentPath = window.location.pathname + window.location.search;
           if (!currentPath.includes("/login")) {
             localStorage.setItem("redirectUrl", currentPath);
@@ -445,6 +448,7 @@ export const authSlice = createSlice({
         if (typeof window !== "undefined") {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("currentRole");
+          localStorage.removeItem("vbook_onboarded");
           const currentPath = window.location.pathname + window.location.search;
           if (!currentPath.includes("/login")) {
             localStorage.setItem("redirectUrl", currentPath);
